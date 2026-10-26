@@ -1,0 +1,46 @@
+<!doctype html><html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600&family=IBM+Plex+Mono:wght@400;500;600&display=block" rel="stylesheet">
+<style>
+:root{--ink:#111318;--soft:#3A3F4B;--grid:#E3E5E9;--accent:#1D4ED8}
+*{box-sizing:border-box;margin:0}
+html,body{width:1200px;height:630px;overflow:hidden;background:#fff;color:var(--ink)}
+.og{position:relative;width:1200px;height:630px;border:0;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:28px 28px;background-position:-1px -1px}
+.frame{position:absolute;inset:36px 48px;border:1px solid var(--ink);background:#fff;display:grid;grid-template-columns:230px 1fr;grid-template-rows:auto 1fr}
+.id{border-right:1px solid var(--ink);border-bottom:1px solid var(--ink);padding:28px;display:flex;flex-direction:column;justify-content:space-between;gap:20px;position:relative}
+.id::after{content:"";position:absolute;right:-12px;bottom:-1px;width:23px;height:11px;background:var(--ink);
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 23 11'%3E%3Cpath d='M0 11A11 11 0 0 0 11 0h1a11 11 0 0 0 11 11z'/%3E%3C/svg%3E") 0 0/100% 100% no-repeat}
+.mark{font-family:'Space Grotesk';font-size:64px;font-weight:600;letter-spacing:-.04em;line-height:1}
+.id p{font-family:'IBM Plex Mono';font-size:13px;line-height:1.6;letter-spacing:.04em;text-transform:uppercase}
+.title{border-bottom:1px solid var(--ink);padding:28px 32px;display:flex;align-items:flex-end}
+h1{font-family:'Space Grotesk';font-size:66px;font-weight:300;line-height:1.05;letter-spacing:-.03em}
+.hl{background:var(--ink);color:#fff;padding:0 10px;font-weight:400}
+.bottom{grid-column:1/-1;position:relative;overflow:hidden;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:28px 28px;background-position:-1px -1px;
+  padding:30px 32px;display:flex;flex-direction:column;justify-content:space-between}
+.years{align-self:flex-start;transform:rotate(-6deg);padding:8px 24px;border:1.5px solid var(--ink);border-radius:999px;background:#fff;box-shadow:5px 5px 0 var(--ink);font-family:'Space Grotesk';font-size:28px;letter-spacing:-.02em}
+.pills{display:flex;gap:12px;list-style:none;padding:0}
+.pill{padding:8px 18px;border:1.5px solid var(--ink);border-radius:999px;background:#fff;box-shadow:4px 4px 0 var(--ink);font-family:'IBM Plex Mono';font-size:15px;font-weight:500}
+.pill.dark{background:var(--ink);color:#fff;box-shadow:4px 4px 0 var(--accent)}
+.pill.ai{border-color:var(--accent);color:var(--accent);box-shadow:4px 4px 0 var(--accent);font-weight:600}
+.r1{transform:rotate(-4deg)}.r2{transform:rotate(3deg)}.r3{transform:rotate(-2deg)}.r4{transform:rotate(4deg)}
+.photo{position:absolute;right:16px;bottom:0;height:356px;width:auto}
+.tag{font-family:'Space Grotesk';font-size:38px;font-weight:300;line-height:1.1;letter-spacing:-.03em;max-width:620px;background:#fff;padding:4px 0}
+.url{position:absolute;right:48px;bottom:12px;font-family:'IBM Plex Mono';font-size:12px;color:var(--soft);letter-spacing:.04em}
+</style></head><body>
+<div class="og">
+  <div class="frame">
+    <div class="id"><span class="mark">AFW</span><p>Agung Fitrah Wibowo<br>Deli Serdang, Sumut</p></div>
+    <div class="title"><h1><span class="hl">Front-End</span> Developer<br>&amp; UI/UX Designer</h1></div>
+    <div class="bottom">
+      <span class="years">+7 tahun</span>
+      <p class="tag">Dari desain di Figma, sampai kode yang rapi.</p>
+      <ul class="pills">
+        <li class="pill dark r1">HTML</li><li class="pill dark r2">CSS</li><li class="pill r3">React</li><li class="pill r4">Vue.js</li><li class="pill r1">Figma</li><li class="pill ai r2">Claude Code</li>
+      </ul>
+      <img class="photo" src="assets/foto-agung.webp" alt="">
+    </div>
+  </div>
+  <span class="url">agungfwibowo.github.io/portfolio</span>
+</div>
+</body></html>
