@@ -157,6 +157,10 @@
     }).join('');
     var ph = SITE.skills.photo, img = document.querySelector('[data-photo]');
     img.src = A + ph.src; img.alt = ph.alt; img.width = ph.width; img.height = ph.height;
+    img.setAttribute('aria-label', UI.photoLink);
+    var st = document.querySelectorAll('.stickers .st'), sk = SITE.skills.stickers;
+    st.forEach(function (n, i) { var v = sk[i] || ''; n.innerHTML = (Array.isArray(v) ? v : [v]).map(esc).join('<br>'); });
+    var li = document.querySelector('[data-in]'); li.href = C.linkedin; li.textContent = UI.linkedin;
   }
   fillStatic();
 
@@ -213,7 +217,7 @@
 
   // reveal saat scroll: elemen yang masuk layar bersamaan muncul berurutan
   // daftar selector sama dengan di css/style.css
-  var RV = '.mark, .id p, .title h1, .roles, .years, .tagline p, .sec-head, .tabs-wrap, .half > *, .skills-head > *, .group, .skills-photo, .plus';
+  var RV = '.mark, .id p, .title h1, .roles, .years, .tagline p, .sec-head, .tabs-wrap, .half > *, .skills-head > *, .group, .skills-photo, .stickers, .plus';
   var rvs = document.querySelectorAll(RV);
   window.__rv = true;
   function startReveal() {
@@ -303,6 +307,30 @@
       cur.classList.toggle('big', !!e.target.closest('a, button, .tab'));
     });
     document.documentElement.addEventListener('mouseleave', function () { cur.classList.remove('on'); });
+  }
+
+  // foto profil: klik membuka LinkedIn; di desktop miring 3D mengikuti arah mouse
+  var photo = document.querySelector('[data-photo]'), stk = document.querySelector('.stickers');
+  var openIn = function () { window.open(SITE.contact.linkedin, '_blank', 'noopener'); };
+  photo.addEventListener('click', openIn);
+  photo.addEventListener('keydown', function (e) { if (e.key === 'Enter') openIn(); });
+  if (!reduce && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    photo.addEventListener('mousemove', function (e) {
+      var r = photo.getBoundingClientRect();
+      var px = (e.clientX - r.left) / r.width - 0.5, py = (e.clientY - r.top) / r.height - 0.5;
+      photo.classList.add('tilting');
+      photo.style.transform = 'perspective(900px) rotateY(' + (px * 28).toFixed(1) + 'deg) rotateX(' + (-py * 28).toFixed(1) + 'deg) scale(1.03)';
+      photo.style.setProperty('--sx', (-px * 16).toFixed(1) + 'px');
+      photo.style.setProperty('--sy', (-py * 16).toFixed(1) + 'px');
+      stk.classList.add('tilting');
+      stk.style.transform = 'translate(' + (px * 14).toFixed(1) + 'px,' + (py * 14).toFixed(1) + 'px)';
+    });
+    photo.addEventListener('mouseleave', function () {
+      photo.classList.remove('tilting');
+      photo.style.transform = '';
+      photo.style.setProperty('--sx', '0px'); photo.style.setProperty('--sy', '0px');
+      stk.classList.remove('tilting'); stk.style.transform = '';
+    });
   }
 
   var last = performance.now();

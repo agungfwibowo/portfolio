@@ -15,7 +15,8 @@ window.SITE.id = {
     play: 'Putar', pause: 'Jeda', ariaPlay: 'Putar rotasi otomatis', ariaPause: 'Jeda rotasi otomatis',
     color: 'Warna', mono: 'Mono', ariaColor: 'Tampilkan screenshot berwarna', ariaMono: 'Tampilkan screenshot hitam-putih',
     jobsList: 'Riwayat kerja', prosList: 'Daftar proyek', mainView: 'tampilan utama', view: 'tampilan',
-    top: 'Kembali ke atas ↑'
+    top: 'Kembali ke atas ↑',
+    linkedin: 'LinkedIn ↗', photoLink: 'Buka profil LinkedIn Agung'
   },
 
   profile: {
@@ -39,13 +40,16 @@ window.SITE.id = {
   contact: {
     email: 'agungf.wibowo@gmail.com',
     phone: '+62 822 8571 5959',
-    address: 'Percut Sei Tuan, Deli Serdang'
+    address: 'Percut Sei Tuan, Deli Serdang',
+    linkedin: 'https://www.linkedin.com/in/agungfwibowo/'
   },
 
   skills: {
     title: ['Keahlian & tools', 'yang dikuasai :'],
     badge: 'Desain + Kode',
     photo: { src: 'foto-agung.webp', alt: 'Agung Fitrah Wibowo duduk di kursi kerja', width: 600, height: 1094 },
+    // stiker di sekitar foto: [pill putih, lingkaran hitam (2 baris), badge biru]
+    stickers: ['Halo, saya Agung!', ['Tinggal di', 'Medan'], 'Figma → Kode'],
     // style: 'dark' | 'light' | 'ai'; icon = kunci di js/icons.js (boleh dikosongkan)
     groups: [
       { label: 'Mahir', style: 'dark', items: [
@@ -98,7 +102,8 @@ window.SITE.en = {
     play: 'Play', pause: 'Pause', ariaPlay: 'Play autoplay', ariaPause: 'Pause autoplay',
     color: 'Color', mono: 'Mono', ariaColor: 'Show screenshots in color', ariaMono: 'Show screenshots in black & white',
     jobsList: 'Work history', prosList: 'Project list', mainView: 'main view', view: 'view',
-    top: 'Back to top ↑'
+    top: 'Back to top ↑',
+    photoLink: 'Open Agung\'s LinkedIn profile'
   },
 
   profile: {
@@ -117,6 +122,7 @@ window.SITE.en = {
     title: ['Skills & tools', 'I work with:'],
     badge: 'Design + Code',
     photo: { alt: 'Agung Fitrah Wibowo sitting in an office chair' },
+    stickers: ["Hi, I'm Agung!", ['Based in', 'Medan'], 'Figma → Code'],
     groups: [
       { label: 'Advanced' },
       { label: 'Intermediate' },

@@ -22,7 +22,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=12">
+<link rel="stylesheet" href="css/style.css?v=16">
 <script>
 (function (d) {
   d.classList.add('js');
@@ -32,9 +32,9 @@
   setTimeout(function () { if (!window.__rv) d.classList.remove('js', 'loading'); }, 2500);
 })(document.documentElement);
 </script>
-<script src="js/data.js?v=13" defer></script>
+<script src="js/data.js?v=15" defer></script>
 <script src="js/icons.js?v=1" defer></script>
-<script src="js/main.js?v=15" defer></script>
+<script src="js/main.js?v=17" defer></script>
 </head>
 <body>
 <div class="loader" aria-hidden="true"><b data-t="profile.mark"></b><i></i><span data-pct>0%</span></div>
@@ -89,7 +89,7 @@
 <section class="panel half contact" aria-labelledby="h-contact">
 <h2 class="h2" id="h-contact" data-t="ui.contact"></h2>
 <a class="mail" data-mail></a>
-<p><a class="tel" data-tel></a><br><span data-t="contact.address"></span></p>
+<p><a class="tel" data-tel></a><br><span data-t="contact.address"></span><br><a class="in" data-in target="_blank" rel="noopener"></a></p>
 </section>
 
 <!-- Keahlian -->
@@ -100,7 +100,8 @@
 </div>
 <div class="gridbg skills-wrap">
 <div class="skills-list" data-skills></div>
-<img class="skills-photo" data-photo alt="" loading="lazy" decoding="async">
+<img class="skills-photo" data-photo alt="" loading="lazy" decoding="async" role="link" tabindex="0">
+<div class="stickers" aria-hidden="true"><span class="st st-pill"></span><span class="st st-dark"></span><span class="st st-blue"></span></div>
 </div>
 </section>
 
