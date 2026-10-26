@@ -1,7 +1,8 @@
 :root{--ink:#111318;--muted:#5A5F6B;--soft:#3A3F4B;--line:#DADDE3;--grid:#E3E5E9;--accent:#1D4ED8;--paper:#FFFFFF;
   --display:'Space Grotesk',sans-serif;--mono:'IBM Plex Mono',monospace}
 *{box-sizing:border-box}
-html,body{overscroll-behavior:none}
+/* tanpa efek rubber hanya di desktop (mouse/trackpad); di layar sentuh pull-to-refresh tetap jalan */
+@media (hover:hover) and (pointer:fine){html,body{overscroll-behavior:none}}
 html{scroll-behavior:smooth}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;-webkit-font-smoothing:antialiased}
 img{max-width:100%}
