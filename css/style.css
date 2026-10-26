@@ -44,12 +44,21 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
 .shot{transition:filter .4s ease}
 .pro-panel.mono .shot{filter:grayscale(1)}
 .ctrl:focus-visible,.tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.tabs-wrap{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start}
-.tablist{min-width:0;display:flex;flex-direction:column;border-top:1px solid var(--ink)}
+.tabs-wrap{--gap:28px;display:flex;flex-wrap:wrap;gap:var(--gap);align-items:flex-start}
+.tablist{min-width:0;display:flex;flex-direction:column;border:1px solid var(--ink);border-bottom:0}
 .tab{width:100%;text-align:left;border:0;cursor:pointer;font:inherit;background:var(--paper);color:var(--ink)}
 .tab,.tab *{transition:background-color .3s ease,color .3s ease}
 .tab[aria-selected="true"]{background:var(--ink);color:#fff}
-.bar{height:1px;background:var(--ink)}
+.bar{position:relative;height:1px;background:var(--ink)}
+/* desktop, saat tab & isi berdampingan: garis titik kecil sepanjang baris (tepi frame → kotak tab → celah → garis progres → tepi frame) */
+.tabs-wrap.side{position:relative}
+.tabs-wrap.side>*{position:relative;z-index:1}
+.tabs-wrap.side::before{content:"";position:absolute;top:0;left:-32px;right:-32px;height:1px;z-index:0;background:repeating-linear-gradient(90deg,var(--ink) 0 2px,transparent 2px 5px)}
+/* garis titik vertikal: sisi kiri & kanan kotak tab diteruskan ke atas dan bawah sampai batas section */
+@media (min-width:840px){.sec:has(.tabs-wrap.side){overflow:clip}}
+.tabs-wrap.side .tablist::before{content:"";position:absolute;top:-100vh;bottom:-100vh;left:-1px;right:-1px;pointer-events:none;background:repeating-linear-gradient(180deg,var(--ink) 0 2px,transparent 2px 5px) left/1px 100% no-repeat,repeating-linear-gradient(180deg,var(--ink) 0 2px,transparent 2px 5px) right/1px 100% no-repeat}
+/* garis titik juga dari tepi kiri frame ke sudut bawah kotak tab */
+.tabs-wrap.side .tablist::after{content:"";position:absolute;bottom:0;left:-32px;right:100%;height:1px;background:repeating-linear-gradient(90deg,var(--ink) 0 2px,transparent 2px 5px)}
 .bar>i{display:block;height:3px;margin-top:-1px;background:var(--accent);width:0}
 
 .jobs{flex:1 1 220px}
@@ -63,7 +72,6 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
 .job-panel h3{margin:0;font-family:var(--display);font-size:28px;font-weight:400;letter-spacing:-.02em;line-height:1.1}
 .job-panel .role{margin:0;font-family:var(--mono);font-size:14px;font-weight:600;color:var(--accent)}
 .job-panel .desc{margin:0;font-family:var(--mono);font-size:14px;line-height:1.7;color:var(--soft)}
-.plus{margin:0;font-family:var(--mono);font-size:13px;letter-spacing:.2em}
 
 /* edu + contact */
 .half{flex:1 1 360px;display:flex;flex-direction:column;gap:22px}
@@ -103,7 +111,7 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
 .tape-item .ico{width:17px;height:17px}
 .tape-plus{width:14px;height:14px;flex-shrink:0;color:#6E9BFF}
 /* desktop: pita memudar ke kanan saat lewat di belakang foto */
-@media (min-width:761px){.tape{-webkit-mask-image:linear-gradient(90deg,#000 55%,transparent 82%);mask-image:linear-gradient(90deg,#000 55%,transparent 82%)}}
+@media (min-width:600px){.tape{-webkit-mask-image:linear-gradient(90deg,#000 55%,transparent 82%);mask-image:linear-gradient(90deg,#000 55%,transparent 82%)}}
 /* variasi: menengah = pita putih miring kanan & berjalan berlawanan; AI = pita biru */
 .tape-light .tape{rotate:1.5deg;background:#fff;color:var(--ink);border-block:1.5px solid var(--ink);box-shadow:0 5px 0 var(--ink)}
 .tape-light .tape-track{animation-direction:reverse}
@@ -136,15 +144,25 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
 .stickers .st{transition:opacity .4s ease,scale .6s cubic-bezier(.34,1.56,.64,1)}
 /* stiker LinkedIn: hanya di layar sentuh (tanpa kursor), bisa di-tap */
 .st-in{display:none}
-@media (hover:none){.st-in{display:inline-flex;right:4%;bottom:16%;padding:8px 14px;border-radius:999px;background:var(--accent);color:#fff;
-  font-family:var(--mono);font-size:13px;font-weight:600;text-decoration:none;pointer-events:auto;rotate:-5deg}}
+/* desktop: foto diukur dari tinggi area keahlian supaya terlihat utuh dari kepala sampai kaki */
+@media (min-width:600px){
+  .skills-photo,.stickers{top:32px;right:4%;height:calc(100% - 64px);width:auto;aspect-ratio:600/1094}
+  /* foto lebih kecil: stiker ikut mengecil dan digeser ke tepi supaya tidak menutupi wajah */
+  .st-pill{top:4%;left:-48%;padding:6px 14px;font-size:15px}
+  .st-dark{top:40%;right:-8%;width:76px;height:76px;font-size:10px}
+  .st-blue{bottom:14%;left:-30%;padding:8px 13px;font-size:14px}
+}
+/* stiker LinkedIn: tampil di perangkat sentuh (tanpa kursor berlabel) dan di tata letak ponsel */
+.st-in{right:4%;bottom:16%;padding:8px 14px;border-radius:999px;background:var(--accent);color:#fff;
+  font-family:var(--mono);font-size:13px;font-weight:600;text-decoration:none;pointer-events:auto;rotate:-5deg}
+@media (hover:none),(max-width:599px){.stickers .st-in{display:inline-flex}}
 .stickers.in .st:nth-child(1){transition-delay:.35s}.stickers.in .st:nth-child(2){transition-delay:.5s}.stickers.in .st:nth-child(3){transition-delay:.65s}.stickers.in .st:nth-child(4){transition-delay:.8s}
 
 /* projects */
 .last{border-bottom:0}
-.tabs-wrap.wide{gap:32px}
+.tabs-wrap.wide{--gap:32px}
 .pros{flex:1 1 260px}
-.pro{display:grid;grid-template-columns:28px minmax(0,1fr);column-gap:8px;align-items:baseline;padding:11px 14px;border-bottom:1px solid var(--line)}
+.pro{display:grid;grid-template-columns:28px minmax(0,1fr);column-gap:8px;align-items:baseline;padding:11px 14px;border-bottom:1px solid var(--ink)}
 .pro .no{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--accent)}
 .pro .nm{display:flex;flex-direction:column;gap:2px}
 .pro .nm b{font-family:var(--display);font-size:16px;font-weight:400}
@@ -232,12 +250,14 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
   .cta.wide .cta-body{transform:none}
 }
 /* isi CTA di tengah, footer menempel di bawah section yang sama */
-.cta-body{flex:1;display:flex;flex-direction:column;justify-content:center;gap:24px}
+.cta-body{flex:1;display:flex;flex-direction:column;justify-content:center;gap:24px;opacity:.9}
 .cta-text{margin-top:8px!important}
 .cta{display:flex;flex-direction:column;gap:56px;background:var(--ink);color:#fff;
   background-image:linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px);background-size:var(--cell,28px) var(--cell,28px);background-position:-1px calc(-1px + var(--gy,0px))}
 /* kanvas cahaya WebGL di belakang isi CTA & pita keahlian, di atas grid */
 .cta{position:relative;z-index:9}
+/* grain di atas isi CTA: noise terang dengan bintik gelap, multiply → teks putih, sorotan biru & tombol ikut berbintik; area hitam tetap hitam */
+.cta::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='2.4' intercept='-.35'/%3E%3CfeFuncG type='linear' slope='2.4' intercept='-.35'/%3E%3CfeFuncB type='linear' slope='2.4' intercept='-.35'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E") 0 0/180px 180px;mix-blend-mode:multiply;opacity:.9}
 .glow{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
 .cta-body,.cta .foot,.skills-head>*{position:relative;z-index:1}
 /* pita keahlian: kanvas selebar layar seperti latar hitamnya */
@@ -291,10 +311,10 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
   /* header lebih ringkas */
   .title{padding-top:32px;gap:20px}
   /* tab jadi strip horizontal agar detail langsung terlihat di bawahnya */
-  .tabs-wrap,.tabs-wrap.wide{gap:20px}
+  .tabs-wrap,.tabs-wrap.wide{--gap:20px}
   .tablist{flex:1 1 100%;flex-direction:row;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scrollbar-width:none;border-top:0;border-left:1px solid var(--ink)}
   /* strip tab selebar layar: keluar dari padding panel 20px kiri-kanan */
-  .tablist{margin:0 -20px;padding:0 20px;scroll-padding:0 20px;border-left:0}
+  .tablist{margin:0 -20px;padding:0 20px;scroll-padding:0 20px;border-left:0;border-right:0}
   /* tab pertama sejajar judul (20px dari tepi), garis kirinya pindah ke tab itu */
   .tablist>:first-child{border-left:1px solid var(--ink)}
   .tablist::-webkit-scrollbar{display:none}
@@ -302,6 +322,9 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
   .job{min-width:170px}
   .pro{min-width:190px;border-color:var(--ink)}
   .job-panel{min-height:0}
+}
+/* keahlian versi ponsel (foto di bawah pita) hanya di bawah 600px; 600px ke atas pakai tata letak desktop */
+@media (max-width:599px){
   .skills-wrap{flex-direction:column;align-items:stretch;padding-bottom:0}
   .skills-list{width:100%}
   /* grup AI di kiri, foto (crop 50% atas) di kanan pada baris yang sama, menempel tepi kanan & bawah */
@@ -316,7 +339,6 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
   /* foto & stiker di atas lapisan fade, jadi hanya grid yang memudar */
   .only-tapes .skills-photo{position:relative;z-index:4;-webkit-mask-image:linear-gradient(#000 82%,transparent);mask-image:linear-gradient(#000 82%,transparent)}
   .only-tapes .stickers{z-index:5}
-  .only-tapes .st-in{bottom:12%}
   .panel.skills{border-bottom:0}
   /* grid + foto sama-sama memudar ke putih di bawah section */
   .skills-wrap.only-tapes::after{content:"";position:absolute;left:0;right:0;bottom:0;height:300px;z-index:3;pointer-events:none;background:linear-gradient(transparent,var(--paper) 85%)}
@@ -325,10 +347,10 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
   .stickers{position:relative;right:auto;top:auto;grid-column:2;grid-row:var(--pr,3);align-self:end;width:calc(100% + 20px);margin-right:-20px;aspect-ratio:600/547}
   /* stiker mobile: lebih kecil & tidak saling menumpuk */
   .st{border-width:2px;box-shadow:0 0 0 1px var(--ink),3px 3px 0 1px var(--ink)}
-  .st-pill{top:0;left:-12%;font-size:11px;padding:4px 9px}
+  .st-pill{top:4%;left:-2%;font-size:11px;padding:4px 9px}
   .st-dark{top:28%;right:3%;width:52px;height:52px;font-size:7px;letter-spacing:.04em}
-  .st-blue{display:none}
-  .st-in{right:auto;left:14%;bottom:10%;font-size:10px;padding:4px 9px}
+  .st-blue{bottom:26%;left:-6%;font-size:11px;padding:4px 9px;border-radius:9px}
+  .st-in{right:-2%;left:auto;bottom:12%;font-size:10px;padding:4px 9px}
   .skills-photo{position:static;grid-column:2;grid-row:var(--pr,3);align-self:end;width:calc(100% + 20px);max-width:none;aspect-ratio:600/547;object-fit:cover;object-position:top;margin:0 -20px 0 0}
 }
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.cta,.cta-body{transition:none}.tape-track{animation:none}.js .stickers .st{opacity:1;scale:1;transition:none}.cursor{display:none}.pill{transform:none}.js :is(.mark,.id p,.title h1,.roles,.years,.tagline p,.sec-head,.tabs-wrap,.half>*,.skills-head>*,.group,.skills-photo,.plus,.cta-in){opacity:1;translate:none;filter:none;transition:none}}

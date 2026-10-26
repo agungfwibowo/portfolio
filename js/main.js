@@ -194,6 +194,9 @@
       state[key].paused = !state[key].paused; renderCtrl(key);
     });
     var list = document.querySelector('[data-list="' + key + '"]');
+    // autoplay berhenti sementara selama kursor di atas daftar tab (mouse saja, bukan sentuhan)
+    list.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') state[key].hover = true; });
+    list.addEventListener('pointerleave', function () { state[key].hover = false; });
     list.addEventListener('scroll', function () { edges(list); }, { passive: true });
     window.addEventListener('resize', function () { edges(list); });
     edges(list);
@@ -456,13 +459,23 @@
     else window.addEventListener('scroll', function () { clearTimeout(snapT); snapT = setTimeout(trySnap, 160); }, { passive: true });
   }
 
+  // tandai tabs-wrap saat daftar tab & isinya berdampingan (tidak turun baris) untuk garis titik penghubung
+  var sides = function () {
+    document.querySelectorAll('.tabs-wrap').forEach(function (w) {
+      var a = w.children[0], b = w.children[1];
+      w.classList.toggle('side', window.innerWidth >= 840 && !!b && Math.abs(a.offsetTop - b.offsetTop) < 2);
+    });
+  };
+  window.addEventListener('resize', sides);
+  sides();
+
   var last = performance.now();
   function tick(now) {
     var dt = now - last; last = now;
     if (document.visibilityState === 'visible') {
       ['jobs', 'pros'].forEach(function (key) {
         var s = state[key];
-        if (s.paused || !s.seen) return;
+        if (s.paused || s.hover || !s.seen) return;
         s.t += dt;
         if (s.t >= CFG[key].dur) { s.t = 0; s.i = (s.i + 1) % DATA[key].length; render(key); }
         bar(key);
@@ -472,7 +485,7 @@
   }
   requestAnimationFrame(tick);
 
-  // cahaya biru mengalir seperti ombak + grain (WebGL) untuk bidang hitam, jalan hanya saat terlihat
+  // cahaya menembus tirai kain yang tertiup angin + grain (WebGL) untuk bidang hitam, jalan hanya saat terlihat
   var glow = function (host) {
   var cv = host && document.createElement('canvas');
   var gl = cv && (cv.getContext('webgl', { premultipliedAlpha: true, antialias: false }) || cv.getContext('experimental-webgl'));
@@ -488,18 +501,20 @@
       ' return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);}',
       'float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<4;i++){v+=a*n(p);p=p*2.03+vec2(1.7,9.2);a*=.5;}return v;}',
       'void main(){',
-      ' vec2 uv=gl_FragCoord.xy/r;vec2 q=vec2(uv.x*r.x/r.y,uv.y);',
-      // domain warp → gerak bergelombang, mengalir ke samping (kiri → kanan); noise dipipihkan vertikal jadi alur horizontal
-      ' vec2 s=q*vec2(1.,2.2);vec2 w=vec2(fbm(s*1.2-vec2(t*.16,0.)),fbm(s*1.2-vec2(t*.12,0.)+5.2));',
-      ' float f=fbm(s*1.5+w*1.4-vec2(t*.14,0.));',
-      // berkas cahaya diagonal dari kanan atas
-      ' vec2 o=vec2(r.x/r.y*.78,1.05);vec2 d=normalize(vec2(-.55,-1.));vec2 v=q-o;',
-      ' float along=dot(v,d);float across=dot(v,vec2(-d.y,d.x))+(w.x-.5)*.35;',
-      ' float beam=exp(-across*across*7.)*smoothstep(-.1,.35,along)*exp(-along*.9);',
-      ' float a=clamp(beam*(.35+.9*f)+f*f*.12,0.,1.)*.85;',
-      ' vec3 c=mix(vec3(.16,.36,.42),vec3(.16,.33,.92),smoothstep(.35,.75,f));',
-      // grain: titik terang & gelap acak tiap frame, lebih kuat di area bercahaya
-      ' float g=(h(gl_FragCoord.xy+fract(floor(t*8.)*.37)*91.)-.5)*(.12+a*.16);',
+      ' vec2 uv=gl_FragCoord.xy/r;float asp=r.x/r.y;vec2 q=vec2(uv.x*asp,uv.y);',
+      // lipatan kain vertikal; noise membuat lipatan bengkok & bergeser seperti tertiup angin dari samping
+      ' float wx=q.x*2.4+(fbm(vec2(q.x*1.1-t*.07,q.y*.7+t*.02))-.5)*2.4;',
+      ' float fold=sin(wx*3.1+t*.35)*.5+.5;',
+      ' fold=fold*.7+(sin(wx*7.3-t*.22+fbm(q*2.+t*.05)*3.)*.5+.5)*.3;',
+      ' float crest=pow(fold,3.);',
+      // cahaya jatuh dari kanan atas, memudar ke bawah & ke kiri
+      ' vec2 lp=vec2(asp*.72,1.15);float d=length((q-lp)*vec2(.55,1.));',
+      ' float spot=exp(-d*d*1.6)*(.45+.55*smoothstep(-.1,1.,uv.y));',
+      ' float a=clamp(crest*spot*.95+spot*.1,0.,1.);',
+      ' float tint=smoothstep(.45,.8,fbm(q*1.3-vec2(t*.05,0.)));',
+      ' vec3 c=mix(vec3(.42,.55,.58),vec3(.22,.38,.92),tint*.55);',
+      // grain diam, hanya muncul di bagian yang terkena cahaya (area gelap tetap bersih)
+      ' float g=(h(gl_FragCoord.xy)-.5)*a*.45;',
       ' gl_FragColor=vec4(c*a+max(g,0.),clamp(a+abs(g),0.,1.));',
       '}'
     ].join('\n');
