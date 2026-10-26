@@ -285,7 +285,7 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
   .skills-wrap.only-tapes{row-gap:0;padding-bottom:88px}
   .only-tapes .skills-photo,.only-tapes .stickers{grid-column:1/-1;justify-self:center;width:min(72%,300px);margin:36px 0 0}
   /* foto & stiker di atas lapisan fade, jadi hanya grid yang memudar */
-  .only-tapes .skills-photo{position:relative;z-index:4}
+  .only-tapes .skills-photo{position:relative;z-index:4;-webkit-mask-image:linear-gradient(#000 75%,transparent);mask-image:linear-gradient(#000 75%,transparent)}
   .only-tapes .stickers{z-index:5}
   /* parallax mobile: transform diatur JS tiap frame, jadi tanpa transisi transform */
   .skills-wrap.only-tapes .skills-photo{transition:opacity .9s cubic-bezier(.16,1,.3,1) var(--d,0s),translate .9s cubic-bezier(.16,1,.3,1) var(--d,0s)}

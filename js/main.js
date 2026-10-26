@@ -370,7 +370,7 @@
       if (!mqMobile.matches) { photo.style.transform = stk.style.transform = ''; return; }
       var r = pWrap.getBoundingClientRect(), vh = window.innerHeight;
       if (r.bottom < 0 || r.top > vh) return;
-      var y = Math.max(-40, Math.min(40, -(r.top + r.height / 2 - vh / 2) * 0.12));
+      var y = Math.max(-70, Math.min(70, -(r.top + r.height / 2 - vh / 2) * 0.25));
       photo.style.transform = stk.style.transform = 'translate3d(0,' + y.toFixed(1) + 'px,0)';
     };
     var onPScroll = function () { if (!pTick) { pTick = true; requestAnimationFrame(photoParallax); } };
