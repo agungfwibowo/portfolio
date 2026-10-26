@@ -16,7 +16,7 @@ window.SITE.id = {
     color: 'Warna', mono: 'Mono', ariaColor: 'Tampilkan screenshot berwarna', ariaMono: 'Tampilkan screenshot hitam-putih',
     jobsList: 'Riwayat kerja', prosList: 'Daftar proyek', mainView: 'tampilan utama', view: 'tampilan',
     top: 'Kembali ke atas ↑',
-    linkedin: 'LinkedIn ↗', photoLink: 'Buka profil LinkedIn Agung'
+    linkedin: 'LinkedIn ↗', photoLink: 'Buka profil LinkedIn Agung', cursorIn: 'Lihat LinkedIn ↗'
   },
 
   profile: {
@@ -50,18 +50,18 @@ window.SITE.id = {
     photo: { src: 'foto-agung.webp', alt: 'Agung Fitrah Wibowo duduk di kursi kerja', width: 600, height: 1094 },
     // stiker di sekitar foto: [pill putih, lingkaran hitam (2 baris), badge biru]
     stickers: ['Halo, saya Agung!', ['Tinggal di', 'Medan'], 'Figma → Kode'],
-    // style: 'dark' | 'light' | 'ai'; icon = kunci di js/icons.js (boleh dikosongkan)
+    // style: 'dark' | 'light' | 'ai'; icon = kunci di js/icons.js (boleh dikosongkan); marquee: true = jadi slider berjalan
     groups: [
-      { label: 'Mahir', style: 'dark', items: [
+      { label: 'Mahir', style: 'dark', marquee: true, items: [
         { name: 'HTML', icon: 'html5' }, { name: 'CSS', icon: 'css' }, { name: 'Tailwind CSS', icon: 'tailwindcss' },
         { name: 'Bootstrap', icon: 'bootstrap' }, { name: 'Figma', icon: 'figma' }
       ] },
-      { label: 'Menengah', style: 'light', items: [
+      { label: 'Menengah', style: 'light', marquee: true, items: [
         { name: 'JavaScript', icon: 'javascript' }, { name: 'React', icon: 'react' }, { name: 'Vue.js', icon: 'vuedotjs' },
         { name: 'PHP · Yii2', icon: 'php' }, { name: 'Laravel', icon: 'laravel' }, { name: 'SCSS / Sass', icon: 'sass' },
         { name: 'WordPress (Divi)', icon: 'wordpress' }, { name: 'Git', icon: 'git' }
       ] },
-      { label: 'AI-Assisted Development', style: 'ai', items: [
+      { label: 'AI-Assisted Development', style: 'ai', marquee: true, items: [
         { name: 'Claude', icon: 'claude' }, { name: 'ChatGPT', icon: 'chat' }, { name: 'Claude Code (agen AI)', icon: 'terminal' }
       ] }
     ]
@@ -103,7 +103,7 @@ window.SITE.en = {
     color: 'Color', mono: 'Mono', ariaColor: 'Show screenshots in color', ariaMono: 'Show screenshots in black & white',
     jobsList: 'Work history', prosList: 'Project list', mainView: 'main view', view: 'view',
     top: 'Back to top ↑',
-    photoLink: 'Open Agung\'s LinkedIn profile'
+    photoLink: 'Open Agung\'s LinkedIn profile', cursorIn: 'View LinkedIn ↗'
   },
 
   profile: {

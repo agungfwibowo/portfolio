@@ -151,16 +151,37 @@
     document.querySelector('[data-list="pros"]').setAttribute('aria-label', UI.prosList);
     var lb = document.querySelector('[data-lang]'); lb.textContent = UI.lang; lb.setAttribute('aria-label', UI.langAria);
     document.documentElement.lang = lang; document.title = SITE.meta.title;
-    document.querySelector('[data-skills]').innerHTML = SITE.skills.groups.map(function (g) {
+    var PLUS = '<svg class="tape-plus" aria-hidden="true" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c.7 6.4 5.6 11.3 12 12-6.4.7-11.3 5.6-12 12-.7-6.4-5.6-11.3-12-12C6.4 11.3 11.3 6.4 12 0z"/></svg>';
+    var groups = SITE.skills.groups, list = groups.filter(function (g) { return !g.marquee; });
+    document.querySelector('[data-skills]').innerHTML = list.map(function (g) {
       return '<div class="group"><span class="group-label' + (g.style === 'ai' ? ' accent' : '') + '">' + esc(g.label) + '</span><ul class="pills">' +
         g.items.map(function (it) { return '<li class="' + cls[g.style] + ' r' + (k++ % 8 + 1) + '">' + icon(it.icon) + esc(it.name) + '</li>'; }).join('') + '</ul></div>';
     }).join('');
+    // grup dengan marquee: true jadi pita berjalan; isi digandakan agar loop mulus, salinan kedua disembunyikan dari pembaca layar
+    var tapes = groups.filter(function (g) { return g.marquee; }), tapesEl = document.querySelector('[data-tapes]');
+    tapesEl.hidden = !tapes.length;
+    tapesEl.innerHTML = tapes.map(function (g) {
+      // ulangi item dalam satu segmen (min. 12) supaya segmen selalu lebih lebar dari pita, tanpa celah kosong
+      var reps = Math.ceil(12 / g.items.length), one = g.items.map(function (it) { return '<span class="tape-item">' + icon(it.icon) + esc(it.name) + '</span>' + PLUS; }).join('');
+      var seg = new Array(reps + 1).join(one);
+      return '<div class="tape-zone tape-' + g.style + '"><span class="group-label tape-title">' + esc(g.label) + '</span>' +
+        '<div class="tape" style="--mq-dur:' + (g.items.length * reps * 4) + 's"><div class="tape-track"><div class="tape-seg">' + seg +
+        '</div><div class="tape-seg" aria-hidden="true">' + seg + '</div></div></div></div>';
+    }).join('');
+    document.querySelector('.skills-list').hidden = !list.length;
+    // baris foto di grid mobile: pita di baris 1, grup biasa sesudahnya; foto sebaris dengan grup terakhir,
+    // atau di baris sendiri di bawah pita kalau semua grup berupa pita
+    var off = tapes.length ? 1 : 0;
+    var wrap = document.querySelector('.skills-wrap');
+    wrap.style.setProperty('--pr', list.length ? list.length + off : off + 1);
+    wrap.classList.toggle('only-tapes', !list.length);
     var ph = SITE.skills.photo, img = document.querySelector('[data-photo]');
     img.src = A + ph.src; img.alt = ph.alt; img.width = ph.width; img.height = ph.height;
     img.setAttribute('aria-label', UI.photoLink);
+    img.setAttribute('data-cursor', UI.cursorIn);
     var st = document.querySelectorAll('.stickers .st'), sk = SITE.skills.stickers;
     st.forEach(function (n, i) { var v = sk[i] || ''; n.innerHTML = (Array.isArray(v) ? v : [v]).map(esc).join('<br>'); });
-    var li = document.querySelector('[data-in]'); li.href = C.linkedin; li.textContent = UI.linkedin;
+    document.querySelectorAll('[data-in]').forEach(function (li) { li.href = C.linkedin; li.textContent = UI.linkedin; });
   }
   fillStatic();
 
@@ -304,7 +325,10 @@
       if (!moving) { moving = true; requestAnimationFrame(follow); }
     }, { passive: true });
     document.addEventListener('mouseover', function (e) {
-      cur.classList.toggle('big', !!e.target.closest('a, button, .tab'));
+      var lab = e.target.closest('[data-cursor]');
+      cur.textContent = lab ? lab.getAttribute('data-cursor') : '';
+      cur.classList.toggle('label', !!lab);
+      cur.classList.toggle('big', !lab && !!e.target.closest('a, button, .tab'));
     });
     document.documentElement.addEventListener('mouseleave', function () { cur.classList.remove('on'); });
   }
