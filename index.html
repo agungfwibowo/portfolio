@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agung Fitrah Wibowo — Front-End Developer &amp; UI/UX Designer</title>
+<meta name="description" content="Portofolio Agung Fitrah Wibowo: Programmer SIMRS, Web Front-End Developer, dan UI/UX Designer di Medan.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#111318;--muted:#5A5F6B;--soft:#3A3F4B;--line:#DADDE3;--grid:#E3E5E9;--accent:#1D4ED8;--paper:#FFFFFF;
+  --display:'Space Grotesk',sans-serif;--mono:'IBM Plex Mono',monospace}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:Inter,system-ui,sans-serif}
+a{color:var(--ink)}a:hover{color:var(--accent)}
+.page{min-height:100vh;padding:0 20px;display:flex;flex-direction:column}
+.frame{flex:1;width:100%;max-width:1200px;margin:0 auto;padding:0 0 64px;display:flex;flex-wrap:wrap;align-content:flex-start;
+  background:linear-gradient(var(--ink),var(--ink)) left top/1px 100% no-repeat,linear-gradient(var(--ink),var(--ink)) right top/1px 100% no-repeat}
+.panel{min-width:0;padding:32px;border-right:1px solid var(--ink);border-bottom:1px solid var(--ink)}
+.full{flex:1 1 100%}
+.gridbg{background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:28px 28px;background-position:-1px -1px}
+.jn{position:relative}
+.jn::after{content:"";position:absolute;right:-10.5px;bottom:0;width:22px;height:11px;z-index:3;pointer-events:none;
+  background:radial-gradient(circle at 0 0,transparent 10.5px,var(--ink) 11px) left top/11px 11px no-repeat,radial-gradient(circle at 100% 0,transparent 10.5px,var(--ink) 11px) right top/11px 11px no-repeat}
+.mono{font-family:var(--mono)}
+.h2{margin:0;font-family:var(--display);font-size:30px;font-weight:300;line-height:1.05;letter-spacing:-.02em}
+
+/* header */
+.id{flex:1 1 240px;padding-top:80px;display:flex;flex-direction:column;justify-content:space-between;gap:40px}
+.mark{font-family:var(--display);font-size:56px;font-weight:600;letter-spacing:-.04em;line-height:1}
+.id p{margin:0;font-family:var(--mono);font-size:13px;line-height:1.6;text-transform:uppercase;letter-spacing:.04em}
+.title{flex:999 1 560px;padding-top:80px;display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:28px}
+.title h1{margin:0;font-family:var(--display);font-size:clamp(40px,5.4vw,68px);font-weight:300;line-height:1.05;letter-spacing:-.03em}
+.hl{background:var(--ink);color:#fff;padding:0 10px;font-weight:400}
+.roles{margin:0;padding:0;list-style:none;font-family:var(--mono);font-size:12px;line-height:1.7;color:var(--soft)}
+
+/* tagline */
+.tagline{padding:40px 32px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:32px 48px}
+.years{align-self:flex-start;transform:rotate(-8deg);margin-top:8px;padding:10px 26px;border:1.5px solid var(--ink);border-radius:999px;background:#fff;box-shadow:5px 5px 0 var(--ink);font-family:var(--display);font-size:30px;letter-spacing:-.02em}
+.tagline p{margin:0;font-family:var(--display);font-size:clamp(32px,3.4vw,44px);font-weight:300;line-height:1.08;letter-spacing:-.03em;background:#fff;padding:4px 0}
+
+/* tabs (experience + projects) */
+.sec{display:flex;flex-direction:column;gap:28px}
+.sec-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:16px}
+.ctrl{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border:1.5px solid var(--ink);border-radius:999px;background:#fff;color:var(--ink);box-shadow:3px 3px 0 var(--ink);cursor:pointer;font-family:var(--mono);font-size:12px;font-weight:600;flex-shrink:0}
+.ctrl:focus-visible,.tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tabs-wrap{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start}
+.tablist{min-width:0;display:flex;flex-direction:column;border-top:1px solid var(--ink)}
+.tab{width:100%;text-align:left;border:0;cursor:pointer;font:inherit;background:#fff;color:var(--ink)}
+.tab[aria-selected="true"]{background:var(--ink);color:#fff}
+.bar{height:1px;background:var(--ink)}
+.bar>i{display:block;height:3px;margin-top:-1px;background:var(--accent);width:0}
+
+.jobs{flex:1 1 220px}
+.job{display:flex;flex-direction:column;gap:4px;padding:14px 16px;border-bottom:1px solid var(--ink)}
+.job .period{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.job .co{font-family:var(--display);font-size:17px}
+.job[aria-selected="true"] .period{color:#C9CDD6}
+.job[aria-selected="true"] .co{font-weight:500}
+.job-panel{flex:999 1 320px;min-width:0;min-height:230px;display:flex;flex-direction:column;gap:12px}
+.job-panel .when{margin:8px 0 0;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.job-panel h3{margin:0;font-family:var(--display);font-size:28px;font-weight:400;letter-spacing:-.02em;line-height:1.1}
+.job-panel .role{margin:0;font-family:var(--mono);font-size:14px;font-weight:600;color:var(--accent)}
+.job-panel .desc{margin:0;font-family:var(--mono);font-size:14px;line-height:1.7;color:var(--soft)}
+.plus{margin:0;font-family:var(--mono);font-size:13px;letter-spacing:.2em}
+
+/* edu + contact */
+.half{flex:1 1 360px;display:flex;flex-direction:column;gap:22px}
+.edu{font-family:var(--mono);font-size:14px;line-height:1.65}
+.edu p{margin:0 0 6px}.edu p+p{margin:0;color:var(--soft)}
+.mail{align-self:flex-start;max-width:100%;padding:14px 22px;border:1.5px solid var(--ink);border-radius:999px;background:#fff;box-shadow:5px 5px 0 var(--ink);font-family:var(--mono);font-size:13px;font-weight:600;text-decoration:none;white-space:nowrap}
+.contact p{margin:0;font-family:var(--mono);font-size:13px;line-height:1.7}
+
+/* skills */
+.skills{padding:0}
+.skills-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:20px;padding:32px;border-bottom:1px solid var(--ink)}
+.skills-head h2{margin:0;font-family:var(--display);font-size:24px;font-weight:300;line-height:1.15;letter-spacing:-.01em}
+.skills-head span{background:var(--ink);color:#fff;padding:2px 14px;font-family:var(--display);font-size:clamp(36px,5vw,60px);letter-spacing:-.03em;line-height:1.1}
+.skills-wrap{position:relative;overflow:hidden;display:flex;align-items:center;min-height:520px;padding:40px 32px}
+.skills-list{position:relative;z-index:1;width:60%;min-width:0;display:flex;flex-direction:column;gap:32px}
+.group{display:flex;flex-direction:column;gap:14px}
+.group-label{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase}
+.pills{display:flex;flex-wrap:wrap;gap:16px 14px;margin:0;padding:0;list-style:none}
+.pill{padding:10px 22px;border:1.5px solid var(--ink);border-radius:999px;background:#fff;box-shadow:4px 4px 0 var(--ink);font-family:var(--mono);font-size:14px;font-weight:500}
+.pill.dark{background:var(--ink);color:#fff;box-shadow:4px 4px 0 var(--accent)}
+.pill.ai{border-color:var(--accent);color:var(--accent);box-shadow:4px 4px 0 var(--accent);font-weight:600}
+.r1{transform:rotate(-4deg)}.r2{transform:rotate(3deg)}.r3{transform:rotate(-2deg)}.r4{transform:rotate(5deg)}.r5{transform:rotate(-3deg)}.r6{transform:rotate(2deg)}.r7{transform:rotate(-5deg)}.r8{transform:rotate(4deg)}
+.skills-photo{position:absolute;right:-2%;top:32px;width:30%;height:auto;display:block;pointer-events:none}
+
+/* projects */
+.pros{flex:1 1 260px}
+.pro{display:grid;grid-template-columns:28px minmax(0,1fr);column-gap:8px;align-items:baseline;padding:11px 14px;border-bottom:1px solid var(--line)}
+.pro .no{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--accent)}
+.pro .nm{display:flex;flex-direction:column;gap:2px}
+.pro .nm b{font-family:var(--display);font-size:16px;font-weight:400}
+.pro .nm small{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.pro[aria-selected="true"] .no{color:#fff}
+.pro[aria-selected="true"] .nm b{font-weight:500}
+.pro[aria-selected="true"] .nm small{color:#C9CDD6}
+.pro-panel{flex:999 1 480px;min-width:0;display:flex;flex-direction:column;gap:16px}
+.pro-top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:8px 16px;margin-top:6px}
+.pro-top h3{margin:0;font-family:var(--display);font-size:30px;font-weight:400;letter-spacing:-.02em;line-height:1.1}
+.pro-top span{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.shot{display:block;width:100%;object-fit:cover;object-position:center top;border:1px solid var(--ink);background:#F4F6FB;aspect-ratio:16/9}
+.shot.hero{box-shadow:6px 6px 0 var(--ink)}
+.thumbs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.meta{margin:8px 0 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px 24px;font-family:var(--mono);font-size:13px;line-height:1.6}
+.meta dt{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.meta dd{margin:0}
+.meta .client{font-weight:600}.meta .tools{color:var(--accent);font-weight:600}
+
+@media (max-width:760px){
+  .skills-wrap{flex-direction:column;align-items:stretch;padding-bottom:0}
+  .skills-list{width:100%}
+  .skills-photo{position:static;width:85%;margin:32px -8% 0 auto}
+}
+@media (prefers-reduced-motion:reduce){.pill{transform:none}}
+</style>
+</head>
+<body>
+<div class="page">
+<main class="frame">
+
+<!-- Header -->
+<div class="panel id jn">
+<span class="mark" aria-label="Monogram AFW">AFW</span>
+<p>Agung Fitrah Wibowo<br>Deli Serdang, Sumut<br>Berkarya sejak 2019</p>
+</div>
+<header class="panel title">
+<h1><span class="hl">Front-End</span> Developer<br>&amp; UI/UX Designer</h1>
+<ul class="roles">
+<li>Programmer SIMRS</li>
+<li>Web Front-End Developer</li>
+<li>UI/UX Designer</li>
+<li>WordPress Developer</li>
+<li>AI-Assisted Developer</li>
+</ul>
+</header>
+
+<!-- Tagline -->
+<div class="panel full gridbg tagline">
+<span class="years">+7 tahun</span>
+<p>Dari desain di Figma, sampai kode yang rapi.</p>
+</div>
+
+<!-- Pengalaman -->
+<section class="panel full sec" id="pengalaman" aria-labelledby="h-exp">
+<div class="sec-head">
+<h2 class="h2" id="h-exp">Pengalaman<br>profesional</h2>
+<button type="button" class="ctrl" data-ctrl="jobs"></button>
+</div>
+<div class="tabs-wrap">
+<div class="tablist jobs" role="tablist" aria-label="Riwayat kerja" data-list="jobs"></div>
+<div class="job-panel" role="tabpanel" aria-live="polite">
+<div class="bar" aria-hidden="true"><i data-bar="jobs"></i></div>
+<p class="when" data-f="jobs.period"></p>
+<h3 data-f="jobs.company"></h3>
+<p class="role" data-f="jobs.role"></p>
+<p class="desc" data-f="jobs.desc"></p>
+</div>
+</div>
+<p class="plus" aria-hidden="true">++++++</p>
+</section>
+
+<!-- Pendidikan + Kontak -->
+<section class="panel half jn" aria-labelledby="h-edu">
+<h2 class="h2" id="h-edu">Pendidikan</h2>
+<div class="edu">
+<p><strong>Okt 2012 — Nov 2016 :</strong> Universitas Potensi Utama, Medan</p>
+<p>Sarjana Komputer (S.Kom)</p>
+</div>
+</section>
+<section class="panel half contact" aria-labelledby="h-contact">
+<h2 class="h2" id="h-contact">Kontak</h2>
+<a class="mail" href="mailto:agungf.wibowo@gmail.com">agungf.wibowo@gmail.com</a>
+<p><a href="tel:+6282285715959" style="text-decoration:none">+62 822 8571 5959</a><br>Percut Sei Tuan, Deli Serdang</p>
+</section>
+
+<!-- Keahlian -->
+<section class="panel full skills" aria-labelledby="h-skills">
+<div class="skills-head">
+<h2 id="h-skills">Keahlian &amp; tools<br>yang dikuasai :</h2>
+<span>Desain + Kode</span>
+</div>
+<div class="gridbg skills-wrap">
+<div class="skills-list">
+<div class="group">
+<span class="group-label">Mahir</span>
+<ul class="pills">
+<li class="pill dark r1">HTML</li><li class="pill dark r2">CSS</li><li class="pill dark r3">Tailwind CSS</li><li class="pill dark r4">Bootstrap</li><li class="pill dark r5">Figma</li>
+</ul>
+</div>
+<div class="group">
+<span class="group-label">Menengah</span>
+<ul class="pills">
+<li class="pill r6">JavaScript</li><li class="pill r7">React</li><li class="pill r2">Vue.js</li><li class="pill r3">PHP · Yii2</li><li class="pill r8">Laravel</li><li class="pill r5">SCSS / Sass</li><li class="pill r6">WordPress (Divi)</li><li class="pill r1">Git</li>
+</ul>
+</div>
+<div class="group">
+<span class="group-label" style="color:var(--accent)">AI-Assisted Development</span>
+<ul class="pills">
+<li class="pill ai r5">Claude</li><li class="pill ai r8">ChatGPT</li><li class="pill ai r3">Claude Code (agen AI)</li>
+</ul>
+</div>
+</div>
+<img class="skills-photo" src="assets/foto-agung-cutout.png" alt="Agung Fitrah Wibowo duduk di kursi kerja" width="787" height="1435">
+</div>
+</section>
+
+<!-- Proyek -->
+<section class="panel full sec" id="proyek" aria-labelledby="h-pro" style="border-bottom:0">
+<div class="sec-head">
+<h2 class="h2" id="h-pro">Proyek pilihan</h2>
+<button type="button" class="ctrl" data-ctrl="pros"></button>
+</div>
+<div class="tabs-wrap" style="gap:32px">
+<div class="tablist pros" role="tablist" aria-label="Daftar proyek" data-list="pros"></div>
+<div class="pro-panel" role="tabpanel" aria-live="polite">
+<div class="bar" aria-hidden="true"><i data-bar="pros"></i></div>
+<div class="pro-top"><h3 data-f="pros.name"></h3><span data-f="pros.label"></span></div>
+<img class="shot hero" data-hero alt="">
+<div class="thumbs" data-thumbs></div>
+<dl class="meta">
+<div><dt>Klien</dt><dd class="client" data-f="pros.client"></dd></div>
+<div><dt>Peran</dt><dd data-f="pros.role"></dd></div>
+<div><dt>Alat</dt><dd class="tools" data-f="pros.tools"></dd></div>
+</dl>
+</div>
+</div>
+</section>
+
+</main>
+</div>
+
+<script>
+(function () {
+  var A = 'assets/';
+  var DATA = {
+    jobs: [
+      { period: 'Mei 2021 — Sekarang', company: 'RSUP H. Adam Malik Medan', role: 'Programmer / Developer · Unit SIMRS', desc: 'Mendesain UI modul SIMRS, membangun front-end aplikasi, mengembangkan backend dengan PHP (Yii2), dan membuat layout print formulir & laporan — dibantu AI (Claude, ChatGPT, Claude Code).' },
+      { period: 'Feb 2022 — Okt 2024', company: 'Faria Edu', role: 'WordPress Developer (Freelance)', desc: 'Mendesain UI web, slicing desain ke HTML/CSS/JS, membangun dan memelihara situs WordPress, mengembangkan komponen React & Vue.js, serta menangani perbaikan dan update fitur.' },
+      { period: 'Okt 2019 — Mei 2021', company: 'Freelancer', role: 'Web Front-End Developer / UI/UX Designer', desc: 'Merancang dan membangun 9 website & web app untuk klien ritel, interior, gaming, industri, edukasi, energi, dan kesehatan.' },
+      { period: 'Jun 2019 — Okt 2019', company: 'Xtend Indonesia', role: 'Web Front-End Developer / UI/UX Designer', desc: 'Komp. Setia Budi, Medan. Front-end website, mobile UI/UX design, dan WordPress dengan Divi Builder.' }
+    ],
+    pros: [
+      { no: '01', name: 'Kimy Kuky Cookies', cat: 'Website E-Commerce', client: 'Kimy Kuky', role: 'Mendesain UI website & membangunnya dengan WordPress + Divi Builder', tools: 'UI Design · WordPress · Divi Builder', imgs: ['kimy-1.jpg', 'kimy-2.jpg', 'kimy-3.jpg'] },
+      { no: '02', name: 'Barik.id', cat: 'Company Profile', client: 'Barik Home & Interior', role: 'Mendesain UI website & membangunnya dengan WordPress + Divi Builder', tools: 'UI Design · WordPress · Divi Builder', imgs: ['barik-1.jpg', 'barik-2.jpg', 'barik-3.jpg'] },
+      { no: '03', name: 'Clarias Gaming Shop', cat: 'Website Top Up', client: 'Clarias Gaming Shop', role: 'Mendesain UI website dengan Figma & slicing ke HTML', tools: 'Figma · UI Design · HTML/CSS', imgs: ['clarias-1.jpg', 'clarias-2.jpg', 'clarias-3.jpg'] },
+      { no: '04', name: 'Kuala Tanjung Industrial Estate', cat: 'Company Profile', client: 'KIKT', role: 'Membangun website dengan WordPress', tools: 'WordPress', imgs: ['kikt-1.jpg', 'kikt-2.jpg'] },
+      { no: '05', name: 'Air Mineral Amoz', cat: 'Company Profile', client: 'PT. Tirta Alpin Makmur', role: 'Mendesain UI website menggunakan Adobe XD', tools: 'Adobe XD · UI Design', imgs: ['amoz-1.jpg', 'amoz-2.jpg', 'amoz-3.jpg'] },
+      { no: '06', name: 'Skill Factory', cat: 'Website', client: 'Skill Factory', role: 'Mendesain UI website dengan Figma & membangunnya dengan WordPress + Divi Builder', tools: 'Figma · WordPress · Divi Builder', imgs: ['sf-1.jpg', 'sf-2.jpg', 'sf-3.jpg'] },
+      { no: '07', name: 'Yuk Belajar', cat: 'Website Edukasi', client: 'Indonesiabelajar.org', role: 'Mendesain UI website dengan Adobe XD & slicing ke HTML', tools: 'Adobe XD · UI Design · HTML/CSS', imgs: ['yb-1.jpg', 'yb-2.jpg', 'yb-3.jpg'] },
+      { no: '08', name: 'Project TV', cat: 'Web App', client: 'Salah satu rumah sakit di China', role: 'Slicing desain ke Vue.js', tools: 'Vue.js · Front-End', imgs: ['tv-1.jpg', 'tv-2.jpg', 'tv-3.jpg'] },
+      { no: '09', name: 'PROBIS UPHK Medan', cat: 'Web App', client: 'PLN UPHK Medan', role: 'Mendesain UI website dengan Adobe XD & slicing dengan Vue.js', tools: 'Adobe XD · UI Design · Vue.js', imgs: ['probis-1.jpg'] },
+      { no: '10', name: 'STARS Mandiri', cat: 'Sistem Informasi', client: 'RSUP H. Adam Malik Medan', role: 'Membuat layout print, mendesain informasi tempat tidur pasien, dan backend dengan framework Yii2', tools: 'UI Design · Layout Print · Yii2', imgs: ['stars-1.jpg', 'stars-2.jpg', 'stars-3.jpg'] }
+    ]
+  };
+  DATA.pros.forEach(function (p) { p.label = p.no + ' · ' + p.cat; });
+
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var CFG = { jobs: { dur: 6000 }, pros: { dur: 5000 } };
+  var state = {
+    jobs: { i: 0, t: 0, paused: reduce },
+    pros: { i: 0, t: 0, paused: reduce }
+  };
+  var ICON_PAUSE = '<svg aria-hidden="true" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="2" x2="4" y2="10"/><line x1="8" y1="2" x2="8" y2="10"/></svg>';
+  var ICON_PLAY = '<svg aria-hidden="true" width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M3 1.5 L10.5 6 L3 10.5 Z"/></svg>';
+
+  function el(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
+  function buildList(key) {
+    var list = document.querySelector('[data-list="' + key + '"]');
+    DATA[key].forEach(function (d, k) {
+      var b = el('button', 'tab ' + (key === 'jobs' ? 'job' : 'pro'));
+      b.type = 'button'; b.setAttribute('role', 'tab');
+      b.innerHTML = key === 'jobs'
+        ? '<span class="period">' + esc(d.period) + '</span><span class="co">' + esc(d.company) + '</span>'
+        : '<span class="no">' + esc(d.no) + '</span><span class="nm"><b>' + esc(d.name) + '</b><small>' + esc(d.cat) + '</small></span>';
+      b.addEventListener('click', function () { select(key, k); });
+      b.addEventListener('keydown', function (e) {
+        var n = DATA[key].length, j = null;
+        if (e.key === 'ArrowDown' || e.key === 'ArrowRight') j = (k + 1) % n;
+        if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') j = (k - 1 + n) % n;
+        if (j !== null) { e.preventDefault(); select(key, j); list.children[j].focus(); }
+      });
+      list.appendChild(b);
+    });
+  }
+
+  function render(key) {
+    var s = state[key], d = DATA[key][s.i];
+    var tabs = document.querySelector('[data-list="' + key + '"]').children;
+    for (var k = 0; k < tabs.length; k++) {
+      tabs[k].setAttribute('aria-selected', k === s.i ? 'true' : 'false');
+      tabs[k].tabIndex = k === s.i ? 0 : -1;
+    }
+    document.querySelectorAll('[data-f^="' + key + '."]').forEach(function (n) {
+      n.textContent = d[n.getAttribute('data-f').split('.')[1]];
+    });
+    if (key === 'pros') {
+      var hero = document.querySelector('[data-hero]');
+      hero.src = A + d.imgs[0]; hero.alt = d.name + ' — tampilan utama';
+      var th = document.querySelector('[data-thumbs]'); th.innerHTML = '';
+      d.imgs.slice(1).forEach(function (src, k) {
+        var im = el('img', 'shot'); im.src = A + src; im.alt = d.name + ' — tampilan ' + (k + 2); im.loading = 'lazy'; th.appendChild(im);
+      });
+    }
+    renderCtrl(key);
+  }
+
+  function renderCtrl(key) {
+    var b = document.querySelector('[data-ctrl="' + key + '"]'), p = state[key].paused;
+    var what = key === 'jobs' ? 'pengalaman' : 'proyek';
+    b.innerHTML = (p ? ICON_PLAY + 'Putar' : ICON_PAUSE + 'Jeda');
+    b.setAttribute('aria-label', (p ? 'Putar ' : 'Jeda ') + what + ' otomatis');
+  }
+
+  function select(key, k) { state[key].i = k; state[key].t = 0; render(key); bar(key); }
+  function bar(key) {
+    document.querySelector('[data-bar="' + key + '"]').style.width = Math.min(100, state[key].t / CFG[key].dur * 100) + '%';
+  }
+
+  ['jobs', 'pros'].forEach(function (key) {
+    buildList(key); render(key); bar(key);
+    document.querySelector('[data-ctrl="' + key + '"]').addEventListener('click', function () {
+      state[key].paused = !state[key].paused; renderCtrl(key);
+    });
+  });
+
+  // preload project images
+  DATA.pros.forEach(function (p) { p.imgs.forEach(function (s) { var i = new Image(); i.src = A + s; }); });
+
+  var last = performance.now();
+  function tick(now) {
+    var dt = now - last; last = now;
+    if (document.visibilityState === 'visible') {
+      ['jobs', 'pros'].forEach(function (key) {
+        var s = state[key];
+        if (s.paused) return;
+        s.t += dt;
+        if (s.t >= CFG[key].dur) { s.t = 0; s.i = (s.i + 1) % DATA[key].length; render(key); }
+        bar(key);
+      });
+    }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>
