@@ -252,6 +252,8 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
   .panel.id{flex-direction:row;align-items:stretch;justify-content:space-between;gap:16px;padding:0 20px 0 0}
   /* logo dalam sel dengan garis kanan setinggi header, plus fillet di bawahnya */
   .id .mark{position:relative;display:flex;align-items:center;padding:16px 20px;font-size:36px;border-right:1px solid var(--ink)}
+  /* fillet di bawah garis kanan logo */
+  .id .mark::after{content:"";position:absolute;right:-12px;bottom:0;width:23px;height:11px;background:var(--ink);pointer-events:none;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 23 11'%3E%3Cpath d='M0 11A11 11 0 0 0 11 0h1a11 11 0 0 0 11 11z'/%3E%3C/svg%3E") 0 0/100% 100% no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 23 11'%3E%3Cpath d='M0 11A11 11 0 0 0 11 0h1a11 11 0 0 0 11 11z'/%3E%3C/svg%3E") 0 0/100% 100% no-repeat}
   .id p{align-self:center;padding:16px 0}
   /* sel logo + garisnya tidak ikut reveal */
   .js .id .mark:not(.in){opacity:1;translate:none;filter:none}
