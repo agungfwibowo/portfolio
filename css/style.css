@@ -9,8 +9,10 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:system-ui,-ap
 img{max-width:100%}
 a{color:var(--ink)}a:hover{color:var(--accent)}
 .page{min-height:100vh;padding:0 20px;display:flex;flex-direction:column}
-.frame{flex:1;width:100%;max-width:1200px;margin:0 auto;padding:0;display:flex;flex-wrap:wrap;align-content:flex-start;
-  background:linear-gradient(var(--ink),var(--ink)) left top/1px 100% no-repeat,linear-gradient(var(--ink),var(--ink)) right top/1px 100% no-repeat}
+.frame{position:relative;flex:1;width:100%;max-width:1200px;margin:0 auto;padding:0;display:flex;flex-wrap:wrap;align-content:flex-start}
+/* garis kiri-kanan frame digambar di atas konten, supaya tidak tertutup pita yang lewat */
+.frame::before,.frame::after{content:"";position:absolute;top:0;bottom:0;width:1px;background:var(--ink);z-index:8;pointer-events:none}
+.frame::before{left:0}.frame::after{right:0}
 .panel{min-width:0;padding:32px;border-right:1px solid var(--ink);border-bottom:1px solid var(--ink)}
 .full{flex:1 1 100%}
 .gridbg{background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:28px 28px;background-position:-1px calc(-1px + var(--gy,0px))}
@@ -247,12 +249,15 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
   .id p{text-align:right;font-size:11px;line-height:1.55}
   .page{padding:0}
   .cta{clip-path:none}
-  .frame{background:none;padding-bottom:0}
+  .frame{padding-bottom:0}
+  .frame::before,.frame::after{display:none}
   .panel{border-right:0;padding:28px 20px}
   /* fillet diputar (⊣) menempel di tepi kanan layar, di ujung garis pembatas */
   .jn::after{right:0;bottom:-12px;width:11px;height:23px;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 23'%3E%3Cpath d='M11 0A11 11 0 0 1 0 11v1a11 11 0 0 1 11 11z'/%3E%3C/svg%3E") 0 0/100% 100% no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 23'%3E%3Cpath d='M11 0A11 11 0 0 1 0 11v1a11 11 0 0 1 11 11z'/%3E%3C/svg%3E") 0 0/100% 100% no-repeat}
   .panel.skills{padding:0}
   .skills-head,.skills-wrap{padding-left:20px;padding-right:20px}
+  .tapes{width:calc(100% + 40px);margin:0 -20px}
+  .tape-title{padding:0 20px 12px}
   .panel.cta{padding:72px 20px 0}
   .cta .foot{padding:20px 0}
   .cta-btn{font-size:13px;padding:0 20px;min-height:50px}

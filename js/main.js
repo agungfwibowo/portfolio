@@ -361,6 +361,40 @@
     });
   }
 
+  // di luar hover, foto tetap sedikit condong ke arah kursor (maks ±4°); hover = tilt penuh seperti di atas
+  if (!reduce && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    var aTick = false, ax = 0, ay = 0;
+    var ambient = function () {
+      aTick = false;
+      if (photo.classList.contains('tilting')) return;
+      var r = photo.getBoundingClientRect();
+      if (r.bottom < 0 || r.top > window.innerHeight) return;
+      var px = Math.max(-1, Math.min(1, (ax - (r.left + r.width / 2)) / (window.innerWidth / 2)));
+      var py = Math.max(-1, Math.min(1, (ay - (r.top + r.height / 2)) / (window.innerHeight / 2)));
+      photo.style.transform = 'perspective(900px) rotateY(' + (px * 4).toFixed(2) + 'deg) rotateX(' + (-py * 4).toFixed(2) + 'deg)';
+      photo.style.setProperty('--sx', (-px * 5).toFixed(1) + 'px');
+      photo.style.setProperty('--sy', (-py * 5).toFixed(1) + 'px');
+      stk.style.transform = 'translate(' + (px * 5).toFixed(1) + 'px,' + (py * 5).toFixed(1) + 'px)';
+    };
+    document.addEventListener('mousemove', function (e) {
+      ax = e.clientX; ay = e.clientY;
+      if (!aTick) { aTick = true; requestAnimationFrame(ambient); }
+    }, { passive: true });
+  }
+
+  // badge "7+ years": +8° di paling atas, berputar ke -8° seiring scroll 0–320px
+  var yrs = document.querySelector('.years');
+  if (yrs && !reduce) {
+    var yTick = false;
+    var tiltYears = function () {
+      yTick = false;
+      var t = Math.min(1, Math.max(0, window.scrollY / 320));
+      yrs.style.transform = 'rotate(' + (8 - 16 * t).toFixed(2) + 'deg)';
+    };
+    window.addEventListener('scroll', function () { if (!yTick) { yTick = true; requestAnimationFrame(tiltYears); } }, { passive: true });
+    tiltYears();
+  }
+
   // CTA melebar penuh saat ~98% terlihat (dibanding tinggi CTA atau layar, mana yang lebih kecil); menyempit lagi di bawah 90%
   var ctaEl = document.querySelector('.cta');
   if (ctaEl) {
