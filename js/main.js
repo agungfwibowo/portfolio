@@ -103,7 +103,7 @@
   // di mobile tablist berupa strip horizontal: geser tab aktif ke kiri strip, tanpa menggulir halaman
   function scrollTab(list, tab) {
     if (list.scrollWidth <= list.clientWidth) return;
-    var left = list.scrollLeft + tab.getBoundingClientRect().left - list.getBoundingClientRect().left;
+    var left = list.scrollLeft + tab.getBoundingClientRect().left - list.getBoundingClientRect().left - (parseFloat(getComputedStyle(list).paddingLeft) || 0);
     list.scrollTo({ left: left, behavior: reduce ? 'auto' : 'smooth' });
   }
 
