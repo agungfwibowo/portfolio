@@ -115,6 +115,21 @@
     edges(list);
   });
 
+  // toggle warna / mono untuk screenshot proyek (default mono), diingat di browser
+  var toneBtn = document.querySelector('[data-tone]'), proPanel = document.querySelector('.pro-panel');
+  var ICON_TONE = '<svg aria-hidden="true" width="12" height="12" viewBox="0 0 12 12"><circle cx="6" cy="6" r="5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M6 1a5 5 0 0 1 0 10z" fill="currentColor"/></svg>';
+  function setTone(mono) {
+    proPanel.classList.toggle('mono', mono);
+    toneBtn.setAttribute('aria-pressed', mono ? 'true' : 'false');
+    toneBtn.innerHTML = ICON_TONE + (mono ? 'Mono' : 'Warna');
+    toneBtn.setAttribute('aria-label', mono ? 'Tampilkan screenshot berwarna' : 'Tampilkan screenshot hitam-putih');
+    try { localStorage.setItem('afw-tone', mono ? 'mono' : 'warna'); } catch (e) {}
+  }
+  var savedTone = null;
+  try { savedTone = localStorage.getItem('afw-tone'); } catch (e) {}
+  setTone(savedTone !== 'warna'); // default mono
+  toneBtn.addEventListener('click', function () { setTone(!proPanel.classList.contains('mono')); });
+
   // rotasi hanya berjalan saat section terlihat di layar
   if ('IntersectionObserver' in window) {
     var io = new IntersectionObserver(function (entries) {
