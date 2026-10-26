@@ -297,6 +297,18 @@
     startReveal();
   }
 
+  // ukuran kotak grid: tetap persegi ~28px, tapi dibagi rata ke lebar section supaya tepi kiri & kanan tidak terpotong
+  var fitGrid = function (el) {
+    var w = el.clientWidth; if (!w) return;
+    el.style.setProperty('--cell', (w / Math.max(1, Math.round(w / 28))).toFixed(3) + 'px');
+  };
+  var gridEls = document.querySelectorAll('.gridbg, .cta');
+  gridEls.forEach(fitGrid);
+  if ('ResizeObserver' in window) {
+    var gro = new ResizeObserver(function (entries) { entries.forEach(function (en) { fitGrid(en.target); }); });
+    gridEls.forEach(function (el) { gro.observe(el); });
+  } else window.addEventListener('resize', function () { gridEls.forEach(fitGrid); });
+
   // parallax grid: latar grid bergerak lebih lambat dari scroll
   if (!reduce) {
     var grids = document.querySelectorAll('.gridbg:not(.tagline), .cta'), ticking = false; // tagline dikecualikan: grid bergerak di belakang badge miring terlihat seperti badge ikut berputar
@@ -393,6 +405,19 @@
     };
     window.addEventListener('scroll', function () { if (!yTick) { yTick = true; requestAnimationFrame(tiltYears); } }, { passive: true });
     tiltYears();
+  }
+
+  // pita "Skills & tools" sticky di atas; saat area keahlian naik, pita dipotong dari bawah seolah tertutup
+  var sHead = document.querySelector('.skills-head'), sWrap = document.querySelector('.skills-wrap');
+  if (sHead && sWrap) {
+    var sTick = false;
+    var coverHead = function () {
+      sTick = false;
+      var cut = Math.max(0, sHead.getBoundingClientRect().bottom - sWrap.getBoundingClientRect().top);
+      sHead.style.clipPath = cut ? 'inset(-240px -100vmax ' + cut.toFixed(1) + 'px)' : '';
+    };
+    window.addEventListener('scroll', function () { if (!sTick) { sTick = true; requestAnimationFrame(coverHead); } }, { passive: true });
+    coverHead();
   }
 
   // CTA melebar penuh saat ~98% terlihat (dibanding tinggi CTA atau layar, mana yang lebih kecil); menyempit lagi di bawah 90%
