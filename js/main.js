@@ -1,26 +1,39 @@
 (function () {
-  var A = 'assets/';
-  var DATA = {
-    jobs: [
-      { period: 'Mei 2021 — Sekarang', company: 'RSUP H. Adam Malik Medan', role: 'Programmer / Developer · Unit SIMRS', desc: 'Mendesain UI modul SIMRS, membangun front-end aplikasi, mengembangkan backend dengan PHP (Yii2), dan membuat layout print formulir & laporan — dibantu AI (Claude, ChatGPT, Claude Code).' },
-      { period: 'Feb 2022 — Okt 2024', company: 'Faria Edu', role: 'WordPress Developer (Freelance)', desc: 'Mendesain UI web, slicing desain ke HTML/CSS/JS, membangun dan memelihara situs WordPress, mengembangkan komponen React & Vue.js, serta menangani perbaikan dan update fitur.' },
-      { period: 'Okt 2019 — Mei 2021', company: 'Freelancer', role: 'Web Front-End Developer / UI/UX Designer', desc: 'Merancang dan membangun 9 website & web app untuk klien ritel, interior, gaming, industri, edukasi, energi, dan kesehatan.' },
-      { period: 'Jun 2019 — Okt 2019', company: 'Xtend Indonesia', role: 'Web Front-End Developer / UI/UX Designer', desc: 'Komp. Setia Budi, Medan. Front-end website, mobile UI/UX design, dan WordPress dengan Divi Builder.' }
-    ],
-    pros: [
-      { no: '01', name: 'Kimy Kuky Cookies', cat: 'Website E-Commerce', client: 'Kimy Kuky', role: 'Mendesain UI website & membangunnya dengan WordPress + Divi Builder', tools: 'UI Design · WordPress · Divi Builder', imgs: ['kimy-1.webp', 'kimy-2.webp', 'kimy-3.webp'] },
-      { no: '02', name: 'Barik.id', cat: 'Company Profile', client: 'Barik Home & Interior', role: 'Mendesain UI website & membangunnya dengan WordPress + Divi Builder', tools: 'UI Design · WordPress · Divi Builder', imgs: ['barik-1.webp', 'barik-2.webp', 'barik-3.webp'] },
-      { no: '03', name: 'Clarias Gaming Shop', cat: 'Website Top Up', client: 'Clarias Gaming Shop', role: 'Mendesain UI website dengan Figma & slicing ke HTML', tools: 'Figma · UI Design · HTML/CSS', imgs: ['clarias-1.webp', 'clarias-2.webp', 'clarias-3.webp'] },
-      { no: '04', name: 'Kuala Tanjung Industrial Estate', cat: 'Company Profile', client: 'KIKT', role: 'Membangun website dengan WordPress', tools: 'WordPress', imgs: ['kikt-1.webp', 'kikt-2.webp'] },
-      { no: '05', name: 'Air Mineral Amoz', cat: 'Company Profile', client: 'PT. Tirta Alpin Makmur', role: 'Mendesain UI website menggunakan Adobe XD', tools: 'Adobe XD · UI Design', imgs: ['amoz-1.webp', 'amoz-2.webp', 'amoz-3.webp'] },
-      { no: '06', name: 'Skill Factory', cat: 'Website', client: 'Skill Factory', role: 'Mendesain UI website dengan Figma & membangunnya dengan WordPress + Divi Builder', tools: 'Figma · WordPress · Divi Builder', imgs: ['sf-1.webp', 'sf-2.webp', 'sf-3.webp'] },
-      { no: '07', name: 'Yuk Belajar', cat: 'Website Edukasi', client: 'Indonesiabelajar.org', role: 'Mendesain UI website dengan Adobe XD & slicing ke HTML', tools: 'Adobe XD · UI Design · HTML/CSS', imgs: ['yb-1.webp', 'yb-2.webp', 'yb-3.webp'] },
-      { no: '08', name: 'Project TV', cat: 'Web App', client: 'Salah satu rumah sakit di China', role: 'Slicing desain ke Vue.js', tools: 'Vue.js · Front-End', imgs: ['tv-1.webp', 'tv-2.webp', 'tv-3.webp'] },
-      { no: '09', name: 'PROBIS UPHK Medan', cat: 'Web App', client: 'PLN UPHK Medan', role: 'Mendesain UI website dengan Adobe XD & slicing dengan Vue.js', tools: 'Adobe XD · UI Design · Vue.js', imgs: ['probis-1.webp'] },
-      { no: '10', name: 'STARS Mandiri', cat: 'Sistem Informasi', client: 'RSUP H. Adam Malik Medan', role: 'Membuat layout print, mendesain informasi tempat tidur pasien, dan backend dengan framework Yii2', tools: 'UI Design · Layout Print · Yii2', imgs: ['stars-1.webp', 'stars-2.webp', 'stars-3.webp'] }
-    ]
-  };
-  DATA.pros.forEach(function (p) { p.label = p.no + ' · ' + p.cat; });
+  // bahasa: `en` hanya menimpa teks; sisanya (gambar, kontak, dll.) diambil dari `id`
+  function merge(a, b) {
+    if (b === undefined) return a;
+    if (Array.isArray(a)) return a.map(function (x, i) { return merge(x, b[i]); });
+    if (a && typeof a === 'object') {
+      var o = {}; Object.keys(a).forEach(function (k) { o[k] = merge(a[k], b[k]); }); return o;
+    }
+    return b;
+  }
+  var LANGS = ['id', 'en'], lang = 'en';
+  try { lang = new URLSearchParams(location.search).get('lang') || localStorage.getItem('afw-lang') || ''; } catch (e) {}
+  if (LANGS.indexOf(lang) < 0) lang = 'en'; // default English
+
+  var SITE, A, UI, DATA = {};
+  function useLang(code) {
+    lang = code;
+    SITE = code === 'id' ? window.SITE.id : merge(window.SITE.id, window.SITE[code]);
+    A = SITE.assets; UI = SITE.ui;
+    DATA.jobs = SITE.jobs;
+    DATA.pros = SITE.projects.map(function (p, i) {
+      var no = (i < 9 ? '0' : '') + (i + 1);
+      return Object.assign({}, p, { no: no, label: no + ' · ' + p.cat });
+    });
+  }
+  useLang(lang);
+
+  // URL mengikuti bahasa yang tampil: English (default) tanpa parameter, Indonesia pakai ?lang=id
+  function syncUrl() {
+    try {
+      var u = new URL(location.href);
+      if (lang === 'en') u.searchParams.delete('lang'); else u.searchParams.set('lang', lang);
+      history.replaceState(null, '', u.pathname + u.search + u.hash);
+    } catch (e) {}
+  }
+  syncUrl();
 
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var CFG = { jobs: { dur: 6000 }, pros: { dur: 5000 } };
@@ -66,14 +79,25 @@
     });
     if (key === 'pros') {
       var hero = document.querySelector('[data-hero]');
-      hero.src = A + d.imgs[0]; hero.alt = d.name + ' — tampilan utama'; hero.decoding = 'async';
+      hero.src = A + d.imgs[0]; hero.alt = d.name + ' — ' + UI.mainView; hero.decoding = 'async';
       var th = document.querySelector('[data-thumbs]'); th.innerHTML = '';
       d.imgs.slice(1).forEach(function (src, k) {
-        var im = el('img', 'shot'); im.src = A + src; im.alt = d.name + ' — tampilan ' + (k + 2); im.loading = 'lazy'; im.decoding = 'async'; th.appendChild(im);
+        var im = el('img', 'shot'); im.src = A + src; im.alt = d.name + ' — ' + UI.view + ' ' + (k + 2); im.loading = 'lazy'; im.decoding = 'async'; th.appendChild(im);
       });
     }
     renderCtrl(key);
+    animateIn(key);
     if (key === 'pros') preload((s.i + 1) % DATA.pros.length);
+  }
+
+  // transisi isi panel saat berganti tab: muncul berurutan, halus
+  var PARTS = { jobs: '.job-panel .when, .job-panel h3, .job-panel .role, .job-panel .desc', pros: '.pro-top, .shot.hero, .thumbs, .meta' };
+  function animateIn(key) {
+    if (reduce || !Element.prototype.animate) return;
+    document.querySelectorAll(PARTS[key]).forEach(function (n, i) {
+      n.animate([{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }],
+        { duration: 450, delay: i * 60, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'backwards' });
+    });
   }
 
   // di mobile tablist berupa strip horizontal: geser tab aktif ke kiri strip, tanpa menggulir halaman
@@ -94,15 +118,47 @@
 
   function renderCtrl(key) {
     var b = document.querySelector('[data-ctrl="' + key + '"]'), p = state[key].paused;
-    var what = key === 'jobs' ? 'pengalaman' : 'proyek';
-    b.innerHTML = (p ? ICON_PLAY + 'Putar' : ICON_PAUSE + 'Jeda');
-    b.setAttribute('aria-label', (p ? 'Putar ' : 'Jeda ') + what + ' otomatis');
+    b.innerHTML = p ? ICON_PLAY + UI.play : ICON_PAUSE + UI.pause;
+    b.setAttribute('aria-label', p ? UI.ariaPlay : UI.ariaPause);
   }
 
   function select(key, k) { state[key].i = k; state[key].t = 0; render(key); bar(key); }
   function bar(key) {
     document.querySelector('[data-bar="' + key + '"]').style.width = Math.min(100, state[key].t / CFG[key].dur * 100) + '%';
   }
+
+  // isi konten statis dari window.SITE (js/data.js)
+  function get(path) { return path.split('.').reduce(function (o, k) { return o && o[k]; }, SITE); }
+  function icon(key) {
+    var d = key && window.ICONS && window.ICONS[key];
+    return d ? '<svg class="ico" aria-hidden="true" viewBox="0 0 24 24" fill="currentColor" fill-rule="evenodd"><path d="' + d + '"/></svg>' : '';
+  }
+  function fillStatic() {
+    var P = SITE.profile, C = SITE.contact;
+    document.querySelectorAll('[data-t]').forEach(function (n) { n.textContent = get(n.getAttribute('data-t')); });
+    document.querySelectorAll('[data-lines]').forEach(function (n) {
+      var v = n.getAttribute('data-lines').split(',');
+      var lines = v.length > 1 ? v.map(get) : get(v[0]);
+      n.innerHTML = lines.map(esc).join('<br>');
+    });
+    document.querySelector('[data-headline]').innerHTML =
+      '<span class="hl">' + esc(P.headline.highlight) + '</span> ' + esc(P.headline.rest) + '<br>' + esc(P.headline.line2);
+    document.querySelector('[data-roles]').innerHTML = P.roles.map(function (r) { return '<li>' + esc(r) + '</li>'; }).join('');
+    var mail = document.querySelector('[data-mail]'); mail.href = 'mailto:' + C.email; mail.textContent = C.email;
+    var tel = document.querySelector('[data-tel]'); tel.href = 'tel:' + C.phone.replace(/[^+\d]/g, ''); tel.textContent = C.phone;
+    var k = 0, cls = { dark: 'pill dark', light: 'pill', ai: 'pill ai' };
+    document.querySelector('[data-list="jobs"]').setAttribute('aria-label', UI.jobsList);
+    document.querySelector('[data-list="pros"]').setAttribute('aria-label', UI.prosList);
+    var lb = document.querySelector('[data-lang]'); lb.textContent = UI.lang; lb.setAttribute('aria-label', UI.langAria);
+    document.documentElement.lang = lang; document.title = SITE.meta.title;
+    document.querySelector('[data-skills]').innerHTML = SITE.skills.groups.map(function (g) {
+      return '<div class="group"><span class="group-label' + (g.style === 'ai' ? ' accent' : '') + '">' + esc(g.label) + '</span><ul class="pills">' +
+        g.items.map(function (it) { return '<li class="' + cls[g.style] + ' r' + (k++ % 8 + 1) + '">' + icon(it.icon) + esc(it.name) + '</li>'; }).join('') + '</ul></div>';
+    }).join('');
+    var ph = SITE.skills.photo, img = document.querySelector('[data-photo]');
+    img.src = A + ph.src; img.alt = ph.alt; img.width = ph.width; img.height = ph.height;
+  }
+  fillStatic();
 
   ['jobs', 'pros'].forEach(function (key) {
     buildList(key); render(key); bar(key);
@@ -121,14 +177,28 @@
   function setTone(mono) {
     proPanel.classList.toggle('mono', mono);
     toneBtn.setAttribute('aria-pressed', mono ? 'true' : 'false');
-    toneBtn.innerHTML = ICON_TONE + (mono ? 'Mono' : 'Warna');
-    toneBtn.setAttribute('aria-label', mono ? 'Tampilkan screenshot berwarna' : 'Tampilkan screenshot hitam-putih');
+    toneBtn.innerHTML = ICON_TONE + (mono ? UI.mono : UI.color);
+    toneBtn.setAttribute('aria-label', mono ? UI.ariaColor : UI.ariaMono);
     try { localStorage.setItem('afw-tone', mono ? 'mono' : 'warna'); } catch (e) {}
   }
   var savedTone = null;
   try { savedTone = localStorage.getItem('afw-tone'); } catch (e) {}
   setTone(savedTone !== 'warna'); // default mono
   toneBtn.addEventListener('click', function () { setTone(!proPanel.classList.contains('mono')); });
+
+  // ganti bahasa: isi ulang konten tanpa reload, posisi tab tetap
+  document.querySelector('[data-lang]').addEventListener('click', function () {
+    useLang(lang === 'id' ? 'en' : 'id');
+    try { localStorage.setItem('afw-lang', lang); } catch (e) {}
+    syncUrl();
+    fillStatic();
+    document.querySelectorAll('.group').forEach(function (g) { g.classList.add('rv', 'in'); }); // grup baru tidak perlu reveal ulang
+    ['jobs', 'pros'].forEach(function (key) {
+      document.querySelector('[data-list="' + key + '"]').innerHTML = '';
+      buildList(key); render(key);
+    });
+    setTone(proPanel.classList.contains('mono'));
+  });
 
   // rotasi hanya berjalan saat section terlihat di layar
   if ('IntersectionObserver' in window) {
@@ -197,6 +267,42 @@
     requestAnimationFrame(step);
   } else {
     startReveal();
+  }
+
+  // parallax grid: latar grid bergerak lebih lambat dari scroll
+  if (!reduce) {
+    var grids = document.querySelectorAll('.gridbg'), ticking = false;
+    var parallax = function () {
+      ticking = false;
+      var vh = window.innerHeight;
+      grids.forEach(function (g) {
+        var r = g.getBoundingClientRect();
+        if (r.bottom < 0 || r.top > vh) return;
+        g.style.setProperty('--gy', (r.top * -0.3).toFixed(1) + 'px');
+      });
+    };
+    window.addEventListener('scroll', function () { if (!ticking) { ticking = true; requestAnimationFrame(parallax); } }, { passive: true });
+    parallax();
+  }
+
+  // cursor follower: ring mengikuti mouse dengan sedikit jeda, membesar di elemen yang bisa diklik
+  var cur = document.querySelector('.cursor');
+  if (cur && !reduce && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    var mx = 0, my = 0, cx = 0, cy = 0, moving = false;
+    var follow = function () {
+      cx += (mx - cx) * 0.2; cy += (my - cy) * 0.2;
+      cur.style.transform = 'translate3d(' + cx.toFixed(1) + 'px,' + cy.toFixed(1) + 'px,0)';
+      if (Math.abs(mx - cx) > 0.1 || Math.abs(my - cy) > 0.1) requestAnimationFrame(follow); else moving = false;
+    };
+    document.addEventListener('mousemove', function (e) {
+      mx = e.clientX; my = e.clientY;
+      if (!cur.classList.contains('on')) { cx = mx; cy = my; cur.classList.add('on'); }
+      if (!moving) { moving = true; requestAnimationFrame(follow); }
+    }, { passive: true });
+    document.addEventListener('mouseover', function (e) {
+      cur.classList.toggle('big', !!e.target.closest('a, button, .tab'));
+    });
+    document.documentElement.addEventListener('mouseleave', function () { cur.classList.remove('on'); });
   }
 
   var last = performance.now();

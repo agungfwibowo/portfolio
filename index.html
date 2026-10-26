@@ -1,27 +1,28 @@
 <!doctype html>
-<html lang="id">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Agung Fitrah Wibowo — Front-End Developer &amp; UI/UX Designer</title>
-<meta name="description" content="Portofolio Agung Fitrah Wibowo: Programmer SIMRS, Web Front-End Developer, dan UI/UX Designer di Medan.">
+<meta name="description" content="Portfolio of Agung Fitrah Wibowo: hospital information system programmer, web front-end developer, and UI/UX designer based in Medan, Indonesia.">
 <meta name="author" content="Agung Fitrah Wibowo">
 <meta name="theme-color" content="#111318">
 <meta property="og:type" content="website">
+<meta property="og:locale" content="en_US">
 <meta property="og:title" content="Agung Fitrah Wibowo — Front-End Developer &amp; UI/UX Designer">
-<meta property="og:description" content="Programmer SIMRS, Web Front-End Developer, dan UI/UX Designer di Medan.">
+<meta property="og:description" content="Hospital information system programmer, web front-end developer, and UI/UX designer based in Medan, Indonesia.">
 <meta property="og:url" content="https://agungfwibowo.github.io/portfolio/">
-<meta property="og:image" content="https://agungfwibowo.github.io/portfolio/assets/og.png?v=2">
+<meta property="og:image" content="https://agungfwibowo.github.io/portfolio/assets/og.png?v=4">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Agung Fitrah Wibowo — Front-End Developer &amp; UI/UX Designer">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://agungfwibowo.github.io/portfolio/assets/og.png?v=2">
+<meta name="twitter:image" content="https://agungfwibowo.github.io/portfolio/assets/og.png?v=4">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23111318'/%3E%3Ctext x='16' y='22' font-family='Arial' font-weight='700' font-size='13' fill='%23fff' text-anchor='middle'%3EAFW%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=4">
+<link rel="stylesheet" href="css/style.css?v=11">
 <script>
 (function (d) {
   d.classList.add('js');
@@ -31,43 +32,41 @@
   setTimeout(function () { if (!window.__rv) d.classList.remove('js', 'loading'); }, 2500);
 })(document.documentElement);
 </script>
-<script src="js/main.js?v=4" defer></script>
+<script src="js/data.js?v=13" defer></script>
+<script src="js/icons.js?v=1" defer></script>
+<script src="js/main.js?v=15" defer></script>
 </head>
 <body>
-<div class="loader" aria-hidden="true"><b>AFW</b><i></i><span data-pct>0%</span></div>
+<div class="loader" aria-hidden="true"><b data-t="profile.mark"></b><i></i><span data-pct>0%</span></div>
+<div class="cursor" aria-hidden="true"></div>
 <div class="page" id="top">
 <main class="frame">
 
 <!-- Header -->
 <div class="panel id jn">
-<span class="mark" aria-label="Monogram AFW">AFW</span>
-<p>Agung Fitrah Wibowo<br>Deli Serdang, Sumut<br>Berkarya sejak 2019</p>
+<span class="mark" data-t="profile.mark"></span>
+<p data-lines="profile.name,profile.location,profile.since"></p>
 </div>
 <header class="panel title">
-<h1><span class="hl">Front-End</span> Developer<br>&amp; UI/UX Designer</h1>
-<ul class="roles">
-<li>Programmer SIMRS</li>
-<li>Web Front-End Developer</li>
-<li>UI/UX Designer</li>
-<li>WordPress Developer</li>
-<li>AI-Assisted Developer</li>
-</ul>
+<button type="button" class="ctrl lang" data-lang></button>
+<h1 data-headline></h1>
+<ul class="roles" data-roles></ul>
 </header>
 
 <!-- Tagline -->
 <div class="panel full gridbg tagline">
-<span class="years">+7 tahun</span>
-<p>Dari desain di Figma, sampai kode yang rapi.</p>
+<span class="years" data-t="profile.years"></span>
+<p data-t="profile.tagline"></p>
 </div>
 
 <!-- Pengalaman -->
 <section class="panel full sec" id="pengalaman" aria-labelledby="h-exp">
 <div class="sec-head">
-<h2 class="h2" id="h-exp">Pengalaman<br>profesional</h2>
+<h2 class="h2" id="h-exp" data-lines="ui.exp"></h2>
 <button type="button" class="ctrl" data-ctrl="jobs"></button>
 </div>
 <div class="tabs-wrap">
-<div class="tablist jobs" role="tablist" aria-label="Riwayat kerja" data-list="jobs"></div>
+<div class="tablist jobs" role="tablist" data-list="jobs"></div>
 <div class="job-panel" role="tabpanel" aria-live="polite">
 <div class="bar" aria-hidden="true"><i data-bar="jobs"></i></div>
 <p class="when" data-f="jobs.period"></p>
@@ -81,69 +80,50 @@
 
 <!-- Pendidikan + Kontak -->
 <section class="panel half jn" aria-labelledby="h-edu">
-<h2 class="h2" id="h-edu">Pendidikan</h2>
+<h2 class="h2" id="h-edu" data-t="ui.edu"></h2>
 <div class="edu">
-<p><strong>Okt 2012 — Nov 2016 :</strong> Universitas Potensi Utama, Medan</p>
-<p>Sarjana Komputer (S.Kom)</p>
+<p><strong data-t="education.period"></strong><strong> :</strong> <span data-t="education.school"></span></p>
+<p data-t="education.degree"></p>
 </div>
 </section>
 <section class="panel half contact" aria-labelledby="h-contact">
-<h2 class="h2" id="h-contact">Kontak</h2>
-<a class="mail" href="mailto:agungf.wibowo@gmail.com">agungf.wibowo@gmail.com</a>
-<p><a class="tel" href="tel:+6282285715959">+62 822 8571 5959</a><br>Percut Sei Tuan, Deli Serdang</p>
+<h2 class="h2" id="h-contact" data-t="ui.contact"></h2>
+<a class="mail" data-mail></a>
+<p><a class="tel" data-tel></a><br><span data-t="contact.address"></span></p>
 </section>
 
 <!-- Keahlian -->
 <section class="panel full skills" aria-labelledby="h-skills">
 <div class="skills-head">
-<h2 id="h-skills">Keahlian &amp; tools<br>yang dikuasai :</h2>
-<span>Desain + Kode</span>
+<h2 id="h-skills" data-lines="skills.title"></h2>
+<span data-t="skills.badge"></span>
 </div>
 <div class="gridbg skills-wrap">
-<div class="skills-list">
-<div class="group">
-<span class="group-label">Mahir</span>
-<ul class="pills">
-<li class="pill dark r1">HTML</li><li class="pill dark r2">CSS</li><li class="pill dark r3">Tailwind CSS</li><li class="pill dark r4">Bootstrap</li><li class="pill dark r5">Figma</li>
-</ul>
-</div>
-<div class="group">
-<span class="group-label">Menengah</span>
-<ul class="pills">
-<li class="pill r6">JavaScript</li><li class="pill r7">React</li><li class="pill r2">Vue.js</li><li class="pill r3">PHP · Yii2</li><li class="pill r8">Laravel</li><li class="pill r5">SCSS / Sass</li><li class="pill r6">WordPress (Divi)</li><li class="pill r1">Git</li>
-</ul>
-</div>
-<div class="group">
-<span class="group-label accent">AI-Assisted Development</span>
-<ul class="pills">
-<li class="pill ai r5">Claude</li><li class="pill ai r8">ChatGPT</li><li class="pill ai r3">Claude Code (agen AI)</li>
-</ul>
-</div>
-</div>
-<img class="skills-photo" src="assets/foto-agung.webp" alt="Agung Fitrah Wibowo duduk di kursi kerja" width="600" height="1094" loading="lazy" decoding="async">
+<div class="skills-list" data-skills></div>
+<img class="skills-photo" data-photo alt="" loading="lazy" decoding="async">
 </div>
 </section>
 
 <!-- Proyek -->
 <section class="panel full sec last" id="proyek" aria-labelledby="h-pro">
 <div class="sec-head">
-<h2 class="h2" id="h-pro">Proyek pilihan</h2>
+<h2 class="h2" id="h-pro" data-t="ui.projects"></h2>
 <div class="ctrls">
 <button type="button" class="ctrl" data-tone aria-pressed="false"></button>
 <button type="button" class="ctrl" data-ctrl="pros"></button>
 </div>
 </div>
 <div class="tabs-wrap wide">
-<div class="tablist pros" role="tablist" aria-label="Daftar proyek" data-list="pros"></div>
+<div class="tablist pros" role="tablist" data-list="pros"></div>
 <div class="pro-panel mono" role="tabpanel" aria-live="polite">
 <div class="bar" aria-hidden="true"><i data-bar="pros"></i></div>
 <div class="pro-top"><h3 data-f="pros.name"></h3><span data-f="pros.label"></span></div>
 <img class="shot hero" data-hero alt="" width="1100" height="619">
 <div class="thumbs" data-thumbs></div>
 <dl class="meta">
-<div><dt>Klien</dt><dd class="client" data-f="pros.client"></dd></div>
-<div><dt>Peran</dt><dd data-f="pros.role"></dd></div>
-<div><dt>Alat</dt><dd class="tools" data-f="pros.tools"></dd></div>
+<div><dt data-t="ui.client"></dt><dd class="client" data-f="pros.client"></dd></div>
+<div><dt data-t="ui.role"></dt><dd data-f="pros.role"></dd></div>
+<div><dt data-t="ui.tools"></dt><dd class="tools" data-f="pros.tools"></dd></div>
 </dl>
 </div>
 </div>
@@ -151,8 +131,8 @@
 
 </main>
 <footer class="foot">
-<span>© 2026 Agung Fitrah Wibowo</span>
-<a href="#top">Kembali ke atas ↑</a>
+<span data-t="footer"></span>
+<a href="#top" data-t="ui.top"></a>
 </footer>
 </div>
 
