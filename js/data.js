@@ -16,7 +16,12 @@ window.SITE.id = {
     color: 'Warna', mono: 'Mono', ariaColor: 'Tampilkan screenshot berwarna', ariaMono: 'Tampilkan screenshot hitam-putih',
     jobsList: 'Riwayat kerja', prosList: 'Daftar proyek', mainView: 'tampilan utama', view: 'tampilan',
     top: 'Kembali ke atas ↑',
-    linkedin: 'LinkedIn ↗', photoLink: 'Buka profil LinkedIn Agung', cursorIn: 'Lihat LinkedIn ↗'
+    linkedin: 'LinkedIn ↗', whatsapp: 'WhatsApp ↗',
+    // pesan pembuka saat chat WhatsApp dibuka (bisa diedit pengunjung sebelum dikirim)
+    waText: 'Halo Agung, saya lihat portofolio kamu dan ingin ngobrol soal ',
+    photoLink: 'Buka profil LinkedIn Agung', cursorIn: 'Lihat LinkedIn ↗',
+    // CTA besar sebelum footer: title = [baris 1, baris 2 (di kotak biru)]
+    cta: { kicker: 'Hubungi saya', title: ['Ayo bikin', 'sesuatu yang keren.'], text: 'Punya proyek, lowongan, atau sekadar ide? Yuk ngobrol.' }
   },
 
   profile: {
@@ -41,7 +46,8 @@ window.SITE.id = {
     email: 'agungf.wibowo@gmail.com',
     phone: '+62 822 8571 5959',
     address: 'Percut Sei Tuan, Deli Serdang',
-    linkedin: 'https://www.linkedin.com/in/agungfwibowo/'
+    linkedin: 'https://www.linkedin.com/in/agungfwibowo/',
+    whatsapp: '+62 813 7041 9424'
   },
 
   skills: {
@@ -103,7 +109,9 @@ window.SITE.en = {
     color: 'Color', mono: 'Mono', ariaColor: 'Show screenshots in color', ariaMono: 'Show screenshots in black & white',
     jobsList: 'Work history', prosList: 'Project list', mainView: 'main view', view: 'view',
     top: 'Back to top ↑',
-    photoLink: 'Open Agung\'s LinkedIn profile', cursorIn: 'View LinkedIn ↗'
+    waText: 'Hi Agung, I came across your portfolio and would like to talk about ',
+    photoLink: 'Open Agung\'s LinkedIn profile', cursorIn: 'View LinkedIn ↗',
+    cta: { kicker: 'Get in touch', title: ['Let\'s build', 'something great.'], text: 'Got a project, a role, or just an idea? Let\'s talk.' }
   },
 
   profile: {

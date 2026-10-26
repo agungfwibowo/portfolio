@@ -144,7 +144,9 @@
     document.querySelector('[data-headline]').innerHTML =
       '<span class="hl">' + esc(P.headline.highlight) + '</span> ' + esc(P.headline.rest) + '<br>' + esc(P.headline.line2);
     document.querySelector('[data-roles]').innerHTML = P.roles.map(function (r) { return '<li>' + esc(r) + '</li>'; }).join('');
-    var mail = document.querySelector('[data-mail]'); mail.href = 'mailto:' + C.email; mail.textContent = C.email;
+    document.querySelectorAll('[data-mail]').forEach(function (m) { m.href = 'mailto:' + C.email; m.textContent = C.email; });
+    var ct = UI.cta.title;
+    document.querySelector('[data-cta-title]').innerHTML = esc(ct[0]) + '<br><span class="cta-hl">' + esc(ct[1]) + '</span>';
     var tel = document.querySelector('[data-tel]'); tel.href = 'tel:' + C.phone.replace(/[^+\d]/g, ''); tel.textContent = C.phone;
     var k = 0, cls = { dark: 'pill dark', light: 'pill', ai: 'pill ai' };
     document.querySelector('[data-list="jobs"]').setAttribute('aria-label', UI.jobsList);
@@ -182,6 +184,7 @@
     var st = document.querySelectorAll('.stickers .st'), sk = SITE.skills.stickers;
     st.forEach(function (n, i) { var v = sk[i] || ''; n.innerHTML = (Array.isArray(v) ? v : [v]).map(esc).join('<br>'); });
     document.querySelectorAll('[data-in]').forEach(function (li) { li.href = C.linkedin; li.textContent = UI.linkedin; });
+    document.querySelectorAll('[data-wa]').forEach(function (w) { w.href = 'https://wa.me/' + C.whatsapp.replace(/\D/g, '') + '?text=' + encodeURIComponent(UI.waText); w.textContent = UI.whatsapp; });
   }
   fillStatic();
 
@@ -238,7 +241,7 @@
 
   // reveal saat scroll: elemen yang masuk layar bersamaan muncul berurutan
   // daftar selector sama dengan di css/style.css
-  var RV = '.mark, .id p, .title h1, .roles, .years, .tagline p, .sec-head, .tabs-wrap, .half > *, .skills-head > *, .group, .skills-photo, .stickers, .plus';
+  var RV = '.mark, .id p, .title h1, .roles, .years, .tagline p, .sec-head, .tabs-wrap, .half > *, .skills-head > *, .group, .skills-photo, .stickers, .plus, .cta-in';
   var rvs = document.querySelectorAll(RV);
   window.__rv = true;
   function startReveal() {
@@ -296,11 +299,12 @@
 
   // parallax grid: latar grid bergerak lebih lambat dari scroll
   if (!reduce) {
-    var grids = document.querySelectorAll('.gridbg'), ticking = false;
+    var grids = document.querySelectorAll('.gridbg, .cta'), ticking = false;
     var parallax = function () {
       ticking = false;
       var vh = window.innerHeight;
       grids.forEach(function (g) {
+        if (g.classList.contains('cta-anim')) return; // jangan repaint latar CTA saat sedang melebar/menyempit
         var r = g.getBoundingClientRect();
         if (r.bottom < 0 || r.top > vh) return;
         g.style.setProperty('--gy', (r.top * -0.3).toFixed(1) + 'px');
@@ -355,6 +359,60 @@
       photo.style.setProperty('--sx', '0px'); photo.style.setProperty('--sy', '0px');
       stk.classList.remove('tilting'); stk.style.transform = '';
     });
+  }
+
+  // parallax foto profil khusus mobile: foto + stiker bergerak lebih lambat dari scroll
+  var mqMobile = window.matchMedia('(max-width: 760px)');
+  if (!reduce) {
+    var pWrap = document.querySelector('.skills-wrap'), pTick = false;
+    var photoParallax = function () {
+      pTick = false;
+      if (!mqMobile.matches) { photo.style.transform = stk.style.transform = ''; return; }
+      var r = pWrap.getBoundingClientRect(), vh = window.innerHeight;
+      if (r.bottom < 0 || r.top > vh) return;
+      var y = Math.max(-40, Math.min(40, -(r.top + r.height / 2 - vh / 2) * 0.12));
+      photo.style.transform = stk.style.transform = 'translate3d(0,' + y.toFixed(1) + 'px,0)';
+    };
+    var onPScroll = function () { if (!pTick) { pTick = true; requestAnimationFrame(photoParallax); } };
+    window.addEventListener('scroll', onPScroll, { passive: true });
+    window.addEventListener('resize', onPScroll);
+    photoParallax();
+  }
+
+  // CTA melebar penuh saat ~98% terlihat (dibanding tinggi CTA atau layar, mana yang lebih kecil); menyempit lagi di bawah 90%
+  var ctaEl = document.querySelector('.cta');
+  if (ctaEl) {
+    var wTick = false;
+    var widen = function () {
+      wTick = false;
+      var r = ctaEl.getBoundingClientRect(), vh = window.innerHeight;
+      var seen = Math.max(0, Math.min(r.bottom, vh) - Math.max(r.top, 0)) / Math.min(r.height, vh);
+      var want = seen >= 0.98 ? true : seen < 0.9 ? false : ctaEl.classList.contains('wide');
+      if (want !== ctaEl.classList.contains('wide')) {
+        ctaEl.classList.add('cta-anim'); ctaEl.classList.toggle('wide', want);
+        clearTimeout(ctaEl._t); ctaEl._t = setTimeout(function () { ctaEl.classList.remove('cta-anim'); }, 750);
+      }
+    };
+    var onW = function () { if (!wTick) { wTick = true; requestAnimationFrame(widen); } };
+    window.addEventListener('scroll', onW, { passive: true });
+    window.addEventListener('resize', onW);
+    widen();
+  }
+
+  // snap lembut ke CTA: hanya setelah scroll berhenti & bila tepi atas CTA sudah dekat tepi atas layar
+  var cta = document.querySelector('.cta');
+  if (cta && !reduce) {
+    var snapT = 0, snapping = false;
+    var trySnap = function () {
+      if (snapping) { snapping = false; return; }
+      var top = cta.getBoundingClientRect().top, near = window.innerHeight * 0.18;
+      if (Math.abs(top) > 4 && Math.abs(top) < near) {
+        snapping = true;
+        window.scrollTo({ top: window.scrollY + top, behavior: 'smooth' });
+      }
+    };
+    if ('onscrollend' in window) window.addEventListener('scrollend', trySnap);
+    else window.addEventListener('scroll', function () { clearTimeout(snapT); snapT = setTimeout(trySnap, 160); }, { passive: true });
   }
 
   var last = performance.now();
