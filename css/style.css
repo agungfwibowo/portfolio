@@ -76,7 +76,7 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
 /* skills */
 .skills{padding:0}
 .skills-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:20px;position:sticky;top:0;padding:48px 32px;background:var(--ink);color:#fff;clip-path:inset(-240px -100vmax 0);z-index:9}
-.skills-head::after{content:"";position:absolute;top:0;bottom:0;left:-100vmax;right:-100vmax;z-index:-1;background:var(--ink)}
+.skills-head::after{content:"";position:absolute;top:0;bottom:0;left:calc(50% - 50vw);right:calc(50% - 50vw);z-index:-1;background:var(--ink)}
 /* garis vertikal (frame & pembatas pendidikan/kontak) memudar sebelum pita hitam */
 .skills-head::before{content:"";position:absolute;left:0;right:-1px;bottom:100%;height:240px;background:linear-gradient(rgba(238,238,235,0),var(--paper) 85%) left/6px 100% no-repeat,linear-gradient(rgba(238,238,235,0),var(--paper) 85%) center/6px 100% no-repeat,linear-gradient(rgba(238,238,235,0),var(--paper) 85%) right/6px 100% no-repeat;pointer-events:none}
 .skills-head h2{margin:0;font-family:var(--display);font-size:24px;font-weight:300;line-height:1.15;letter-spacing:-.01em}
@@ -204,7 +204,12 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
 /* pita hitam keahlian sudah jadi batas, garis bawah pendidikan/kontak tidak perlu */
 .contact{border-bottom:0}
 @media (min-width:840px){.half{border-bottom:0;padding-bottom:96px}}
-@media (max-width:839px){.skills-head::before{display:none}}
+@media (max-width:839px){
+  .skills-head::before{display:none}
+  /* fillet (⊣) di tepi kanan layar, di ujung garis bawah header dan garis antara pendidikan/kontak */
+  .panel.half:not(.contact){position:relative}
+  .panel.title::after,.panel.half:not(.contact)::after{content:"";position:absolute;right:0;bottom:-12px;width:11px;height:23px;z-index:3;pointer-events:none;background:var(--ink);-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 23'%3E%3Cpath d='M11 0A11 11 0 0 1 0 11v1a11 11 0 0 1 11 11z'/%3E%3C/svg%3E") 0 0/100% 100% no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 23'%3E%3Cpath d='M11 0A11 11 0 0 1 0 11v1a11 11 0 0 1 11 11z'/%3E%3C/svg%3E") 0 0/100% 100% no-repeat}
+}
 /* section proyek langsung menyambung ke CTA, tanpa garis bawah */
 #proyek{border-bottom:0}
 /* CTA besar sebelum footer */
@@ -229,6 +234,14 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
 .cta-text{margin-top:8px!important}
 .cta{display:flex;flex-direction:column;gap:56px;background:var(--ink);color:#fff;
   background-image:linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px);background-size:var(--cell,28px) var(--cell,28px);background-position:-1px calc(-1px + var(--gy,0px))}
+/* kanvas cahaya WebGL di belakang isi CTA & pita keahlian, di atas grid */
+.cta{position:relative;z-index:9}
+.glow{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+.cta-body,.cta .foot,.skills-head>*{position:relative;z-index:1}
+/* pita keahlian: kanvas selebar layar seperti latar hitamnya */
+.skills-head canvas.glow{position:absolute;z-index:0;left:calc(50% - 50vw);width:100vw}
+/* kanvas disisipkan JS, bukan bagian reveal */
+.js .skills-head canvas.glow{opacity:1;translate:none;filter:none}
 .cta-kick{margin:0;font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#8FB0FF}
 .cta-title{margin:0;font-family:var(--display);font-size:clamp(46px,9vw,128px);font-weight:300;line-height:.98;letter-spacing:-.04em}
 .cta-hl{padding:0 .14em;background:var(--accent);font-weight:400;-webkit-box-decoration-break:clone;box-decoration-break:clone}

@@ -471,4 +471,76 @@
     requestAnimationFrame(tick);
   }
   requestAnimationFrame(tick);
+
+  // cahaya biru mengalir seperti ombak + grain (WebGL) untuk bidang hitam, jalan hanya saat terlihat
+  var glow = function (host) {
+  var cv = host && document.createElement('canvas');
+  var gl = cv && (cv.getContext('webgl', { premultipliedAlpha: true, antialias: false }) || cv.getContext('experimental-webgl'));
+  if (gl) {
+    cv.className = 'glow';
+    cv.setAttribute('aria-hidden', 'true');
+    host.insertBefore(cv, host.firstChild);
+    var VS = 'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
+    var FS = [
+      'precision mediump float;uniform vec2 r;uniform float t;',
+      'float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}',
+      'float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);',
+      ' return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);}',
+      'float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<4;i++){v+=a*n(p);p=p*2.03+vec2(1.7,9.2);a*=.5;}return v;}',
+      'void main(){',
+      ' vec2 uv=gl_FragCoord.xy/r;vec2 q=vec2(uv.x*r.x/r.y,uv.y);',
+      // domain warp → gerak bergelombang, mengalir ke samping (kiri → kanan); noise dipipihkan vertikal jadi alur horizontal
+      ' vec2 s=q*vec2(1.,2.2);vec2 w=vec2(fbm(s*1.2-vec2(t*.16,0.)),fbm(s*1.2-vec2(t*.12,0.)+5.2));',
+      ' float f=fbm(s*1.5+w*1.4-vec2(t*.14,0.));',
+      // berkas cahaya diagonal dari kanan atas
+      ' vec2 o=vec2(r.x/r.y*.78,1.05);vec2 d=normalize(vec2(-.55,-1.));vec2 v=q-o;',
+      ' float along=dot(v,d);float across=dot(v,vec2(-d.y,d.x))+(w.x-.5)*.35;',
+      ' float beam=exp(-across*across*7.)*smoothstep(-.1,.35,along)*exp(-along*.9);',
+      ' float a=clamp(beam*(.35+.9*f)+f*f*.12,0.,1.)*.85;',
+      ' vec3 c=mix(vec3(.16,.36,.42),vec3(.16,.33,.92),smoothstep(.35,.75,f));',
+      // grain: titik terang & gelap acak tiap frame, lebih kuat di area bercahaya
+      ' float g=(h(gl_FragCoord.xy+fract(floor(t*8.)*.37)*91.)-.5)*(.12+a*.16);',
+      ' gl_FragColor=vec4(c*a+max(g,0.),clamp(a+abs(g),0.,1.));',
+      '}'
+    ].join('\n');
+    var mk = function (type, src) { var sh = gl.createShader(type); gl.shaderSource(sh, src); gl.compileShader(sh); return sh; };
+    var prog = gl.createProgram();
+    gl.attachShader(prog, mk(gl.VERTEX_SHADER, VS));
+    gl.attachShader(prog, mk(gl.FRAGMENT_SHADER, FS));
+    gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) { cv.remove(); }
+    else {
+      gl.useProgram(prog);
+      gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+      var loc = gl.getAttribLocation(prog, 'p');
+      gl.enableVertexAttribArray(loc);
+      gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+      var uR = gl.getUniformLocation(prog, 'r'), uT = gl.getUniformLocation(prog, 't');
+      // resolusi 1 piksel CSS (bukan devicePixelRatio): grain tetap tajam, beban GPU tetap ringan
+      var size = function () {
+        var w = Math.max(1, Math.round(cv.clientWidth)), hgt = Math.max(1, Math.round(cv.clientHeight));
+        if (cv.width !== w || cv.height !== hgt) { cv.width = w; cv.height = hgt; gl.viewport(0, 0, w, hgt); }
+        gl.uniform2f(uR, w, hgt);
+      };
+      var t0 = performance.now(), glowOn = false, glowRaf = 0;
+      var draw = function (now) {
+        size();
+        gl.uniform1f(uT, reduce ? 12 : (now - t0) / 1000 * 1.6);
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+        if (glowOn && !reduce) glowRaf = requestAnimationFrame(draw);
+      };
+      if ('IntersectionObserver' in window) {
+        new IntersectionObserver(function (es) {
+          glowOn = es[0].isIntersecting;
+          cancelAnimationFrame(glowRaf);
+          if (glowOn) glowRaf = requestAnimationFrame(draw);
+        }).observe(host);
+      } else { glowOn = true; glowRaf = requestAnimationFrame(draw); }
+      window.addEventListener('resize', function () { if (!glowOn) return; cancelAnimationFrame(glowRaf); glowRaf = requestAnimationFrame(draw); });
+    }
+  }
+  };
+  glow(document.querySelector('.cta'));
+  glow(document.querySelector('.skills-head'));
 })();
