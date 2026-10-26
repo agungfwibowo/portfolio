@@ -299,7 +299,7 @@
 
   // parallax grid: latar grid bergerak lebih lambat dari scroll
   if (!reduce) {
-    var grids = document.querySelectorAll('.gridbg, .cta'), ticking = false;
+    var grids = document.querySelectorAll('.gridbg:not(.tagline), .cta'), ticking = false; // tagline dikecualikan: grid bergerak di belakang badge miring terlihat seperti badge ikut berputar
     var parallax = function () {
       ticking = false;
       var vh = window.innerHeight;
