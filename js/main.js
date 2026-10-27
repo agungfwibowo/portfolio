@@ -321,22 +321,13 @@
     gridEls.forEach(function (el) { gro.observe(el); });
   } else window.addEventListener('resize', function () { gridEls.forEach(fitGrid); });
 
-  // parallax grid: latar grid bergerak lebih lambat dari scroll
-  if (!reduce) {
-    var grids = document.querySelectorAll('.gridbg:not(.tagline), .cta'), ticking = false; // tagline dikecualikan: grid bergerak di belakang badge miring terlihat seperti badge ikut berputar
-    var parallax = function () {
-      ticking = false;
-      var vh = window.innerHeight;
-      grids.forEach(function (g) {
-        if (g.classList.contains('cta-anim')) return; // jangan repaint latar CTA saat sedang melebar/menyempit
-        var r = g.getBoundingClientRect();
-        if (r.bottom < 0 || r.top > vh) return;
-        g.style.setProperty('--gy', (r.top * -0.3).toFixed(1) + 'px');
-      });
-    };
-    window.addEventListener('scroll', function () { if (!ticking) { ticking = true; requestAnimationFrame(parallax); } }, { passive: true });
-    parallax();
-  }
+  // grid bergulir hanya jalan saat section-nya terlihat; di luar layar animasinya dijeda (.grid-on)
+  if ('IntersectionObserver' in window) {
+    var gio = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { e.target.classList.toggle('grid-on', e.isIntersecting); });
+    });
+    document.querySelectorAll('.tagline.gridbg, .skills-wrap, .cta').forEach(function (el) { gio.observe(el); });
+  } else document.querySelectorAll('.tagline.gridbg, .skills-wrap, .cta').forEach(function (el) { el.classList.add('grid-on'); });
 
   // cursor follower: ring mengikuti mouse dengan sedikit jeda, membesar di elemen yang bisa diklik
   var cur = document.querySelector('.cursor');
