@@ -621,7 +621,7 @@
   // berikutnya begitu transisi selesai, jadi polanya tidak pernah berulang persis.
   // Jarak dihitung dari ukuran .bubbles (selebar .frame), bukan vw/vh (lebar layar), supaya batas
   // kanan-kiri geraknya selalu ikut lebar frame walau di layar lebar.
-  if (!reduce) {
+  if (!reduce && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
     var bwrap = document.querySelector('.bubbles');
     if (bwrap) {
       document.querySelectorAll('.bubble').forEach(function (el, i) {
