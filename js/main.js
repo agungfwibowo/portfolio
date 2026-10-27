@@ -578,14 +578,14 @@
       var uR = gl.getUniformLocation(prog, 'r'), uT = gl.getUniformLocation(prog, 't'), uG = gl.getUniformLocation(prog, 'gs');
       var desk = window.matchMedia('(min-width:840px)');
       // desktop: setengah resolusi CSS, cahaya lembut tidak butuh piksel penuh, GPU jauh lebih ringan;
-      // ponsel (layar rapat, DPR tinggi): setengah CSS membuat satu butir grain melebar jadi beberapa piksel fisik
-      // (terlihat kasar/besar), jadi resolusi dinaikkan mengikuti kerapatan layar (dibatasi DPR 2)
+      // ponsel (layar rapat, DPR tinggi): grain butuh ~1 piksel fisik per butir supaya tidak kasar, jadi
+      // resolusi disamakan dengan piksel fisik layar (dibatasi DPR 2.5 agar beban GPU tidak berlebihan)
       var size = function () {
-        var k = desk.matches ? 0.5 : Math.min(window.devicePixelRatio || 1, 2) * 0.5;
+        var k = desk.matches ? 0.5 : Math.min(window.devicePixelRatio || 1, 2.5);
         var w = Math.max(1, Math.round(cv.clientWidth * k)), hgt = Math.max(1, Math.round(cv.clientHeight * k));
         if (cv.width !== w || cv.height !== hgt) { cv.width = w; cv.height = hgt; gl.viewport(0, 0, w, hgt); }
         gl.uniform2f(uR, w, hgt);
-        gl.uniform1f(uG, desk.matches ? .08 : .14);
+        gl.uniform1f(uG, desk.matches ? .08 : .1);
       };
       var t0 = performance.now(), glowOn = false, glowRaf = 0, lastDraw = 0;
       // dibatasi ~30fps & dilewati saat host tertutup (pita keahlian yang sudah tertimpa area keahlian)
