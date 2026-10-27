@@ -16,6 +16,12 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
 .panel{min-width:0;padding:32px;border-right:1px solid var(--ink);border-bottom:1px solid var(--ink)}
 .full{flex:1 1 100%}
 .gridbg{background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:var(--cell,28px) var(--cell,28px);background-position:-1px calc(-1px + var(--gy,0px))}
+/* parallax grid tanpa repaint: grid dipindah ke lapisan ::before yang lebih tinggi (±400px) lalu digeser transform (JS mengisi --gy) */
+.skills-wrap.gridbg{background-image:none;isolation:isolate}
+.skills-wrap::before,.cta::before{content:"";position:absolute;left:0;right:0;top:-400px;bottom:-400px;z-index:-1;pointer-events:none;
+  background-image:linear-gradient(var(--gl) 1px,transparent 1px),linear-gradient(90deg,var(--gl) 1px,transparent 1px);
+  background-size:var(--cell,28px) var(--cell,28px);background-position:-1px 399px;transform:translate3d(0,var(--gy,0px),0);will-change:transform}
+.skills-wrap{--gl:var(--grid)}.cta{--gl:rgba(255,255,255,.06)}
 .mono{font-family:var(--mono)}
 .h2{margin:0;font-family:var(--display);font-size:30px;font-weight:300;line-height:1.05;letter-spacing:-.02em}
 
@@ -83,10 +89,14 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
 
 /* skills */
 .skills{padding:0}
-.skills-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:20px;position:sticky;top:0;padding:48px 32px;background:var(--ink);color:#fff;clip-path:inset(-240px -100vmax 0);z-index:9}
-.skills-head::after{content:"";position:absolute;top:0;bottom:0;left:calc(50% - 50vw);right:calc(50% - 50vw);z-index:-1;background:var(--ink)}
-/* garis vertikal (frame & pembatas pendidikan/kontak) memudar sebelum pita hitam */
-.skills-head::before{content:"";position:absolute;left:0;right:-1px;bottom:100%;height:240px;background:linear-gradient(rgba(238,238,235,0),var(--paper) 85%) left/6px 100% no-repeat,linear-gradient(rgba(238,238,235,0),var(--paper) 85%) center/6px 100% no-repeat,linear-gradient(rgba(238,238,235,0),var(--paper) 85%) right/6px 100% no-repeat;pointer-events:none}
+.skills-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:20px;position:sticky;top:0;padding:48px 32px;color:#fff;clip-path:inset(-240px -100vmax 0);z-index:9}
+.skills-head::after{content:"";position:absolute;top:0;bottom:0;left:calc(50% - 50vw);right:calc(50% - 50vw);z-index:-1;background:var(--ink);transform:scaleY(var(--sy,1))}
+/* pita membuka dari garis 1px ke tinggi penuh seiring scroll (JS mengisi --sy); teks muncul belakangan (--so) */
+.skills-head>h2,.skills-head>span{opacity:var(--so,1)}
+/* opacity mengikuti scroll langsung: tanpa transisi (transisi reveal 0,9s membuat teks tertinggal & berat) */
+.js .skills .skills-head>h2.in,.js .skills .skills-head>span.in{transition:translate .6s cubic-bezier(.16,1,.3,1),filter .6s cubic-bezier(.16,1,.3,1)}
+/* reveal teks pita lebih halus: geser & blur kecil (pita sendiri sudah beranimasi membuka) */
+.js .skills .skills-head>h2:not(.in),.js .skills .skills-head>span:not(.in){translate:0 12px;filter:blur(2px)}
 .skills-head h2{margin:0;font-family:var(--display);font-size:24px;font-weight:300;line-height:1.15;letter-spacing:-.01em}
 .skills-head span{padding:2px 0;font-family:var(--display);font-size:clamp(36px,5vw,60px);letter-spacing:-.03em;line-height:1.1}
 .skills-wrap{position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;min-height:520px;padding:40px 32px}
@@ -221,9 +231,8 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
 }
 /* pita hitam keahlian sudah jadi batas, garis bawah pendidikan/kontak tidak perlu */
 .contact{border-bottom:0}
-@media (min-width:840px){.half{border-bottom:0;padding-bottom:96px}}
+@media (min-width:840px){.half{border-bottom:0}}
 @media (max-width:839px){
-  .skills-head::before{display:none}
   /* fillet (⊣) di tepi kanan layar, di ujung garis bawah header, atas pendidikan, dan antara pendidikan/kontak */
   .panel.half:not(.contact),#pengalaman{position:relative}
   /* fillet (⊢) di tepi kiri layar, di garis atas pendidikan */
@@ -232,6 +241,11 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
 }
 /* section proyek langsung menyambung ke CTA, tanpa garis bawah */
 #proyek{border-bottom:0}
+/* desktop: garis vertikal (frame & garis titik tab) memudar sebelum CTA, seperti di atas pita keahlian */
+@media (min-width:840px){
+  #proyek{position:relative;border-right:0;padding-bottom:140px}
+  #proyek::after{content:"";position:absolute;left:0;right:0;bottom:0;height:140px;z-index:9;pointer-events:none;background:linear-gradient(rgba(238,238,235,0),var(--paper) 85%)}
+}
 /* CTA besar sebelum footer */
 /* full-bleed: keluar dari lebar frame sampai tepi browser; min. setinggi layar */
 .panel.cta{flex:0 0 100vw;width:100vw;margin-left:calc(50% - 50vw);border-right:0;border-bottom:0}
@@ -239,11 +253,12 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
 .panel.cta{padding:104px max(32px,calc(50vw - 600px + 32px)) 0}
 /* dvh mengikuti URL bar mobile yang muncul/sembunyi, jadi CTA selalu pas satu layar */
 .cta{min-height:100vh;min-height:100dvh}
-/* lebar CTA mengikuti section di atasnya (dipotong clip-path), lalu melebar penuh saat ~98% terlihat (JS menambah .wide) */
-.cta{clip-path:inset(0 max(20px,calc(50vw - 600px)));transition:clip-path .7s cubic-bezier(.16,1,.3,1);will-change:clip-path}
-/* tepi dibulatkan ke piksel utuh supaya tidak berkedip saat animasi (browser yang mendukung round()) */
-@supports (width:round(1.5px,1px)){.cta{clip-path:inset(0 round(max(20px,50vw - 600px),1px))}}
-.cta.wide{clip-path:inset(0)}
+/* lebar CTA mengikuti section di atasnya: dua panel warna kertas menutup tepi kiri-kanan, lalu bergeser keluar (transform)
+   saat ~98% terlihat (JS menambah .wide). Bukan clip-path: animasi clip-path memaksa repaint kanvas WebGL & grain → berkedip */
+.cta-side{position:absolute;top:0;bottom:0;width:max(20px,calc(50vw - 600px));z-index:3;pointer-events:none;background:var(--paper);
+  transition:transform .7s cubic-bezier(.16,1,.3,1);will-change:transform}
+.cta-side.l{left:0}.cta-side.r{right:0}
+.cta.wide .cta-side.l{transform:translateX(-100%)}.cta.wide .cta-side.r{transform:translateX(100%)}
 /* desktop: isi CTA sedikit lebih kecil saat CTA masih selebar section, membesar bersama CTA */
 @media (min-width:840px){
   .cta-body{transform:scale(.72);transform-origin:center;transition:transform .7s cubic-bezier(.16,1,.3,1)}
@@ -252,8 +267,7 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
 /* isi CTA di tengah, footer menempel di bawah section yang sama */
 .cta-body{flex:1;display:flex;flex-direction:column;justify-content:center;gap:24px;opacity:.9}
 .cta-text{margin-top:8px!important}
-.cta{display:flex;flex-direction:column;gap:56px;background:var(--ink);color:#fff;
-  background-image:linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px);background-size:var(--cell,28px) var(--cell,28px);background-position:-1px calc(-1px + var(--gy,0px))}
+.cta{display:flex;flex-direction:column;gap:56px;background:var(--ink);color:#fff;overflow:clip}
 /* kanvas cahaya WebGL di belakang isi CTA & pita keahlian, di atas grid */
 .cta{position:relative;z-index:9}
 /* grain di atas isi CTA: noise terang dengan bintik gelap, multiply → teks putih, sorotan biru & tombol ikut berbintik; area hitam tetap hitam */
@@ -261,7 +275,7 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
 .glow{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
 .cta-body,.cta .foot,.skills-head>*{position:relative;z-index:1}
 /* pita keahlian: kanvas selebar layar seperti latar hitamnya */
-.skills-head canvas.glow{position:absolute;z-index:0;left:calc(50% - 50vw);width:100vw}
+.skills-head canvas.glow{position:absolute;z-index:0;transform:scaleY(var(--sy,1));left:calc(50% - 50vw);width:100vw}
 /* kanvas disisipkan JS, bukan bagian reveal */
 .js .skills-head canvas.glow{opacity:1;translate:none;filter:none}
 .cta-kick{margin:0;font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#8FB0FF}
@@ -294,7 +308,7 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
   .js .id .mark:not(.in){opacity:1;translate:none;filter:none}
   .id p{text-align:right;font-size:11px;line-height:1.55}
   .page{padding:0}
-  .cta{clip-path:none}
+  .cta-side{display:none}
   .frame{padding-bottom:0}
   .frame::before,.frame::after{display:none}
   .panel{border-right:0;padding:28px 20px}

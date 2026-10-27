@@ -231,16 +231,25 @@
     setTone(proPanel.classList.contains('mono'));
   });
 
-  // rotasi hanya berjalan saat section terlihat di layar
-  if ('IntersectionObserver' in window) {
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) { state[e.target.getAttribute('data-sec')].seen = e.isIntersecting; });
-    }, { threshold: 0.25 });
-    ['jobs', 'pros'].forEach(function (key) {
-      var sec = document.querySelector('[data-list="' + key + '"]').closest('section');
-      sec.setAttribute('data-sec', key); io.observe(sec);
+  // rotasi hanya berjalan saat section terlihat: di desktop minimal menutupi 40% tinggi layar
+  // (section yang lebih pendek dari itu cukup terlihat utuh); di mobile cukup terlihat sedikit
+  var secs = ['jobs', 'pros'].map(function (key) {
+    return { key: key, el: document.querySelector('[data-list="' + key + '"]').closest('section') };
+  });
+  var vTick = false;
+  var checkSeen = function () {
+    vTick = false;
+    var vh = window.innerHeight, desk = window.innerWidth >= 840;
+    secs.forEach(function (o) {
+      var r = o.el.getBoundingClientRect();
+      var vis = Math.min(r.bottom, vh) - Math.max(r.top, 0);
+      state[o.key].seen = desk ? vis >= Math.min(vh * 0.4, r.height) - 1 : vis > 0;
     });
-  } else { state.jobs.seen = state.pros.seen = true; }
+  };
+  var onSeen = function () { if (!vTick) { vTick = true; requestAnimationFrame(checkSeen); } };
+  window.addEventListener('scroll', onSeen, { passive: true });
+  window.addEventListener('resize', onSeen);
+  checkSeen();
 
   // reveal saat scroll: elemen yang masuk layar bersamaan muncul berurutan
   // daftar selector sama dengan di css/style.css
@@ -414,10 +423,21 @@
   var sHead = document.querySelector('.skills-head'), sWrap = document.querySelector('.skills-wrap');
   if (sHead && sWrap) {
     var sTick = false;
+    // baca posisi dulu, baru tulis — dan tulis hanya bila nilainya berubah (hindari layout paksa tiap frame scroll)
+    var lastSy = '', lastSo = '', lastClip = null;
     var coverHead = function () {
       sTick = false;
-      var cut = Math.max(0, sHead.getBoundingClientRect().bottom - sWrap.getBoundingClientRect().top);
-      sHead.style.clipPath = cut ? 'inset(-240px -100vmax ' + cut.toFixed(1) + 'px)' : '';
+      var hr = sHead.getBoundingClientRect(), wr = sWrap.getBoundingClientRect(), vh = window.innerHeight;
+      // pita membuka: tetap 1px dulu saat masuk layar (sampai tepi atasnya di 90% layar), lalu membuka penuh di 50% layar
+      var op = reduce ? 1 : Math.min(1, Math.max(0, (vh * 0.9 - hr.top) / (vh * 0.4)));
+      var sy = Math.max(1 / hr.height, op).toFixed(3);
+      // teks baru muncul di paruh akhir pembukaan, supaya tidak terlihat samar di atas latar terang
+      var so = Math.min(1, Math.max(0, (op - 0.5) / 0.5)).toFixed(2);
+      var cut = Math.max(0, Math.round(hr.bottom - wr.top));
+      sHead._covered = cut >= hr.height - 1;
+      if (sy !== lastSy) { sHead.style.setProperty('--sy', sy); lastSy = sy; }
+      if (so !== lastSo) { sHead.style.setProperty('--so', so); lastSo = so; }
+      if (cut !== lastClip) { sHead.style.clipPath = cut ? 'inset(-240px -100vmax ' + cut + 'px)' : ''; lastClip = cut; }
     };
     window.addEventListener('scroll', function () { if (!sTick) { sTick = true; requestAnimationFrame(coverHead); } }, { passive: true });
     coverHead();
@@ -427,6 +447,8 @@
   var ctaEl = document.querySelector('.cta');
   if (ctaEl) {
     var wTick = false;
+    // panel penutup tepi (lihat .cta-side di CSS)
+    ['l', 'r'].forEach(function (side) { var d = document.createElement('span'); d.className = 'cta-side ' + side; d.setAttribute('aria-hidden', 'true'); ctaEl.appendChild(d); });
     var widen = function () {
       wTick = false;
       var r = ctaEl.getBoundingClientRect(), vh = window.innerHeight;
@@ -532,18 +554,21 @@
       gl.enableVertexAttribArray(loc);
       gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
       var uR = gl.getUniformLocation(prog, 'r'), uT = gl.getUniformLocation(prog, 't');
-      // resolusi 1 piksel CSS (bukan devicePixelRatio): grain tetap tajam, beban GPU tetap ringan
+      // setengah resolusi CSS: cahaya lembut tidak butuh piksel penuh, beban GPU jauh lebih ringan (grain isi CTA dari lapisan CSS)
       var size = function () {
-        var w = Math.max(1, Math.round(cv.clientWidth)), hgt = Math.max(1, Math.round(cv.clientHeight));
+        var w = Math.max(1, Math.round(cv.clientWidth * 0.5)), hgt = Math.max(1, Math.round(cv.clientHeight * 0.5));
         if (cv.width !== w || cv.height !== hgt) { cv.width = w; cv.height = hgt; gl.viewport(0, 0, w, hgt); }
         gl.uniform2f(uR, w, hgt);
       };
-      var t0 = performance.now(), glowOn = false, glowRaf = 0;
+      var t0 = performance.now(), glowOn = false, glowRaf = 0, lastDraw = 0;
+      // dibatasi ~30fps & dilewati saat host tertutup (pita keahlian yang sudah tertimpa area keahlian)
       var draw = function (now) {
+        if (glowOn && !reduce) glowRaf = requestAnimationFrame(draw);
+        if (host._covered || now - lastDraw < 32) return;
+        lastDraw = now;
         size();
         gl.uniform1f(uT, reduce ? 12 : (now - t0) / 1000 * 1.6);
         gl.drawArrays(gl.TRIANGLES, 0, 3);
-        if (glowOn && !reduce) glowRaf = requestAnimationFrame(draw);
       };
       if ('IntersectionObserver' in window) {
         new IntersectionObserver(function (es) {
