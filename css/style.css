@@ -159,7 +159,7 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
 .tape-seg{display:flex;align-items:center;gap:22px;padding:14px 22px 14px 0}
 .tape-item{display:inline-flex;align-items:center;gap:10px;white-space:nowrap;font-family:var(--mono);font-size:15px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
 .tape-item .ico{width:17px;height:17px}
-.tape-plus{width:14px;height:14px;flex-shrink:0;color:#6E9BFF}
+.tape-plus{width:14px;height:14px;flex-shrink:0;color:var(--accent)}
 /* desktop: pita memudar ke kanan saat lewat di belakang foto */
 @media (min-width:600px){.tape{-webkit-mask-image:linear-gradient(90deg,#000 55%,transparent 82%);mask-image:linear-gradient(90deg,#000 55%,transparent 82%)}}
 /* variasi: menengah = pita putih miring kanan & berjalan berlawanan; AI = pita biru */
@@ -180,7 +180,7 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
     drop-shadow(var(--sx) var(--sy) 0 var(--ink))}
 /* gabung transisi tilt + reveal (lebih spesifik dari .rv); delay reveal hanya untuk opacity/translate */
 .skills-wrap .skills-photo{transition:transform .5s cubic-bezier(.16,1,.3,1),filter .5s cubic-bezier(.16,1,.3,1),
-  opacity .9s cubic-bezier(.16,1,.3,1) var(--d,0s),translate .9s cubic-bezier(.16,1,.3,1) var(--d,0s)}
+  opacity .9s cubic-bezier(.16,1,.3,1) var(--d,0s),translate .9s cubic-bezier(.16,1,.3,1) var(--d,0s); mix-blend-mode:luminosity;}
 .skills-wrap .skills-photo.tilting{transition:transform .12s linear,filter .12s linear}
 .skills-photo:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
 .contact .in{font-weight:600}
