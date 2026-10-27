@@ -15,8 +15,8 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
 .frame::before{left:0}.frame::after{right:0}
 /* bubble dekoratif: nempel di layar (fixed) biar selalu kelihatan walau discroll,
    lebar dibatasi sama seperti kiri-kanan .frame, tinggi penuh layar untuk ruang gerak atas-bawah */
-.bubbles{position:fixed;top:0;left:50%;translate:-50% 0;width:calc(100% - 40px);max-width:1200px;height:100vh;z-index:-1;overflow:hidden;pointer-events:none; mix-blend-mode: exclusion;}
-.bubble{position:absolute;border-radius:50%;background:var(--accent);opacity:.1;filter:blur(24px);
+.bubbles{position:fixed;top:0;left:50%;translate:-50% 0;width:calc(100% - 40px);max-width:1200px;height:100vh;z-index:-1;overflow:hidden;pointer-events:none;mix-blend-mode:exclusion;}
+.bubble{position:absolute;border-radius:50%;background:var(--accent);opacity:.35;filter:blur(65px);
   transition:translate 7s ease-in-out,scale 7s ease-in-out}
 .bubble-1{width:150px;height:150px;left:20%;top:10%}
 .bubble-2{width:150px;height:150px;left:78%;top:55%}
@@ -105,6 +105,7 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
 
 /* edu + contact */
 .half{flex:1 1 360px;display:flex;flex-direction:column;gap:22px}
+.half .h2{font-weight:600}
 .edu{font-family:var(--mono);font-size:14px;line-height:1.65}
 .edu p{margin:0 0 6px}.edu p+p{margin:0;color:var(--soft)}
 .mail{align-self:flex-start;max-width:100%;padding:14px 22px;border:1.5px solid var(--ink);border-radius:999px;background:var(--card);box-shadow:5px 5px 0 var(--ink);font-family:var(--mono);font-size:13px;font-weight:600;text-decoration:none;white-space:nowrap}
@@ -114,6 +115,8 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
 /* skills */
 .skills{padding:0}
 .skills-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:20px;position:sticky;top:0;padding:48px 32px;color:#fff;clip-path:inset(-240px -100vmax 0);z-index:9}
+/* desktop: garis tengah pendidikan/kontak diteruskan menembus area kepala keahlian sampai ke pita hitam */
+@media (min-width:840px){.skills-head::before{content:"";position:absolute;top:0;height:50%;left:calc(50% - .5px);width:1px;background:var(--ink);z-index:0;pointer-events:none}}
 .skills-head::after{content:"";position:absolute;top:0;bottom:0;left:calc(50% - 50vw);right:calc(50% - 50vw);z-index:-1;background:var(--ink);transform:scaleY(var(--sy,1))}
 /* pita membuka dari garis 1px ke tinggi penuh seiring scroll (JS mengisi --sy); teks muncul belakangan (--so) */
 .skills-head>h2,.skills-head>span{opacity:var(--so,1)}
