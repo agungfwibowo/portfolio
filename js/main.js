@@ -643,7 +643,7 @@
       var ease = [.009, .01, .008], lag = [1, 1.2, 0.8];
       var pos = bubs.map(function () { return window.scrollY; });
       var running = false;
-      function tick() {
+      function bubTick() {
         var y = window.scrollY, moving = false;
         bubs.forEach(function (el, i) {
           pos[i] += (y - pos[i]) * ease[i % 3];
@@ -651,10 +651,10 @@
           if (Math.abs(y - pos[i]) > 0.3) moving = true;
           el.style.transform = 'translateY(' + off.toFixed(1) + 'px)';
         });
-        if (moving) requestAnimationFrame(tick); else running = false;
+        if (moving) requestAnimationFrame(bubTick); else running = false;
       }
       window.addEventListener('scroll', function () {
-        if (!running) { running = true; requestAnimationFrame(tick); }
+        if (!running) { running = true; requestAnimationFrame(bubTick); }
       }, { passive: true });
     }
   }
