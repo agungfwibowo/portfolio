@@ -55,12 +55,12 @@
       b.innerHTML = key === 'jobs'
         ? '<span class="period">' + esc(d.period) + '</span><span class="co">' + esc(d.company) + '</span>'
         : '<span class="no">' + esc(d.no) + '</span><span class="nm"><b>' + esc(d.name) + '</b><small>' + esc(d.cat) + '</small></span>';
-      b.addEventListener('click', function () { select(key, k); });
+      b.addEventListener('click', function () { pick(key, k); });
       b.addEventListener('keydown', function (e) {
         var n = DATA[key].length, j = null;
         if (e.key === 'ArrowDown' || e.key === 'ArrowRight') j = (k + 1) % n;
         if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') j = (k - 1 + n) % n;
-        if (j !== null) { e.preventDefault(); select(key, j); list.children[j].focus(); }
+        if (j !== null) { e.preventDefault(); pick(key, j); list.children[j].focus(); }
       });
       list.appendChild(b);
     });
@@ -123,6 +123,9 @@
   }
 
   function select(key, k) { state[key].i = k; state[key].t = 0; render(key); bar(key); }
+  // dipilih user (klik / panah): autoplay istirahat 1 menit supaya isi tab sempat dibaca, lalu jalan lagi
+  var HOLD = 60000;
+  function pick(key, k) { state[key].hold = performance.now() + HOLD; select(key, k); }
   function bar(key) {
     document.querySelector('[data-bar="' + key + '"]').style.width = Math.min(100, state[key].t / CFG[key].dur * 100) + '%';
   }
@@ -231,19 +234,19 @@
     setTone(proPanel.classList.contains('mono'));
   });
 
-  // rotasi hanya berjalan saat section terlihat: di desktop minimal menutupi 40% tinggi layar
-  // (section yang lebih pendek dari itu cukup terlihat utuh); di mobile cukup terlihat sedikit
+  // rotasi hanya berjalan saat section terlihat minimal menutupi 40% tinggi layar, di desktop & mobile
+  // (section yang lebih pendek dari itu cukup terlihat utuh)
   var secs = ['jobs', 'pros'].map(function (key) {
     return { key: key, el: document.querySelector('[data-list="' + key + '"]').closest('section') };
   });
   var vTick = false;
   var checkSeen = function () {
     vTick = false;
-    var vh = window.innerHeight, desk = window.innerWidth >= 840;
+    var vh = window.innerHeight;
     secs.forEach(function (o) {
       var r = o.el.getBoundingClientRect();
       var vis = Math.min(r.bottom, vh) - Math.max(r.top, 0);
-      state[o.key].seen = desk ? vis >= Math.min(vh * 0.4, r.height) - 1 : vis > 0;
+      state[o.key].seen = vis >= Math.min(vh * 0.4, r.height) - 1;
     });
   };
   var onSeen = function () { if (!vTick) { vTick = true; requestAnimationFrame(checkSeen); } };
@@ -508,7 +511,7 @@
     var dt = now - last; last = now;
     ['jobs', 'pros'].forEach(function (key) {
       var s = state[key];
-      if (s.paused || s.hover || !s.seen) return;
+      if (s.paused || s.hover || !s.seen || now < (s.hold || 0)) return;
       s.t += dt;
       if (s.t >= CFG[key].dur) { s.t = 0; s.i = (s.i + 1) % DATA[key].length; render(key); }
       bar(key);
