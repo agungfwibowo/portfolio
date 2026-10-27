@@ -347,24 +347,24 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
   .tapes{grid-column:1/-1;grid-row:1;width:calc(100% + 40px);margin:0 -20px}
   .tape-title{padding:0 20px 12px}
   .tape-item{font-size:13px}
-  /* semua grup berupa pita: foto di tengah di bawah pita, bagian bawah memudar, ada jarak ke section berikutnya */
-  .skills-wrap.only-tapes{row-gap:0;padding-bottom:88px}
+  /* semua grup berupa pita: foto di tengah di bawah pita, menempel di garis bawah section */
+  .skills-wrap.only-tapes{row-gap:0;padding-bottom:24px}
+  /* foto berakhir sedikit di atas garis (sisa grid memudar terlihat), dan section proyek diberi ruang lebih sebelum judulnya */
+  #proyek{padding-top:60px}
   .only-tapes .skills-photo,.only-tapes .stickers{grid-column:1/-1;justify-self:center;width:min(72%,300px);margin:36px 0 0}
-  /* foto & stiker di atas lapisan fade, jadi hanya grid yang memudar */
-  .only-tapes .skills-photo{position:relative;z-index:4;-webkit-mask-image:linear-gradient(#000 82%,transparent);mask-image:linear-gradient(#000 82%,transparent)}
+  .only-tapes .skills-photo{position:relative;z-index:4}
   .only-tapes .stickers{z-index:5}
-  .panel.skills{border-bottom:0}
-  /* grid + foto sama-sama memudar ke putih di bawah section */
+  /* grid memudar ke bawah; foto & stiker di atas lapisan fade (z-index 4/5) jadi tetap utuh */
   .skills-wrap.only-tapes::after{content:"";position:absolute;left:0;right:0;bottom:0;height:300px;z-index:3;pointer-events:none;background:linear-gradient(transparent,var(--paper) 85%)}
   .group{grid-column:1/-1;position:relative;z-index:1}
   .group:last-child{grid-column:1;align-self:start;margin-bottom:36px}
-  .stickers{position:relative;right:auto;top:auto;grid-column:2;grid-row:var(--pr,3);align-self:end;width:calc(100% + 20px);margin-right:-20px;aspect-ratio:600/547}
+  .stickers{position:relative;right:auto;top:auto;grid-column:2;grid-row:var(--pr,3);align-self:end;width:calc(100% + 20px);margin-right:-20px;aspect-ratio:600/760}
   /* stiker mobile: lebih kecil & tidak saling menumpuk */
   .st{border-width:2px;box-shadow:0 0 0 1px var(--ink),3px 3px 0 1px var(--ink)}
   .st-pill{top:4%;left:-2%;font-size:11px;padding:4px 9px}
   .st-dark{top:28%;right:3%;width:52px;height:52px;font-size:7px;letter-spacing:.04em}
   .st-blue{bottom:26%;left:-6%;font-size:11px;padding:4px 9px;border-radius:9px}
   .st-in{right:-2%;left:auto;bottom:12%;font-size:10px;padding:4px 9px}
-  .skills-photo{position:static;grid-column:2;grid-row:var(--pr,3);align-self:end;width:calc(100% + 20px);max-width:none;aspect-ratio:600/547;object-fit:cover;object-position:top;margin:0 -20px 0 0}
+  .skills-photo{position:static;grid-column:2;grid-row:var(--pr,3);align-self:end;width:calc(100% + 20px);max-width:none;aspect-ratio:600/760;object-fit:cover;object-position:top;margin:0 -20px 0 0}
 }
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.cta,.cta-body{transition:none}.tape-track{animation:none}.js .stickers .st{opacity:1;scale:1;transition:none}.cursor{display:none}.pill{transform:none}.js :is(.mark,.id p,.title h1,.roles,.years,.tagline p,.sec-head,.tabs-wrap,.half>*,.skills-head>*,.group,.skills-photo,.plus,.cta-in){opacity:1;translate:none;filter:none;transition:none}}
