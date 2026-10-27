@@ -537,7 +537,9 @@
     host.insertBefore(cv, host.firstChild);
     var VS = 'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
     var FS = [
-      'precision mediump float;uniform vec2 r;uniform float t;uniform float gs;',
+      // highp bila GPU mendukung: di Android mediump = float 16-bit, nilai waktu yang terus membesar membuat noise pecah berpiksel
+      '#ifdef GL_FRAGMENT_PRECISION_HIGH\nprecision highp float;\n#else\nprecision mediump float;\n#endif',
+      'uniform vec2 r;uniform float t;uniform float gs;',
       'float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}',
       'float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);',
       ' return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);}',
@@ -590,7 +592,8 @@
         if (host._covered || now - lastDraw < 32) return;
         lastDraw = now;
         size();
-        gl.uniform1f(uT, reduce ? 12 : (now - t0) / 1000 * 1.6);
+        // waktu dijaga tetap kecil (diputar ulang tiap 5 menit) supaya presisi float di GPU ponsel tidak habis
+        gl.uniform1f(uT, reduce ? 12 : ((now - t0) / 1000 * 1.6) % 480);
         gl.drawArrays(gl.TRIANGLES, 0, 3);
       };
       if ('IntersectionObserver' in window) {
