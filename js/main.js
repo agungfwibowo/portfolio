@@ -582,7 +582,7 @@
         var w = Math.max(1, Math.round(cv.clientWidth * 0.5)), hgt = Math.max(1, Math.round(cv.clientHeight * 0.5));
         if (cv.width !== w || cv.height !== hgt) { cv.width = w; cv.height = hgt; gl.viewport(0, 0, w, hgt); }
         gl.uniform2f(uR, w, hgt);
-        gl.uniform1f(uG, desk.matches ? .08 : .45);
+        gl.uniform1f(uG, desk.matches ? .08 : .22);
       };
       var t0 = performance.now(), glowOn = false, glowRaf = 0, lastDraw = 0;
       // dibatasi ~30fps & dilewati saat host tertutup (pita keahlian yang sudah tertimpa area keahlian)
