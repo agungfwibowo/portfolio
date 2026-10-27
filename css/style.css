@@ -1,4 +1,4 @@
-:root{--ink:#111318;--muted:#5A5F6B;--soft:#3A3F4B;--line:#DADDE3;--grid:#DCDCD7;--accent:#1D4ED8;--paper:#EEEEEB;
+:root{--ink:#111318;--muted:#5A5F6B;--soft:#3A3F4B;--line:#DADDE3;--grid:#D9D2BF;--accent:#1D4ED8;--paper:#EAE4D5;--card:#F6F2E8;
   --display:'Space Grotesk',sans-serif;--mono:'IBM Plex Mono',monospace}
 *{box-sizing:border-box}
 /* tanpa efek rubber hanya di desktop (mouse/trackpad); di layar sentuh pull-to-refresh tetap jalan */
@@ -36,19 +36,19 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
 
 /* tagline */
 .tagline{padding:40px 32px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:32px 48px}
-.years{align-self:flex-start;transform:rotate(-8deg);margin-top:8px;padding:10px 26px;border:1.5px solid var(--ink);border-radius:999px;background:#fff;box-shadow:5px 5px 0 var(--ink);font-family:var(--display);font-size:30px;letter-spacing:-.02em}
+.years{align-self:flex-start;transform:rotate(-8deg);margin-top:8px;padding:10px 26px;border:1.5px solid var(--ink);border-radius:999px;background:var(--card);box-shadow:5px 5px 0 var(--ink);font-family:var(--display);font-size:30px;letter-spacing:-.02em}
 .tagline p{margin:0;font-family:var(--display);font-size:clamp(32px,3.4vw,44px);font-weight:300;line-height:1.08;letter-spacing:-.03em;background:var(--paper);padding:4px 0}
 
 /* tabs (experience + projects) */
 .sec{display:flex;flex-direction:column;gap:28px}
 .sec-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:16px}
-.ctrl{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border:1.5px solid var(--ink);border-radius:999px;background:#fff;color:var(--ink);box-shadow:3px 3px 0 var(--ink);cursor:pointer;font-family:var(--mono);font-size:12px;font-weight:600;flex-shrink:0}
+.ctrl{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border:1.5px solid var(--ink);border-radius:999px;background:var(--card);color:var(--ink);box-shadow:3px 3px 0 var(--ink);cursor:pointer;font-family:var(--mono);font-size:12px;font-weight:600;flex-shrink:0}
 .ctrls{display:flex;gap:12px}
 .title{position:relative}
 .ctrl.lang{position:absolute;top:16px;right:16px;min-height:32px;padding:0 12px;box-shadow:2px 2px 0 var(--ink);letter-spacing:.08em}
 .ctrl[aria-pressed="true"]{background:var(--ink);color:#fff;box-shadow:3px 3px 0 var(--accent)}
-.shot{transition:filter .4s ease}
-.pro-panel.mono .shot{filter:grayscale(1)}
+.shot{filter:grayscale(0) brightness(.84);transition:filter .4s ease}
+.pro-panel.mono .shot{filter:grayscale(1) brightness(.84)}
 .ctrl:focus-visible,.tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .tabs-wrap{--gap:28px;display:flex;flex-wrap:wrap;gap:var(--gap);align-items:flex-start}
 .tablist{min-width:0;display:flex;flex-direction:column;border:1px solid var(--ink);border-bottom:0}
@@ -83,7 +83,7 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
 .half{flex:1 1 360px;display:flex;flex-direction:column;gap:22px}
 .edu{font-family:var(--mono);font-size:14px;line-height:1.65}
 .edu p{margin:0 0 6px}.edu p+p{margin:0;color:var(--soft)}
-.mail{align-self:flex-start;max-width:100%;padding:14px 22px;border:1.5px solid var(--ink);border-radius:999px;background:#fff;box-shadow:5px 5px 0 var(--ink);font-family:var(--mono);font-size:13px;font-weight:600;text-decoration:none;white-space:nowrap}
+.mail{align-self:flex-start;max-width:100%;padding:14px 22px;border:1.5px solid var(--ink);border-radius:999px;background:var(--card);box-shadow:5px 5px 0 var(--ink);font-family:var(--mono);font-size:13px;font-weight:600;text-decoration:none;white-space:nowrap}
 .contact p{margin:0;font-family:var(--mono);font-size:13px;line-height:1.7}
 .contact .tel{text-decoration:none}
 
@@ -105,7 +105,7 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
 .group-label{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase}
 .group-label.accent{color:var(--accent)}
 .pills{display:flex;flex-wrap:wrap;gap:16px 14px;margin:0;padding:0;list-style:none}
-.pill{display:inline-flex;align-items:center;gap:8px;padding:10px 22px;border:1.5px solid var(--ink);border-radius:999px;background:#fff;box-shadow:4px 4px 0 var(--ink);font-family:var(--mono);font-size:14px;font-weight:500}
+.pill{display:inline-flex;align-items:center;gap:8px;padding:10px 22px;border:1.5px solid var(--ink);border-radius:999px;background:var(--card);box-shadow:4px 4px 0 var(--ink);font-family:var(--mono);font-size:14px;font-weight:500}
 .pill.dark{background:var(--ink);color:#fff;box-shadow:4px 4px 0 var(--accent)}
 .pill.ai{border-color:var(--accent);color:var(--accent);box-shadow:4px 4px 0 var(--accent);font-weight:600}
 .pill .ico{width:15px;height:15px;flex-shrink:0}
@@ -123,7 +123,7 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
 /* desktop: pita memudar ke kanan saat lewat di belakang foto */
 @media (min-width:600px){.tape{-webkit-mask-image:linear-gradient(90deg,#000 55%,transparent 82%);mask-image:linear-gradient(90deg,#000 55%,transparent 82%)}}
 /* variasi: menengah = pita putih miring kanan & berjalan berlawanan; AI = pita biru */
-.tape-light .tape{rotate:1.5deg;background:#fff;color:var(--ink);border-block:1.5px solid var(--ink);box-shadow:0 5px 0 var(--ink)}
+.tape-light .tape{rotate:1.5deg;background:var(--card);color:var(--ink);border-block:1.5px solid var(--ink);box-shadow:0 5px 0 var(--ink)}
 .tape-light .tape-track{animation-direction:reverse}
 .tape-light .tape-title{padding-bottom:26px}
 .tape-light .tape-plus{color:var(--accent)}
@@ -145,7 +145,7 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
 .stickers.tilting{transition:transform .12s linear}
 .st{position:absolute;display:inline-flex;align-items:center;justify-content:center;text-align:center;border:3px solid #fff;
   box-shadow:0 0 0 1.5px var(--ink),5px 5px 0 1.5px var(--ink);font-family:var(--display);line-height:1.05;letter-spacing:-.01em;white-space:nowrap}
-.st-pill{top:9%;left:-18%;padding:8px 18px;border-radius:999px;background:#fff;font-size:19px;rotate:-9deg}
+.st-pill{top:9%;left:-18%;padding:8px 18px;border-radius:999px;background:var(--card);font-size:19px;rotate:-9deg}
 .st-dark{top:34%;right:12%;width:96px;height:96px;border-radius:50%;background:var(--ink);color:#fff;font-family:var(--mono);font-size:12px;font-weight:600;
   letter-spacing:.06em;text-transform:uppercase;line-height:1.35;rotate:12deg}
 .st-blue{bottom:30%;left:-10%;padding:10px 16px;border-radius:14px;background:var(--accent);color:#fff;font-size:18px;font-weight:500;rotate:6deg}
@@ -245,7 +245,7 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
 /* desktop: garis vertikal (frame & garis titik tab) memudar sebelum CTA, seperti di atas pita keahlian */
 @media (min-width:840px){
   #proyek{position:relative;border-right:0;padding-bottom:140px}
-  #proyek::after{content:"";position:absolute;left:0;right:0;bottom:0;height:140px;z-index:9;pointer-events:none;background:linear-gradient(rgba(238,238,235,0),var(--paper) 85%)}
+  #proyek::after{content:"";position:absolute;left:0;right:0;bottom:0;height:140px;z-index:9;pointer-events:none;background:linear-gradient(rgba(234,228,213,0),var(--paper) 85%)}
 }
 /* CTA besar sebelum footer */
 /* full-bleed: keluar dari lebar frame sampai tepi browser; min. setinggi layar */
@@ -274,9 +274,12 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
 /* grain di atas isi CTA: noise terang dengan bintik gelap, multiply → teks putih, sorotan biru & tombol ikut berbintik; area hitam tetap hitam */
 .cta::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='2.4' intercept='-.35'/%3E%3CfeFuncG type='linear' slope='2.4' intercept='-.35'/%3E%3CfeFuncB type='linear' slope='2.4' intercept='-.35'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E") 0 0/180px 180px;mix-blend-mode:multiply;opacity:.9}
 .glow{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+/* cahaya di depan isi (screen: hitam tetap hitam, teks ikut tersinari), dimasker memudar dari kanan atas searah sumber cahaya */
+.cta .glow,.skills-head canvas.glow{z-index:2;mix-blend-mode:screen;
+  -webkit-mask-image:radial-gradient(ellipse 85% 130% at 72% 0%,#000 25%,transparent 80%);mask-image:radial-gradient(ellipse 85% 130% at 72% 0%,#000 25%,transparent 80%)}
 .cta-body,.cta .foot,.skills-head>*{position:relative;z-index:1}
 /* pita keahlian: kanvas selebar layar seperti latar hitamnya */
-.skills-head canvas.glow{position:absolute;z-index:0;transform:scaleY(var(--sy,1));left:calc(50% - 50vw);width:100vw}
+.skills-head canvas.glow{position:absolute;transform:scaleY(var(--sy,1));left:calc(50% - 50vw);width:100vw}
 /* kanvas disisipkan JS, bukan bagian reveal */
 .js .skills-head canvas.glow{opacity:1;translate:none;filter:none}
 .cta-kick{margin:0;font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#8FB0FF}
@@ -284,7 +287,7 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
 .cta-hl{padding:0 .14em;background:var(--accent);font-weight:400;-webkit-box-decoration-break:clone;box-decoration-break:clone}
 .cta-text{margin:0;max-width:560px;font-family:var(--mono);font-size:15px;line-height:1.7;color:#C9CDD6}
 .cta-btns{display:flex;flex-wrap:wrap;gap:16px 20px;margin-top:16px}
-.cta-btn{display:inline-flex;align-items:center;min-height:56px;padding:0 28px;border:1.5px solid #fff;border-radius:999px;background:#fff;color:var(--ink);
+.cta-btn{display:inline-flex;align-items:center;min-height:56px;padding:0 28px;border:1.5px solid #fff;border-radius:999px;background:var(--card);color:var(--ink);
   box-shadow:5px 5px 0 var(--accent);font-family:var(--mono);font-size:15px;font-weight:600;text-decoration:none;transition:translate .2s ease,box-shadow .2s ease}
 .cta-btn:hover{color:var(--ink);translate:-2px -2px;box-shadow:7px 7px 0 var(--accent)}
 .cta-btn.ghost{background:transparent;color:#fff;box-shadow:5px 5px 0 #fff}
