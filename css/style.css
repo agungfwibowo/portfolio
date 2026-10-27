@@ -355,6 +355,8 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
   .js .id .mark:not(.in){opacity:1;translate:none;filter:none}
   .id p{text-align:right;font-size:11px;line-height:1.55}
   .page{padding:0}
+  /* .page tidak punya gutter lagi di mobile, jadi .bubbles ikut full lebar layar (tanpa -40px) */
+  .bubbles{width:100%}
   .cta-side{display:none}
   .frame{padding-bottom:0}
   .frame::before,.frame::after{display:none}
