@@ -44,7 +44,7 @@ window.SITE.id = {
 
   contact: {
     email: 'agungf.wibowo@gmail.com',
-    phone: '+62 822 8571 5959',
+    phone: '+62 813 7041 9424',
     address: 'Percut Sei Tuan, Deli Serdang',
     linkedin: 'https://www.linkedin.com/in/agungfwibowo/',
     whatsapp: '+62 813 7041 9424'
