@@ -517,7 +517,7 @@
     host.insertBefore(cv, host.firstChild);
     var VS = 'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
     var FS = [
-      'precision mediump float;uniform vec2 r;uniform float t;',
+      'precision mediump float;uniform vec2 r;uniform float t;uniform float gs;',
       'float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}',
       'float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);',
       ' return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);}',
@@ -535,8 +535,8 @@
       ' float a=clamp(crest*spot*.95+spot*.1,0.,1.);',
       ' float tint=smoothstep(.45,.8,fbm(q*1.3-vec2(t*.05,0.)));',
       ' vec3 c=mix(vec3(.42,.55,.58),vec3(.22,.38,.92),tint*.55);',
-      // grain diam, hanya muncul di bagian yang terkena cahaya (area gelap tetap bersih)
-      ' float g=(h(gl_FragCoord.xy)-.5)*a*.45;',
+      // grain diam, hanya muncul di bagian yang terkena cahaya (area gelap tetap bersih); lebih halus di desktop
+      ' float g=(h(gl_FragCoord.xy)-.5)*a*gs;',
       ' gl_FragColor=vec4(c*a+max(g,0.),clamp(a+abs(g),0.,1.));',
       '}'
     ].join('\n');
@@ -553,12 +553,14 @@
       var loc = gl.getAttribLocation(prog, 'p');
       gl.enableVertexAttribArray(loc);
       gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-      var uR = gl.getUniformLocation(prog, 'r'), uT = gl.getUniformLocation(prog, 't');
+      var uR = gl.getUniformLocation(prog, 'r'), uT = gl.getUniformLocation(prog, 't'), uG = gl.getUniformLocation(prog, 'gs');
+      var desk = window.matchMedia('(min-width:840px)');
       // setengah resolusi CSS: cahaya lembut tidak butuh piksel penuh, beban GPU jauh lebih ringan (grain isi CTA dari lapisan CSS)
       var size = function () {
         var w = Math.max(1, Math.round(cv.clientWidth * 0.5)), hgt = Math.max(1, Math.round(cv.clientHeight * 0.5));
         if (cv.width !== w || cv.height !== hgt) { cv.width = w; cv.height = hgt; gl.viewport(0, 0, w, hgt); }
         gl.uniform2f(uR, w, hgt);
+        gl.uniform1f(uG, desk.matches ? .08 : .45);
       };
       var t0 = performance.now(), glowOn = false, glowRaf = 0, lastDraw = 0;
       // dibatasi ~30fps & dilewati saat host tertutup (pita keahlian yang sudah tertimpa area keahlian)
