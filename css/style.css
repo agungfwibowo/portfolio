@@ -65,7 +65,10 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
 .tabs-wrap.side .tablist::before{content:"";position:absolute;top:-100vh;bottom:-100vh;left:-1px;right:-1px;pointer-events:none;background:repeating-linear-gradient(180deg,var(--ink) 0 2px,transparent 2px 5px) left/1px 100% no-repeat,repeating-linear-gradient(180deg,var(--ink) 0 2px,transparent 2px 5px) right/1px 100% no-repeat}
 /* garis titik juga dari tepi kiri frame ke sudut bawah kotak tab */
 .tabs-wrap.side .tablist::after{content:"";position:absolute;bottom:0;left:-32px;right:100%;height:1px;background:repeating-linear-gradient(90deg,var(--ink) 0 2px,transparent 2px 5px)}
-.bar>i{display:block;height:3px;margin-top:-1px;background:var(--accent);width:0}
+.bar>i{position:relative;display:block;height:3px;margin-top:-1px;background:var(--accent);width:0}
+/* bintang ✦ (sama dengan pita keahlian) menempel di ujung isi progres */
+.bar>i::after{content:"";position:absolute;right:-8px;top:50%;width:16px;height:16px;margin-top:-8px;background:var(--accent);
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 0c.7 6.4 5.6 11.3 12 12-6.4.7-11.3 5.6-12 12-.7-6.4-5.6-11.3-12-12C6.4 11.3 11.3 6.4 12 0z'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 0c.7 6.4 5.6 11.3 12 12-6.4.7-11.3 5.6-12 12-.7-6.4-5.6-11.3-12-12C6.4 11.3 11.3 6.4 12 0z'/%3E%3C/svg%3E") center/contain no-repeat}
 
 .jobs{flex:1 1 220px}
 .job{display:flex;flex-direction:column;gap:4px;padding:14px 16px;border-bottom:1px solid var(--ink)}
