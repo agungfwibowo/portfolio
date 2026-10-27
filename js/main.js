@@ -258,6 +258,7 @@
     document.documentElement.style.setProperty('--ab', 'rgb(' + rgb.map(function (v) { return Math.round(v * 255); }).join(' ') + ')');
     accentRGB = rgb.map(function (v) { return v + (1 - v) * 0.15; });
     setHue(rgb);
+    document.documentElement.classList.add('accent-picked');
   });
 
   // tema gelap: hue latar mengikuti aksen; toggle menyimpan pilihan

@@ -5,6 +5,11 @@ html[data-theme=dark]{color-scheme:dark;--paper:hsl(var(--h) 14% 6%);--card:hsl(
 html[data-theme=dark] .skills-head,html[data-theme=dark] .cta{--ink:#07080b}
 html[data-theme=dark] .cta{--accent:color-mix(in srgb,var(--ab) 78%,#000)}
 html[data-theme=dark] .st-blue,html[data-theme=dark] .st-in{color:#111318}
+html[data-theme=dark] .tab[aria-selected="true"]{background:var(--accent);color:#07080b}
+html[data-theme=dark] .job[aria-selected="true"] .period,html[data-theme=dark] .pro[aria-selected="true"] .nm small{color:#07080b;opacity:.72}
+html[data-theme=dark] .pro[aria-selected="true"] .no{color:#07080b}
+html.accent-picked .hl{background:var(--accent)}
+html[data-theme=dark] .hl{background:var(--accent);color:#07080b}
 html[data-theme=dark] .bubble{opacity:.4}
 *{box-sizing:border-box}
 /* tanpa efek rubber hanya di desktop (mouse/trackpad); di layar sentuh pull-to-refresh tetap jalan */
