@@ -232,6 +232,7 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
 /* pita hitam keahlian sudah jadi batas, garis bawah pendidikan/kontak tidak perlu */
 .contact{border-bottom:0}
 @media (min-width:840px){.half{border-bottom:0}}
+@media (min-width:840px){.skills-wrap{min-height:max(520px,80vh)}}
 @media (max-width:839px){
   /* fillet (⊣) di tepi kanan layar, di ujung garis bawah header, atas pendidikan, dan antara pendidikan/kontak */
   .panel.half:not(.contact),#pengalaman{position:relative}
