@@ -36,7 +36,7 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
 
 /* tagline */
 .tagline{padding:40px 32px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:32px 48px}
-.years{align-self:flex-start;transform:rotate(-8deg);margin-top:8px;padding:10px 26px;border:1.5px solid var(--ink);border-radius:999px;background:var(--card);box-shadow:5px 5px 0 var(--ink);font-family:var(--display);font-size:30px;letter-spacing:-.02em}
+.years{--sx:0px;--sy:0px;align-self:flex-start;transform:rotate(-8deg);margin-top:8px;padding:10px 26px;border:1.5px solid var(--ink);border-radius:999px;background:var(--card);box-shadow:calc(5px + var(--sx)) calc(5px + var(--sy)) 0 var(--ink);font-family:var(--display);font-size:30px;letter-spacing:-.02em}
 .tagline p{margin:0;font-family:var(--display);font-size:clamp(32px,3.4vw,44px);font-weight:300;line-height:1.08;letter-spacing:-.03em;background:var(--paper);padding:4px 0}
 
 /* tabs (experience + projects) */
@@ -133,7 +133,10 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
 @keyframes mq{to{transform:translateX(-50%)}}
 .r1{transform:rotate(-4deg)}.r2{transform:rotate(3deg)}.r3{transform:rotate(-2deg)}.r4{transform:rotate(5deg)}.r5{transform:rotate(-3deg)}.r6{transform:rotate(2deg)}.r7{transform:rotate(-5deg)}.r8{transform:rotate(4deg)}
 .skills-photo{position:absolute;right:-2%;top:32px;width:30%;height:auto;display:block;cursor:pointer;
-  --sx:0px;--sy:0px;filter:drop-shadow(var(--sx) var(--sy) 0 var(--ink))}
+  /* stiker potong (die-cut): garis putih tebal mengikuti siluet foto, lalu bayangan tilt di belakangnya;
+     tumpukan drop-shadow tanpa blur (bukan filter SVG url()) supaya transisi tilt tetap mulus */
+  --sx:0px;--sy:0px;filter:drop-shadow(3px 0 0 #fff) drop-shadow(-3px 0 0 #fff) drop-shadow(0 3px 0 #fff) drop-shadow(0 -3px 0 #fff)
+    drop-shadow(var(--sx) var(--sy) 0 var(--ink))}
 /* gabung transisi tilt + reveal (lebih spesifik dari .rv); delay reveal hanya untuk opacity/translate */
 .skills-wrap .skills-photo{transition:transform .5s cubic-bezier(.16,1,.3,1),filter .5s cubic-bezier(.16,1,.3,1),
   opacity .9s cubic-bezier(.16,1,.3,1) var(--d,0s),translate .9s cubic-bezier(.16,1,.3,1) var(--d,0s)}
@@ -207,6 +210,9 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
 .js :is(.mark,.id p,.title h1,.roles,.years,.tagline p,.sec-head,.tabs-wrap,.half>*,.skills-head>*,.group,.skills-photo,.plus,.cta-in):not(.in){opacity:0;translate:0 48px;filter:blur(6px)}
 .js .skills-photo:not(.in){translate:80px 0}
 .rv{transition:opacity .9s cubic-bezier(.16,1,.3,1),translate .9s cubic-bezier(.16,1,.3,1),filter .9s cubic-bezier(.16,1,.3,1);transition-delay:var(--d,0s)}
+/* badge tahun: tilt 3D (transform + bayangan) ikut dihaluskan, delay reveal hanya untuk opacity/translate/filter */
+.years.rv{transition:opacity .9s cubic-bezier(.16,1,.3,1) var(--d,0s),translate .9s cubic-bezier(.16,1,.3,1) var(--d,0s),filter .9s cubic-bezier(.16,1,.3,1) var(--d,0s),
+  transform .35s cubic-bezier(.16,1,.3,1),box-shadow .35s cubic-bezier(.16,1,.3,1)}
 
 
 /* cursor follower: hanya perangkat dengan mouse */

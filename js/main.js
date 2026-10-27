@@ -406,16 +406,32 @@
     }, { passive: true });
   }
 
-  // badge "7+ years": +8° di paling atas, berputar ke -8° seiring scroll 0–320px
+  // badge "7+ years": miring 3D seperti foto profil, tanpa perlu hover — di desktop condong ke arah kursor
+  // di mana pun di halaman, di ponsel (atau sebelum mouse bergerak) condong mengikuti posisinya di layar saat scroll;
+  // bayangan bergeser berlawanan arah
   var yrs = document.querySelector('.years');
   if (yrs && !reduce) {
-    var yTick = false;
+    var yTick = false, mx = null, my = 0;
     var tiltYears = function () {
       yTick = false;
-      var t = Math.min(1, Math.max(0, window.scrollY / 320));
-      yrs.style.transform = 'rotate(' + (8 - 16 * t).toFixed(2) + 'deg)';
+      var r = yrs.getBoundingClientRect(), vw = window.innerWidth, vh = window.innerHeight;
+      if (r.bottom < 0 || r.top > vh) return;
+      var cx = r.left + r.width / 2, cy = r.top + r.height / 2, px, py;
+      if (mx === null) { px = 0; py = Math.max(-1, Math.min(1, (cy - vh / 2) / (vh / 2))); }
+      else {
+        px = Math.max(-1, Math.min(1, (mx - cx) / (vw / 2)));
+        py = Math.max(-1, Math.min(1, (my - cy) / (vh / 2)));
+      }
+      yrs.style.transform = 'perspective(700px) rotateX(' + (-py * 20).toFixed(2) + 'deg) rotateY(' + (px * 20).toFixed(2) + 'deg) rotate(-8deg)';
+      yrs.style.setProperty('--sx', (-px * 7).toFixed(1) + 'px');
+      yrs.style.setProperty('--sy', (-py * 7).toFixed(1) + 'px');
     };
-    window.addEventListener('scroll', function () { if (!yTick) { yTick = true; requestAnimationFrame(tiltYears); } }, { passive: true });
+    var yQueue = function () { if (!yTick) { yTick = true; requestAnimationFrame(tiltYears); } };
+    window.addEventListener('scroll', yQueue, { passive: true });
+    window.addEventListener('resize', yQueue);
+    if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      document.addEventListener('mousemove', function (e) { mx = e.clientX; my = e.clientY; yQueue(); }, { passive: true });
+    }
     tiltYears();
   }
 
