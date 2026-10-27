@@ -75,7 +75,7 @@ window.SITE.id = {
 
   jobs: [
     { period: 'Mei 2021 — Sekarang', company: 'RSUP H. Adam Malik Medan', role: 'Programmer / Developer · Unit SIMRS', desc: 'Mendesain UI modul SIMRS, membangun front-end aplikasi, mengembangkan backend dengan PHP (Yii2), dan membuat layout print formulir & laporan — dibantu AI (Claude, ChatGPT, Claude Code).' },
-    { period: 'Feb 2022 — Okt 2024', company: 'Faria Edu', role: 'WordPress Developer (Penuh waktu · Remote)', desc: 'Slicing desain ke Svelte + Tailwind CSS sekaligus mengerjakan logic animasi untuk situs produk Faria Education Group — ManageBac, SchoolsBuddy, OpenApply, dan lainnya. Membangun dan memelihara situs WordPress, mengembangkan komponen React & Vue.js, serta menangani perbaikan dan update fitur.' },
+    { period: 'Feb 2022 — Okt 2024', company: 'Faria Edu', role: 'WordPress Developer (Remote)', desc: 'Slicing desain ke Svelte + Tailwind CSS sekaligus mengerjakan logic animasi untuk situs produk Faria Education Group — ManageBac, SchoolsBuddy, OpenApply, dan lainnya. Membangun dan memelihara situs WordPress, mengembangkan komponen React & Vue.js, serta menangani perbaikan dan update fitur.' },
     { period: 'Okt 2019 — Mei 2021', company: 'Freelancer', role: 'Web Front-End Developer / UI/UX Designer', desc: 'Merancang dan membangun 9 website & web app untuk klien ritel, interior, gaming, industri, edukasi, energi, dan kesehatan.' },
     { period: 'Jun 2019 — Okt 2019', company: 'Xtend Indonesia', role: 'Web Front-End Developer / UI/UX Designer', desc: 'Komp. Setia Budi, Medan. Front-end website, mobile UI/UX design, dan WordPress dengan Divi Builder.' }
   ],
