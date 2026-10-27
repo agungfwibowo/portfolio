@@ -75,7 +75,7 @@ window.SITE.id = {
 
   jobs: [
     { period: 'Mei 2021 — Sekarang', company: 'RSUP H. Adam Malik Medan', role: 'Programmer / Developer · Unit SIMRS', desc: 'Mendesain UI modul SIMRS, membangun front-end aplikasi, mengembangkan backend dengan PHP (Yii2), dan membuat layout print formulir & laporan — dibantu AI (Claude, ChatGPT, Claude Code).' },
-    { period: 'Feb 2022 — Okt 2024', company: 'Faria Edu', role: 'WordPress Developer (Freelance)', desc: 'Slicing desain ke Svelte + Tailwind CSS sekaligus mengerjakan logic animasi untuk situs produk Faria Education Group — ManageBac, SchoolsBuddy, OpenApply, dan lainnya. Membangun dan memelihara situs WordPress, mengembangkan komponen React & Vue.js, serta menangani perbaikan dan update fitur.' },
+    { period: 'Feb 2022 — Okt 2024', company: 'Faria Edu', role: 'WordPress Developer (Penuh waktu · Remote)', desc: 'Slicing desain ke Svelte + Tailwind CSS sekaligus mengerjakan logic animasi untuk situs produk Faria Education Group — ManageBac, SchoolsBuddy, OpenApply, dan lainnya. Membangun dan memelihara situs WordPress, mengembangkan komponen React & Vue.js, serta menangani perbaikan dan update fitur.' },
     { period: 'Okt 2019 — Mei 2021', company: 'Freelancer', role: 'Web Front-End Developer / UI/UX Designer', desc: 'Merancang dan membangun 9 website & web app untuk klien ritel, interior, gaming, industri, edukasi, energi, dan kesehatan.' },
     { period: 'Jun 2019 — Okt 2019', company: 'Xtend Indonesia', role: 'Web Front-End Developer / UI/UX Designer', desc: 'Komp. Setia Budi, Medan. Front-end website, mobile UI/UX design, dan WordPress dengan Divi Builder.' }
   ],
@@ -140,7 +140,7 @@ window.SITE.en = {
 
   jobs: [
     { period: 'May 2021 — Present', role: 'Programmer / Developer · SIMRS Unit', desc: 'Designing UI for hospital information system (SIMRS) modules, building application front-ends, developing the backend with PHP (Yii2), and creating print layouts for forms & reports — assisted by AI (Claude, ChatGPT, Claude Code).' },
-    { period: 'Feb 2022 — Oct 2024', desc: 'Sliced designs into Svelte + Tailwind CSS and built the animation logic for Faria Education Group product sites — ManageBac, SchoolsBuddy, OpenApply, and more. Built and maintained WordPress sites, developed React & Vue.js components, and handled fixes and feature updates.' },
+    { period: 'Feb 2022 — Oct 2024', role: 'WordPress Developer (Full-time · Remote)', desc: 'Sliced designs into Svelte + Tailwind CSS and built the animation logic for Faria Education Group product sites — ManageBac, SchoolsBuddy, OpenApply, and more. Built and maintained WordPress sites, developed React & Vue.js components, and handled fixes and feature updates.' },
     { period: 'Oct 2019 — May 2021', desc: 'Designed and built 9 websites & web apps for clients in retail, interior design, gaming, industry, education, energy, and healthcare.' },
     { period: 'Jun 2019 — Oct 2019', desc: 'Setia Budi Complex, Medan. Website front-end, mobile UI/UX design, and WordPress with Divi Builder.' }
   ],
