@@ -611,7 +611,10 @@
         lastDraw = now;
         size();
         // waktu dijaga tetap kecil (diputar ulang tiap 5 menit) supaya presisi float di GPU ponsel tidak habis
-        gl.uniform1f(uT, reduce ? 12 : ((now - t0) / 1000 * 1.6) % 480);
+        var tt = reduce ? 12 : ((now - t0) / 1000 * 1.6) % 480;
+        gl.uniform1f(uT, tt);
+        // kain memudar ke transparan menjelang waktu diputar ulang (480) lalu muncul lagi, jadi lompatannya tak terlihat
+        cv.style.opacity = reduce ? '' : Math.max(0, Math.min(1, tt / 12, (480 - tt) / 12)).toFixed(3);
         gl.drawArrays(gl.TRIANGLES, 0, 3);
       };
       if ('IntersectionObserver' in window) {
