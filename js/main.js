@@ -661,12 +661,18 @@
         cv.style.opacity = reduce ? '' : Math.max(0, Math.min(1, tt / 12, (480 - tt) / 12)).toFixed(3);
         gl.drawArrays(gl.TRIANGLES, 0, 3);
       };
+      // GPU ponsel membuang konteks WebGL saat section lama di luar layar/tab di latar: tanpa pemulihan, kanvas membeku di frame terakhir
+      var rebuild = function () { cancelAnimationFrame(glowRaf); glowOn = false; io && io.disconnect(); cv.remove(); glow(host); };
+      cv.addEventListener('webglcontextlost', function (e) { e.preventDefault(); rebuild(); });
+      var io;
       if ('IntersectionObserver' in window) {
-        new IntersectionObserver(function (es) {
+        io = new IntersectionObserver(function (es) {
           glowOn = es[0].isIntersecting;
+          if (glowOn && gl.isContextLost()) { rebuild(); return; }
           cancelAnimationFrame(glowRaf);
           if (glowOn) glowRaf = requestAnimationFrame(draw);
-        }).observe(host);
+        });
+        io.observe(host);
       } else { glowOn = true; glowRaf = requestAnimationFrame(draw); }
       window.addEventListener('resize', function () { if (!glowOn) return; cancelAnimationFrame(glowRaf); glowRaf = requestAnimationFrame(draw); });
       document.addEventListener('visibilitychange', function () {
