@@ -257,6 +257,29 @@
     rgb = hsl2rgb(h, sat, (lo + hi) / 2);
     document.documentElement.style.setProperty('--ab', 'rgb(' + rgb.map(function (v) { return Math.round(v * 255); }).join(' ') + ')');
     accentRGB = rgb.map(function (v) { return v + (1 - v) * 0.15; });
+    setHue(rgb);
+  });
+
+  // tema gelap: hue latar mengikuti aksen; toggle menyimpan pilihan
+  function setHue(c) {
+    var mx = Math.max(c[0], c[1], c[2]), mn = Math.min(c[0], c[1], c[2]), d = mx - mn, hue = 0;
+    if (d) hue = mx === c[0] ? ((c[1] - c[2]) / d) % 6 : mx === c[1] ? (c[2] - c[0]) / d + 2 : (c[0] - c[1]) / d + 4;
+    document.documentElement.style.setProperty('--h', Math.round(((hue * 60) + 360) % 360));
+  }
+  var themeBtn = document.querySelector('[data-theme-toggle]'), metaTheme = document.querySelector('meta[name=theme-color]');
+  function applyTheme(dark) {
+    if (dark) document.documentElement.dataset.theme = 'dark'; else delete document.documentElement.dataset.theme;
+    themeBtn.setAttribute('aria-pressed', dark ? 'true' : 'false');
+    if (metaTheme) metaTheme.setAttribute('content', dark ? '#0a0b0f' : '#111318');
+  }
+  applyTheme(document.documentElement.dataset.theme === 'dark');
+  themeBtn.addEventListener('click', function () {
+    var dark = document.documentElement.dataset.theme !== 'dark', root = document.documentElement;
+    root.classList.add('theme-switch');
+    applyTheme(dark);
+    void root.offsetWidth;
+    requestAnimationFrame(function () { requestAnimationFrame(function () { root.classList.remove('theme-switch'); }); });
+    try { localStorage.setItem('afw-theme', dark ? 'dark' : 'light'); } catch (e) {}
   });
 
   // ganti bahasa: isi ulang konten tanpa reload, posisi tab tetap

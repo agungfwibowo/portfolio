@@ -22,10 +22,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=164">
+<link rel="stylesheet" href="css/style.css?v=174">
 <script>
 (function (d) {
   d.classList.add('js');
+  // tema gelap: pilihan tersimpan, default mengikuti sistem; diterapkan sebelum render agar tidak berkedip
+  try { var th = localStorage.getItem('afw-theme') || (matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light'); if (th === 'dark') d.dataset.theme = 'dark'; } catch (e) {}
   // loader hanya di kunjungan pertama per tab
   try { if (!sessionStorage.getItem('afw-seen')) d.classList.add('loading'); } catch (e) {}
   // cadangan: kalau main.js gagal dimuat, tampilkan semua konten
@@ -34,7 +36,7 @@
 </script>
 <script src="js/data.js?v=25" defer></script>
 <script src="js/icons.js?v=2" defer></script>
-<script src="js/main.js?v=89" defer></script>
+<script src="js/main.js?v=91" defer></script>
 </head>
 <body>
 <div class="loader" aria-hidden="true"><b data-t="profile.mark"></b><i></i><span data-pct>0%</span></div>
@@ -55,6 +57,7 @@
 </div>
 <header class="panel title">
 <button type="button" class="ctrl swatch" data-accent aria-label="Ganti warna aksen (acak biru)"></button>
+<button type="button" class="ctrl theme" data-theme-toggle aria-label="Tema gelap / terang" aria-pressed="false"></button>
 <button type="button" class="ctrl lang" data-lang></button>
 <h1 data-headline></h1>
 <ul class="roles" data-roles></ul>
