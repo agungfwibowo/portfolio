@@ -114,6 +114,8 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
 .tape-zone{overflow:hidden;padding:0 0 12px}
 .tape-title{display:block;padding:0 32px 14px}
 .tape{width:104%;margin-left:-2%;rotate:-1.5deg;background:var(--ink);color:#fff;box-shadow:0 5px 0 var(--accent);overflow:hidden}
+/* layar mati / tab tersembunyi: semua animasi CSS dijeda (JS memasang .off di <html>) */
+.off *,.off *::before,.off *::after{animation-play-state:paused!important}
 .tape-track{display:flex;width:max-content;animation:mq var(--mq-dur,25s) linear infinite}
 .tape:hover .tape-track{animation-play-state:paused}
 .tape-seg{display:flex;align-items:center;gap:22px;padding:14px 22px 14px 0}

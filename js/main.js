@@ -507,21 +507,31 @@
   window.addEventListener('resize', sides);
   sides();
 
-  var last = performance.now();
+  // layar mati / tab disembunyikan / aplikasi di latar: semua loop rAF berhenti total & animasi CSS dijeda,
+  // lanjut lagi saat terlihat (autoplay tidak melompat karena waktu `last` diatur ulang)
+  var hidden = function () { return document.visibilityState === 'hidden'; };
+  var last = performance.now(), tickRaf = 0;
   function tick(now) {
+    tickRaf = 0;
+    if (hidden()) return;
     var dt = now - last; last = now;
-    if (document.visibilityState === 'visible') {
-      ['jobs', 'pros'].forEach(function (key) {
-        var s = state[key];
-        if (s.paused || s.hover || !s.seen) return;
-        s.t += dt;
-        if (s.t >= CFG[key].dur) { s.t = 0; s.i = (s.i + 1) % DATA[key].length; render(key); }
-        bar(key);
-      });
-    }
-    requestAnimationFrame(tick);
+    ['jobs', 'pros'].forEach(function (key) {
+      var s = state[key];
+      if (s.paused || s.hover || !s.seen) return;
+      s.t += dt;
+      if (s.t >= CFG[key].dur) { s.t = 0; s.i = (s.i + 1) % DATA[key].length; render(key); }
+      bar(key);
+    });
+    tickRaf = requestAnimationFrame(tick);
   }
-  requestAnimationFrame(tick);
+  var onVis = function () {
+    document.documentElement.classList.toggle('off', hidden());
+    if (!hidden() && !tickRaf) { last = performance.now(); tickRaf = requestAnimationFrame(tick); }
+  };
+  document.addEventListener('visibilitychange', onVis);
+  window.addEventListener('pagehide', function () { document.documentElement.classList.add('off'); });
+  window.addEventListener('pageshow', onVis);
+  tickRaf = requestAnimationFrame(tick);
 
   // cahaya menembus tirai kain yang tertiup angin + grain (WebGL) untuk bidang hitam, jalan hanya saat terlihat
   var glow = function (host) {
@@ -581,6 +591,7 @@
       var t0 = performance.now(), glowOn = false, glowRaf = 0, lastDraw = 0;
       // dibatasi ~30fps & dilewati saat host tertutup (pita keahlian yang sudah tertimpa area keahlian)
       var draw = function (now) {
+        if (hidden()) { glowRaf = 0; return; }
         if (glowOn && !reduce) glowRaf = requestAnimationFrame(draw);
         if (host._covered || now - lastDraw < 32) return;
         lastDraw = now;
@@ -596,6 +607,10 @@
         }).observe(host);
       } else { glowOn = true; glowRaf = requestAnimationFrame(draw); }
       window.addEventListener('resize', function () { if (!glowOn) return; cancelAnimationFrame(glowRaf); glowRaf = requestAnimationFrame(draw); });
+      document.addEventListener('visibilitychange', function () {
+        cancelAnimationFrame(glowRaf); glowRaf = 0;
+        if (!hidden() && glowOn) glowRaf = requestAnimationFrame(draw);
+      });
     }
   }
   };
