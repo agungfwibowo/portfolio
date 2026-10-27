@@ -11,6 +11,7 @@ html[data-theme=dark] .pro[aria-selected="true"] .no{color:#07080b}
 html.accent-picked .hl{background:var(--accent)}
 html[data-theme=dark] .hl{background:var(--accent);color:#07080b}
 html[data-theme=dark] .bubble{opacity:.4}
+html[data-theme=dark] .pro-panel.mono .shot{filter:grayscale(1) brightness(.5)}
 *{box-sizing:border-box}
 /* tanpa efek rubber hanya di desktop (mouse/trackpad); di layar sentuh pull-to-refresh tetap jalan */
 @media (hover:hover) and (pointer:fine){html,body{overscroll-behavior:none}}
@@ -88,8 +89,8 @@ a{color:var(--fg)}a:hover{color:var(--accent)}
 .ctrl.theme,.ctrl.theme[aria-pressed="true"]{position:absolute;top:16px;right:116px;width:32px;min-height:32px;padding:0;border-radius:50%;background:linear-gradient(90deg,#F6F2E8 50%,#111318 50%);box-shadow:2px 2px 0 var(--fg)}
 .ctrl.lang{position:absolute;top:16px;right:16px;min-height:32px;padding:0 12px;box-shadow:2px 2px 0 var(--fg);letter-spacing:.08em}
 .ctrl[aria-pressed="true"]{background:var(--ink);color:#fff;box-shadow:3px 3px 0 var(--accent)}
-.shot{filter:grayscale(0) brightness(.84);transition:filter .4s ease}
-.pro-panel.mono .shot{filter:grayscale(1) brightness(.84)}
+.shot{filter:grayscale(0) brightness(.84);transition:filter .4s ease;}
+.pro-panel.mono .shot{filter:grayscale(1) contrast(.8)}
 .ctrl:focus-visible,.tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .tabs-wrap{--gap:28px;display:flex;flex-wrap:wrap;gap:var(--gap);align-items:flex-start}
 .tablist{min-width:0;display:flex;flex-direction:column;border:1px solid var(--fg);border-bottom:0}
