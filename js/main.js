@@ -636,6 +636,26 @@
         }
         setTimeout(next, i * 700);
       });
+
+      // bubble tetap fixed, tapi pas scroll tertinggal sebentar (delay) lalu menyusul pelan;
+      // tiap bubble beda kelambatannya supaya terasa ada kedalaman
+      var bubs = Array.prototype.slice.call(document.querySelectorAll('.bubble'));
+      var ease = [.009, .01, .008], lag = [1, 1.2, 0.8];
+      var pos = bubs.map(function () { return window.scrollY; });
+      var running = false;
+      function tick() {
+        var y = window.scrollY, moving = false;
+        bubs.forEach(function (el, i) {
+          pos[i] += (y - pos[i]) * ease[i % 3];
+          var off = (pos[i] - y) * lag[i % 3];
+          if (Math.abs(y - pos[i]) > 0.3) moving = true;
+          el.style.transform = 'translateY(' + off.toFixed(1) + 'px)';
+        });
+        if (moving) requestAnimationFrame(tick); else running = false;
+      }
+      window.addEventListener('scroll', function () {
+        if (!running) { running = true; requestAnimationFrame(tick); }
+      }, { passive: true });
     }
   }
 })();

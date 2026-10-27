@@ -16,12 +16,17 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
 /* bubble dekoratif: nempel di layar (fixed) biar selalu kelihatan walau discroll,
    lebar dibatasi sama seperti kiri-kanan .frame, tinggi penuh layar untuk ruang gerak atas-bawah */
 .bubbles{position:fixed;top:0;left:50%;translate:-50% 0;width:calc(100% - 40px);max-width:1200px;height:100vh;z-index:-1;overflow:hidden;pointer-events:none;mix-blend-mode:exclusion;}
-.bubble{position:absolute;border-radius:50%;background:var(--accent);opacity:.35;filter:blur(65px);
+.bubble{position:absolute;border-radius:50%;background:var(--accent);opacity:.8;filter:blur(35px);
   transition:translate 7s ease-in-out,scale 7s ease-in-out}
 .bubble-1{width:150px;height:150px;left:20%;top:10%}
 .bubble-2{width:150px;height:150px;left:78%;top:55%}
 .bubble-3{width:150px;height:150px;left:45%;top:75%}
-@media (prefers-reduced-motion:reduce){.bubble{transition:none}}
+/* grain di lapisan bubble: hanya terlihat di section tanpa background (yang tertembus bubble) */
+.bubbles::after{content:"";position:absolute;inset:-60px;pointer-events:none;opacity:1;will-change:transform; mix-blend-mode: multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.7' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation:grain 1.2s steps(6) infinite}
+@keyframes grain{0%{transform:translate(0,0)}17%{transform:translate(-30px,18px)}33%{transform:translate(22px,-34px)}50%{transform:translate(-14px,40px)}67%{transform:translate(36px,12px)}83%{transform:translate(-26px,-22px)}100%{transform:translate(0,0)}}
+@media (prefers-reduced-motion:reduce){.bubble{transition:none}.bubbles::after{animation:none}}
 .panel{min-width:0;padding:32px;border-right:1px solid var(--ink);border-bottom:1px solid var(--ink)}
 .full{flex:1 1 100%}
 .gridbg{background-color:var(--paper);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:var(--cell,28px) var(--cell,28px);background-position:-1px -1px}
