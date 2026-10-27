@@ -235,6 +235,30 @@
   setTone(savedTone !== 'warna'); // default mono
   toneBtn.addEventListener('click', function () { setTone(!proPanel.classList.contains('mono')); });
 
+  // warna aksen acak (hue bebas: merah, hijau, oranye, biru, ...) dengan kontras setara biru awal #1D4ED8:
+  // lightness dicari per-hue supaya luminans relatifnya ~0.10 (teks putih di atasnya tetap terbaca); tidak disimpan.
+  // accentRGB dipakai shader kain (sedikit lebih terang karena latarnya hitam)
+  var accentRGB = [0.26, 0.42, 0.93];
+  function hsl2rgb(h, s, l) {
+    var a = s * Math.min(l, 1 - l);
+    var f = function (n) { var k = (n + h / 30) % 12; return l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1)); };
+    return [f(0), f(8), f(4)];
+  }
+  function lum(c) {
+    var q = c.map(function (v) { return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); });
+    return 0.2126 * q[0] + 0.7152 * q[1] + 0.0722 * q[2];
+  }
+  document.querySelector('[data-accent]').addEventListener('click', function () {
+    var h = Math.random() * 360, sat = 0.72 + Math.random() * 0.12, lo = 0.12, hi = 0.65, rgb;
+    for (var k = 0; k < 18; k++) {
+      var mid = (lo + hi) / 2; rgb = hsl2rgb(h, sat, mid);
+      if (lum(rgb) > 0.10) hi = mid; else lo = mid;
+    }
+    rgb = hsl2rgb(h, sat, (lo + hi) / 2);
+    document.documentElement.style.setProperty('--ab', 'rgb(' + rgb.map(function (v) { return Math.round(v * 255); }).join(' ') + ')');
+    accentRGB = rgb.map(function (v) { return v + (1 - v) * 0.15; });
+  });
+
   // ganti bahasa: isi ulang konten tanpa reload, posisi tab tetap
   document.querySelector('[data-lang]').addEventListener('click', function () {
     useLang(lang === 'id' ? 'en' : 'id');
@@ -347,6 +371,24 @@
     document.querySelectorAll('.tagline.gridbg, .skills-wrap, .cta').forEach(function (el) { gio.observe(el); });
   } else document.querySelectorAll('.tagline.gridbg, .skills-wrap, .cta').forEach(function (el) { el.classList.add('grid-on'); });
 
+  // abaikan mousemove palsu: di layar penuh (toolbar browser muncul/hilang) Chrome bisa mengirim mousemove tanpa gerakan nyata
+  // (movementX/Y = 0) tapi koordinatnya melompat jauh; kursor follower & badge "7+ years" jadi ikut terbang ke sana.
+  // Hasil dicache di event supaya dua listener mousemove memakai penilaian yang sama.
+  var lastMove = null;
+  function bogusMove(e) {
+    if (e.__bogus !== undefined) return e.__bogus;
+    var bad = false;
+    if (lastMove) {
+      var dy = Math.abs(e.clientY - lastMove.y), vh = window.innerHeight;
+      // (1) tanpa gerakan nyata tapi koordinat melompat; (2) "teleport" dari strip atas layar (zona toolbar layar penuh macOS)
+      // ke bagian bawah layar dalam satu event — mustahil untuk gerakan tangan, koordinat Y-nya terbalik
+      bad = (e.movementX === 0 && e.movementY === 0 && Math.abs(e.clientX - lastMove.x) + dy > 8) ||
+        (lastMove.y < 90 && e.clientY > vh * 0.6 && dy > vh * 0.4);
+    }
+    if (!bad) lastMove = { x: e.clientX, y: e.clientY };
+    return (e.__bogus = bad);
+  }
+
   // cursor follower: ring mengikuti mouse dengan sedikit jeda, membesar di elemen yang bisa diklik
   var cur = document.querySelector('.cursor');
   if (cur && !reduce && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
@@ -357,6 +399,7 @@
       if (Math.abs(mx - cx) > 0.1 || Math.abs(my - cy) > 0.1) requestAnimationFrame(follow); else moving = false;
     };
     document.addEventListener('mousemove', function (e) {
+      if (bogusMove(e)) return;
       mx = e.clientX; my = e.clientY;
       if (!cur.classList.contains('on')) { cx = mx; cy = my; cur.classList.add('on'); }
       if (!moving) { moving = true; requestAnimationFrame(follow); }
@@ -439,7 +482,7 @@
     window.addEventListener('scroll', yQueue, { passive: true });
     window.addEventListener('resize', yQueue);
     if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-      document.addEventListener('mousemove', function (e) { mx = e.clientX; my = e.clientY; yQueue(); }, { passive: true });
+      document.addEventListener('mousemove', function (e) { if (bogusMove(e)) return; mx = e.clientX; my = e.clientY; yQueue(); }, { passive: true });
     }
     tiltYears();
   }
@@ -554,7 +597,7 @@
     var FS = [
       // highp bila GPU mendukung: di Android mediump = float 16-bit, nilai waktu yang terus membesar membuat noise pecah berpiksel
       '#ifdef GL_FRAGMENT_PRECISION_HIGH\nprecision highp float;\n#else\nprecision mediump float;\n#endif',
-      'uniform vec2 r;uniform float t;uniform float gs;',
+      'uniform vec2 r;uniform float t;uniform float gs;uniform vec3 ac;',
       'float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}',
       'float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);',
       ' return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);}',
@@ -571,7 +614,7 @@
       ' float spot=exp(-d*d*1.6)*(.45+.55*smoothstep(-.1,1.,uv.y));',
       ' float a=clamp(crest*spot*.95+spot*.1,0.,1.);',
       ' float tint=smoothstep(.45,.8,fbm(q*1.3-vec2(t*.05,0.)));',
-      ' vec3 c=mix(vec3(.42,.55,.58),vec3(.22,.38,.92),tint*.55);',
+      ' vec3 c=mix(vec3(.42,.55,.58),ac,tint*.55);',
       // grain diam, hanya muncul di bagian yang terkena cahaya (area gelap tetap bersih); lebih halus di desktop
       ' float g=(h(gl_FragCoord.xy)-.5)*a*gs;',
       ' gl_FragColor=vec4(c*a+max(g,0.),clamp(a+abs(g),0.,1.));',
@@ -590,7 +633,7 @@
       var loc = gl.getAttribLocation(prog, 'p');
       gl.enableVertexAttribArray(loc);
       gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-      var uR = gl.getUniformLocation(prog, 'r'), uT = gl.getUniformLocation(prog, 't'), uG = gl.getUniformLocation(prog, 'gs');
+      var uR = gl.getUniformLocation(prog, 'r'), uT = gl.getUniformLocation(prog, 't'), uG = gl.getUniformLocation(prog, 'gs'), uA = gl.getUniformLocation(prog, 'ac');
       var desk = window.matchMedia('(min-width:840px)');
       // desktop: setengah resolusi CSS, cahaya lembut tidak butuh piksel penuh, GPU jauh lebih ringan;
       // ponsel (layar rapat, DPR tinggi): grain butuh ~1 piksel fisik per butir supaya tidak kasar, jadi
@@ -613,6 +656,7 @@
         // waktu dijaga tetap kecil (diputar ulang tiap 5 menit) supaya presisi float di GPU ponsel tidak habis
         var tt = reduce ? 12 : ((now - t0) / 1000 * 1.6) % 480;
         gl.uniform1f(uT, tt);
+        gl.uniform3f(uA, accentRGB[0], accentRGB[1], accentRGB[2]);
         // kain memudar ke transparan menjelang waktu diputar ulang (480) lalu muncul lagi, jadi lompatannya tak terlihat
         cv.style.opacity = reduce ? '' : Math.max(0, Math.min(1, tt / 12, (480 - tt) / 12)).toFixed(3);
         gl.drawArrays(gl.TRIANGLES, 0, 3);
@@ -676,4 +720,6 @@
       }, { passive: true });
     }
   }
+  // panel debug sementara: buka halaman dengan ?dbg
+  if (/[?&]dbg/.test(location.search)) { var dsc = document.createElement('script'); dsc.src = 'js/dbg.js?v=1'; document.body.appendChild(dsc); }
 })();

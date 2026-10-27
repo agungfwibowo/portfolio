@@ -1,9 +1,9 @@
-:root{--ink:#111318;--muted:#5A5F6B;--soft:#3A3F4B;--line:#DADDE3;--grid:#D9D2BF;--accent:#1D4ED8;--paper:#EAE4D5;--card:#F6F2E8;
+:root{--ink:#111318;--muted:#5A5F6B;--soft:#3A3F4B;--line:#DADDE3;--grid:#D9D2BF;--ab:#1D4ED8;--accent:var(--ab);--paper:#EAE4D5;--card:#F6F2E8;
   --display:'Space Grotesk',sans-serif;--mono:'IBM Plex Mono',monospace}
 *{box-sizing:border-box}
 /* tanpa efek rubber hanya di desktop (mouse/trackpad); di layar sentuh pull-to-refresh tetap jalan */
 @media (hover:hover) and (pointer:fine){html,body{overscroll-behavior:none}}
-html{scroll-behavior:smooth}
+html{scroll-behavior:smooth;}
 body{overflow-x:clip}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;-webkit-font-smoothing:antialiased}
 img{max-width:100%}
@@ -40,7 +40,7 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
 .skills-wrap::before,.cta::before{content:"";position:absolute;left:0;right:0;top:-400px;bottom:-400px;z-index:-1;pointer-events:none;
   background-image:linear-gradient(var(--gl) 1px,transparent 1px),linear-gradient(90deg,var(--gl) 1px,transparent 1px);
   background-size:var(--cell,28px) var(--cell,28px);background-position:-1px 399px;will-change:translate;animation:grid-up 3s linear infinite}
-.skills-wrap{--gl:var(--grid)}.cta{--gl:rgba(255,255,255,.06);--accent:#1638A8} /* biru di CTA sedikit lebih gelap */
+.skills-wrap{--gl:var(--grid)}.cta{--gl:rgba(255,255,255,.06);--accent:color-mix(in srgb,var(--ab) 78%,#000)} /* biru di CTA sedikit lebih gelap */
 /* semua grid bergulir ke atas tanpa henti, satu kotak per putaran sehingga sambungannya tak terlihat;
    tagline (panel kecil) cukup menggeser background-position */
 @keyframes grid-up{to{translate:0 calc(-1 * var(--cell,28px))}}
@@ -73,6 +73,7 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
 .ctrl{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border:1.5px solid var(--ink);border-radius:999px;background:var(--card);color:var(--ink);box-shadow:3px 3px 0 var(--ink);cursor:pointer;font-family:var(--mono);font-size:12px;font-weight:600;flex-shrink:0}
 .ctrls{display:flex;gap:12px}
 .title{position:relative}
+.ctrl.swatch{position:absolute;top:16px;right:72px;width:32px;min-height:32px;padding:0;border-radius:50%;background:var(--accent);box-shadow:2px 2px 0 var(--ink)}
 .ctrl.lang{position:absolute;top:16px;right:16px;min-height:32px;padding:0 12px;box-shadow:2px 2px 0 var(--ink);letter-spacing:.08em}
 .ctrl[aria-pressed="true"]{background:var(--ink);color:#fff;box-shadow:3px 3px 0 var(--accent)}
 .shot{filter:grayscale(0) brightness(.84);transition:filter .4s ease}
@@ -344,7 +345,7 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
   .cta-mark-top{display:inline-block}
   .cta-title .cta-mark{display:none}
 }
-.cta-kick{margin:0;font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#8FB0FF}
+.cta-kick{margin:0;font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:color-mix(in srgb,var(--ab) 55%,#fff)}
 .cta-title{margin:0;font-family:var(--display);font-size:clamp(46px,9vw,128px);font-weight:300;line-height:.98;letter-spacing:-.04em}
 .cta-hl{padding:0 .14em;background:var(--accent);font-weight:400;-webkit-box-decoration-break:clone;box-decoration-break:clone}
 .cta-text{margin:0;max-width:560px;font-family:var(--mono);font-size:15px;line-height:1.7;color:#C9CDD6}
@@ -354,11 +355,11 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
 .cta-btn:hover{color:var(--ink);translate:-2px -2px;box-shadow:7px 7px 0 var(--accent)}
 .cta-btn.ghost{background:transparent;color:#fff;box-shadow:5px 5px 0 #fff}
 .cta-btn.ghost:hover{color:#fff;box-shadow:7px 7px 0 #fff}
-.cta-btn:focus-visible{outline:2px solid #8FB0FF;outline-offset:3px}
+.cta-btn:focus-visible{outline:2px solid color-mix(in srgb,var(--ab) 55%,#fff);outline-offset:3px}
 
 /* footer */
 .foot{margin:0;padding:24px 0;color:#8B909C;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;font-family:var(--mono);font-size:12px}
-.foot a{color:#fff}.foot a:hover{color:#8FB0FF}
+.foot a{color:#fff}.foot a:hover{color:color-mix(in srgb,var(--ab) 55%,#fff)}
 
 /* tablet & mobile: panel bertumpuk, tanpa garis kanan-kiri, konten penuh */
 @media (max-width:839px){
