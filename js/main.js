@@ -149,7 +149,7 @@
     document.querySelector('[data-roles]').innerHTML = P.roles.map(function (r) { return '<li>' + esc(r) + '</li>'; }).join('');
     document.querySelectorAll('[data-mail]').forEach(function (m) { m.href = 'mailto:' + C.email; m.textContent = C.email; });
     var ct = UI.cta.title;
-    document.querySelector('[data-cta-title]').innerHTML = esc(ct[0]) + '<br><span class="cta-hl">' + esc(ct[1]) + '</span>';
+    document.querySelector('[data-cta-title]').innerHTML = esc(ct[0]) + ' <b class="cta-mark" aria-hidden="true">' + esc(get('profile.mark')) + '</b><br><span class="cta-hl">' + esc(ct[1]) + '</span>';
     var tel = document.querySelector('[data-tel]'); tel.href = 'tel:' + C.phone.replace(/[^+\d]/g, ''); tel.textContent = C.phone;
     var k = 0, cls = { dark: 'pill dark', light: 'pill', ai: 'pill ai' };
     document.querySelector('[data-list="jobs"]').setAttribute('aria-label', UI.jobsList);

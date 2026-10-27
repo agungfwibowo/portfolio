@@ -21,10 +21,12 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
 .skills-wrap::before,.cta::before{content:"";position:absolute;left:0;right:0;top:-400px;bottom:-400px;z-index:-1;pointer-events:none;
   background-image:linear-gradient(var(--gl) 1px,transparent 1px),linear-gradient(90deg,var(--gl) 1px,transparent 1px);
   background-size:var(--cell,28px) var(--cell,28px);background-position:-1px 399px;will-change:translate;animation:grid-up 3s linear infinite}
-.skills-wrap{--gl:var(--grid)}.cta{--gl:rgba(255,255,255,.06)}
+.skills-wrap{--gl:var(--grid)}.cta{--gl:rgba(255,255,255,.06);--accent:#1638A8} /* biru di CTA sedikit lebih gelap */
 /* semua grid bergulir ke atas tanpa henti, satu kotak per putaran sehingga sambungannya tak terlihat;
    tagline (panel kecil) cukup menggeser background-position */
 @keyframes grid-up{to{translate:0 calc(-1 * var(--cell,28px))}}
+/* grid CTA & keahlian memudar di atas & bawah; lapisan grid lebih tinggi 400px di tiap sisi, jadi pudarnya dimulai dari tepi section */
+.cta::before,.skills-wrap::before{-webkit-mask-image:linear-gradient(transparent 400px,#000 500px,#000 calc(100% - 500px),transparent calc(100% - 400px));mask-image:linear-gradient(transparent 400px,#000 500px,#000 calc(100% - 500px),transparent calc(100% - 400px))}
 .tagline.gridbg{animation:grid-bg-up 3s linear infinite}
 @keyframes grid-bg-up{to{background-position:-1px calc(-1px - var(--cell,28px))}}
 /* di luar layar dijeda (JS memasang .grid-on saat section terlihat) */
@@ -301,6 +303,10 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
 .skills-head canvas.glow{position:absolute;transform:scaleY(var(--sy,1));left:calc(50% - 50vw);width:100vw}
 /* kanvas disisipkan JS, bukan bagian reveal */
 .js .skills-head canvas.glow{opacity:1;translate:none;filter:none}
+/* logo AFW dalam kotak putih di baris pertama judul, rata kanan dengan tepi kotak sorotan ("…great.");
+   judul selebar baris terpanjangnya (align-self) supaya float kanan jatuh tepat di tepi kotak itu */
+.cta-title{align-self:flex-start}
+.cta-mark{float:right;margin:.72em 0 0 .3em;padding:.14em .26em;background:var(--ink);color:#fff;font-size:.36em;font-weight:600;letter-spacing:-.04em;line-height:1}
 .cta-kick{margin:0;font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#8FB0FF}
 .cta-title{margin:0;font-family:var(--display);font-size:clamp(46px,9vw,128px);font-weight:300;line-height:.98;letter-spacing:-.04em}
 .cta-hl{padding:0 .14em;background:var(--accent);font-weight:400;-webkit-box-decoration-break:clone;box-decoration-break:clone}
