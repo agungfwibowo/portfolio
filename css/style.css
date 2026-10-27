@@ -306,7 +306,13 @@ a{color:var(--ink)}a:hover{color:var(--accent)}
 /* logo AFW dalam kotak putih di baris pertama judul, rata kanan dengan tepi kotak sorotan ("…great.");
    judul selebar baris terpanjangnya (align-self) supaya float kanan jatuh tepat di tepi kotak itu */
 .cta-title{align-self:flex-start}
-.cta-mark{float:right;margin:.72em 0 0 .3em;padding:.14em .26em;background:var(--ink);color:#fff;font-size:.36em;font-weight:600;letter-spacing:-.04em;line-height:1}
+.cta-mark{float:right;margin:.72em 0 0 .3em;padding:.14em .26em;background:var(--card);color:var(--ink);font-size:.36em;font-weight:600;letter-spacing:-.04em;line-height:1}
+/* mobile: logo AFW pindah ke atas "GET IN TOUCH" (lebih mudah dibaca di layar sempit daripada mengambang di judul) */
+.cta-mark-top{display:none;align-self:flex-start;margin:0 0 12px;padding:6px 12px;background:var(--card);color:var(--ink);font-family:var(--display);font-size:20px;font-weight:600;letter-spacing:-.04em;line-height:1}
+@media (max-width:839px){
+  .cta-mark-top{display:inline-block}
+  .cta-title .cta-mark{display:none}
+}
 .cta-kick{margin:0;font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#8FB0FF}
 .cta-title{margin:0;font-family:var(--display);font-size:clamp(46px,9vw,128px);font-weight:300;line-height:.98;letter-spacing:-.04em}
 .cta-hl{padding:0 .14em;background:var(--accent);font-weight:400;-webkit-box-decoration-break:clone;box-decoration-break:clone}
