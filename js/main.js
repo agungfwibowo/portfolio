@@ -616,4 +616,26 @@
   };
   glow(document.querySelector('.cta'));
   glow(document.querySelector('.skills-head'));
+
+  // bubble dekoratif: tiap bubble jalan ke titik+ukuran acak sendiri-sendiri, lalu pilih titik acak
+  // berikutnya begitu transisi selesai, jadi polanya tidak pernah berulang persis.
+  // Jarak dihitung dari ukuran .bubbles (selebar .frame), bukan vw/vh (lebar layar), supaya batas
+  // kanan-kiri geraknya selalu ikut lebar frame walau di layar lebar.
+  if (!reduce) {
+    var bwrap = document.querySelector('.bubbles');
+    if (bwrap) {
+      document.querySelectorAll('.bubble').forEach(function (el, i) {
+        function next() {
+          var dur = 5000 + Math.random() * 6000;
+          var dx = (Math.random() * 0.6 - 0.3) * bwrap.clientWidth;
+          var dy = (Math.random() * 0.6 - 0.3) * bwrap.clientHeight;
+          el.style.transitionDuration = dur + 'ms';
+          el.style.translate = dx.toFixed(0) + 'px ' + dy.toFixed(0) + 'px';
+          el.style.scale = (0.8 + Math.random() * 2).toFixed(2);
+          setTimeout(next, dur);
+        }
+        setTimeout(next, i * 700);
+      });
+    }
+  }
 })();
