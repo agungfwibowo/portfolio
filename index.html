@@ -22,12 +22,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=174">
+<link rel="stylesheet" href="css/style.css?v=175">
 <script>
 (function (d) {
   d.classList.add('js');
-  // tema gelap: pilihan tersimpan, default mengikuti sistem; diterapkan sebelum render agar tidak berkedip
-  try { var th = localStorage.getItem('afw-theme') || (matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light'); if (th === 'dark') d.dataset.theme = 'dark'; } catch (e) {}
+  // tema gelap: pilihan tersimpan, default terang; diterapkan sebelum render agar tidak berkedip
+  try { var th = localStorage.getItem('afw-theme'); if (th === 'dark') d.dataset.theme = 'dark'; } catch (e) {}
   // loader hanya di kunjungan pertama per tab
   try { if (!sessionStorage.getItem('afw-seen')) d.classList.add('loading'); } catch (e) {}
   // cadangan: kalau main.js gagal dimuat, tampilkan semua konten
