@@ -205,6 +205,21 @@
     edges(list);
   });
 
+  // tinggi panel slider hanya boleh naik (min-height = tertinggi yang pernah terlihat), supaya tidak loncat tiap ganti slide;
+  // diulang dari nol hanya kalau lebar panel berubah (rotasi/resize), bukan saat URL bar HP muncul-hilang
+  if ('ResizeObserver' in window) {
+    ['.job-panel', '.pro-panel'].forEach(function (sel) {
+      var p = document.querySelector(sel); if (!p) return;
+      var maxH = 0, lastW = 0;
+      new ResizeObserver(function () {
+        var w = p.clientWidth;
+        if (w !== lastW) { lastW = w; maxH = 0; p.style.minHeight = ''; }
+        var h = p.getBoundingClientRect().height;
+        if (h > maxH + 0.5) { maxH = h; p.style.minHeight = maxH + 'px'; }
+      }).observe(p);
+    });
+  }
+
   // toggle warna / mono untuk screenshot proyek (default mono), diingat di browser
   var toneBtn = document.querySelector('[data-tone]'), proPanel = document.querySelector('.pro-panel');
   var ICON_TONE = '<svg aria-hidden="true" width="12" height="12" viewBox="0 0 12 12"><circle cx="6" cy="6" r="5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M6 1a5 5 0 0 1 0 10z" fill="currentColor"/></svg>';
