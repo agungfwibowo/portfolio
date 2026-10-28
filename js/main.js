@@ -527,13 +527,15 @@
   if (sHead && sWrap) {
     var sTick = false;
     // baca posisi dulu, baru tulis — dan tulis hanya bila nilainya berubah (hindari layout paksa tiap frame scroll)
-    var lastSy = '', lastSo = '', lastClip = null;
+    var lastSy = '', lastSo = '', lastClip = null, lastHh = '';
     var coverHead = function () {
       sTick = false;
       var hr = sHead.getBoundingClientRect(), wr = sWrap.getBoundingClientRect(), vh = window.innerHeight;
       // pita membuka: tetap 1px dulu saat masuk layar (sampai tepi atasnya di 90% layar), lalu membuka penuh di 50% layar
       var op = reduce ? 1 : Math.min(1, Math.max(0, (vh * 0.9 - hr.top) / (vh * 0.4)));
       var sy = Math.max(1 / hr.height, op).toFixed(3);
+      var hh2 = Math.round(hr.height / 2) + 'px';
+      if (hh2 !== lastHh) { sHead.parentNode.style.setProperty('--hh2', hh2); lastHh = hh2; }
       // teks baru muncul di paruh akhir pembukaan, supaya tidak terlihat samar di atas latar terang
       var so = Math.min(1, Math.max(0, (op - 0.5) / 0.5)).toFixed(2);
       var cut = Math.max(0, Math.round(hr.bottom - wr.top));
