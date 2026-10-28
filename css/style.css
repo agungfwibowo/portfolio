@@ -407,19 +407,18 @@ a{color:var(--fg)}a:hover{color:var(--accent)}
 @media (max-width:760px){
   /* header lebih ringkas */
   .title{padding-top:32px;gap:20px}
-  /* tab jadi strip horizontal agar detail langsung terlihat di bawahnya */
-  .tabs-wrap,.tabs-wrap.wide{--gap:20px}
-  .tablist{flex:1 1 100%;flex-direction:row;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scrollbar-width:none;border-top:0;border-left:1px solid var(--fg)}
-  /* strip tab selebar layar: keluar dari padding panel 20px kiri-kanan */
-  .tablist{margin:0 -20px;padding:0 20px;scroll-padding:0 20px;border-left:0;border-right:0}
-  /* tab pertama sejajar judul (20px dari tepi), garis kirinya pindah ke tab itu */
-  .tablist>:first-child{border-left:1px solid var(--fg)}
-  .tablist::-webkit-scrollbar{display:none}
-  .tab{flex:0 0 auto;width:auto;scroll-snap-align:start;border:1px solid var(--fg);border-left:0}
-  .job{min-width:170px}
-  .pro{min-width:190px;border-color:var(--fg)}
-  .job-panel{min-height:0}
 }
+/* tab jadi strip horizontal (slider) kapan pun daftar & isi tidak muat berdampingan (JS memasang .stack), agar detail langsung terlihat */
+.tabs-wrap.stack,.tabs-wrap.wide.stack{--gap:20px}
+.tabs-wrap.stack .tablist{flex:1 1 100%;flex-direction:row;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scrollbar-width:none;border-top:0;margin:0 -20px;padding:0 20px;scroll-padding:0 20px;border-left:0;border-right:0}
+.tabs-wrap.stack .tablist>:first-child{border-left:1px solid var(--fg)}
+.tabs-wrap.stack .tablist::-webkit-scrollbar{display:none}
+.tabs-wrap.stack .tab{flex:0 0 auto;width:auto;scroll-snap-align:start;border:1px solid var(--fg);border-left:0}
+.tabs-wrap.stack .job{min-width:170px}
+.tabs-wrap.stack .pro{min-width:190px;border-color:var(--fg)}
+.tabs-wrap.stack .job-panel{min-height:0}
+/* panel ≥840px berpadding 32px, jadi strip keluar 32px agar tetap selebar panel */
+@media (min-width:840px){.tabs-wrap.stack .tablist{margin:0 -32px;padding:0 32px;scroll-padding:0 32px}}
 /* keahlian versi ponsel (foto di bawah pita) hanya di bawah 600px; 600px ke atas pakai tata letak desktop */
 @media (max-width:599px){
   .skills-wrap{flex-direction:column;align-items:stretch;padding-bottom:0}

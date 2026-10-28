@@ -577,10 +577,15 @@
   var sides = function () {
     document.querySelectorAll('.tabs-wrap').forEach(function (w) {
       var a = w.children[0], b = w.children[1];
-      w.classList.toggle('side', window.innerWidth >= 840 && !!b && Math.abs(a.offsetTop - b.offsetTop) < 2);
+      // ukur tanpa mode slider: kalau daftar & isi tak muat berdampingan, daftar tab jadi slider horizontal (.stack)
+      w.classList.remove('stack');
+      var beside = !!b && Math.abs(a.offsetTop - b.offsetTop) < 2;
+      w.classList.toggle('side', window.innerWidth >= 840 && beside);
+      w.classList.toggle('stack', !beside);
     });
   };
   window.addEventListener('resize', sides);
+  window.addEventListener('load', sides);
   sides();
 
   // layar mati / tab disembunyikan / aplikasi di latar: semua loop rAF berhenti total & animasi CSS dijeda,
