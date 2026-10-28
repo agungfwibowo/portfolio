@@ -2,7 +2,7 @@
   --display:'Space Grotesk',sans-serif;--mono:'IBM Plex Mono',monospace}
 /* tema gelap: rona latar mengikuti hue aksen (--h diisi JS); CTA memakai warna tetap sendiri */
 html[data-theme=dark]{color-scheme:dark;--paper:hsl(var(--h) 14% 6%);--card:hsl(var(--h) 14% 10%);--ink:hsl(var(--h) 18% 3%);--fg:hsl(var(--h) 20% 92%);--muted:hsl(var(--h) 8% 68%);--soft:hsl(var(--h) 10% 80%);--line:hsl(var(--h) 12% 18%);--grid:hsl(var(--h) 14% 11%);--accent:color-mix(in srgb,var(--ab) 55%,#fff)}
-html[data-theme=dark] .skills-head,html[data-theme=dark] .cta{--ink:#07080b}
+html[data-theme=dark] .skills-head,html[data-theme=dark] .cta{--ink:color-mix(in srgb,var(--ab) 26%,#000)}
 html[data-theme=dark] .cta{--accent:color-mix(in srgb,var(--ab) 78%,#000)}
 html[data-theme=dark] .st-blue,html[data-theme=dark] .st-in{color:#111318}
 html[data-theme=dark] .tab[aria-selected="true"]{background:var(--accent);color:#07080b}
@@ -341,7 +341,9 @@ a{color:var(--fg)}a:hover{color:var(--accent)}
 .glow{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
 /* cahaya di depan isi (screen: hitam tetap hitam, teks ikut tersinari), dimasker memudar dari kanan atas searah sumber cahaya */
 .cta .glow,.skills-head canvas.glow{z-index:2;mix-blend-mode:screen;
-  -webkit-mask-image:radial-gradient(ellipse 85% 130% at 72% 0%,#000 25%,transparent 80%);mask-image:radial-gradient(ellipse 85% 130% at 72% 0%,#000 25%,transparent 80%)}
+  -webkit-mask-image:linear-gradient(#000 35%,transparent 95%);mask-image:linear-gradient(#000 35%,transparent 95%)}
+/* pita keahlian: cahaya tetap memudar dari kanan atas */
+.skills-head canvas.glow{-webkit-mask-image:radial-gradient(ellipse 85% 130% at 72% 0%,#000 25%,transparent 80%);mask-image:radial-gradient(ellipse 85% 130% at 72% 0%,#000 25%,transparent 80%)}
 .cta-body,.cta .foot,.skills-head>*{position:relative;z-index:1}
 /* pita keahlian: kanvas selebar layar seperti latar hitamnya */
 .skills-head canvas.glow{position:absolute;transform:scaleY(var(--sy,1));left:calc(50% - 50vw);width:100vw}
