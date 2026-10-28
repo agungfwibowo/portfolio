@@ -121,7 +121,6 @@ a{color:var(--fg)}a:hover{color:var(--accent)}
 .job .period{font-family:var(--mono);font-size:12px;color:var(--muted)}
 .job .co{font-family:var(--display);font-size:17px}
 .job[aria-selected="true"] .period{color:#C9CDD6}
-.job[aria-selected="true"] .co{font-weight:500}
 .job-panel{flex:999 1 320px;min-width:0;min-height:230px;display:flex;flex-direction:column;gap:12px}
 .job-panel .when{margin:8px 0 0;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .job-panel h3{margin:0;font-family:var(--display);font-size:28px;font-weight:400;letter-spacing:-.02em;line-height:1.1}
@@ -236,7 +235,6 @@ a{color:var(--fg)}a:hover{color:var(--accent)}
 .pro .nm b{font-family:var(--display);font-size:16px;font-weight:400}
 .pro .nm small{font-family:var(--mono);font-size:12px;color:var(--muted)}
 .pro[aria-selected="true"] .no{color:#fff}
-.pro[aria-selected="true"] .nm b{font-weight:500}
 .pro[aria-selected="true"] .nm small{color:#C9CDD6}
 .pro-panel{flex:999 1 480px;min-width:0;display:flex;flex-direction:column;gap:16px}
 .pro-top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:8px 16px;margin-top:6px}
