@@ -101,9 +101,13 @@
   }
 
   // di mobile tablist berupa strip horizontal: geser tab aktif ke kiri strip, tanpa menggulir halaman
+  // user menggeser strip sendiri: jangan ditarik kembali oleh autoplay, baru geser otomatis lagi setelah 10 detik tanpa sentuhan
+  var STRIP_IDLE = 10000;
   function scrollTab(list, tab) {
     if (list.scrollWidth <= list.clientWidth) return;
+    if (performance.now() - (list._userAt || -1e9) < STRIP_IDLE) return;
     var left = list.scrollLeft + tab.getBoundingClientRect().left - list.getBoundingClientRect().left - (parseFloat(getComputedStyle(list).paddingLeft) || 0);
+    list._prog = true; clearTimeout(list._progT); list._progT = setTimeout(function () { list._prog = false; }, 900);
     list.scrollTo({ left: left, behavior: reduce ? 'auto' : 'smooth' });
   }
 
@@ -123,9 +127,14 @@
   }
 
   function select(key, k) { state[key].i = k; state[key].t = 0; render(key); bar(key); }
-  // dipilih user (klik / panah): autoplay istirahat 1 menit supaya isi tab sempat dibaca, lalu jalan lagi
-  var HOLD = 60000;
-  function pick(key, k) { state[key].hold = performance.now() + HOLD; select(key, k); }
+  // dipilih user (klik / panah): autoplay istirahat 30 detik supaya isi tab sempat dibaca, lalu jalan lagi
+  var HOLD = 30000;
+  function pick(key, k) {
+    state[key].hold = performance.now() + HOLD;
+    // klik/panah tetap menggeser strip ke tab aktif, meski user baru menggesernya
+    document.querySelector('[data-list="' + key + '"]')._userAt = -1e9;
+    select(key, k);
+  }
   function bar(key) {
     document.querySelector('[data-bar="' + key + '"]').style.width = Math.min(100, state[key].t / CFG[key].dur * 100) + '%';
   }
@@ -200,7 +209,9 @@
     // autoplay berhenti sementara selama kursor di atas daftar tab (mouse saja, bukan sentuhan)
     list.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') state[key].hover = true; });
     list.addEventListener('pointerleave', function () { state[key].hover = false; });
-    list.addEventListener('scroll', function () { edges(list); }, { passive: true });
+    var userTouch = function () { list._userAt = performance.now(); };
+    ['pointerdown', 'touchstart', 'wheel'].forEach(function (ev) { list.addEventListener(ev, userTouch, { passive: true }); });
+    list.addEventListener('scroll', function () { edges(list); if (!list._prog) userTouch(); }, { passive: true });
     window.addEventListener('resize', function () { edges(list); });
     edges(list);
   });
@@ -724,6 +735,18 @@
   if (!reduce && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
     var bwrap = document.querySelector('.bubbles');
     if (bwrap) {
+      // grain bubble berpola mosaik titik (grid sel 3px, kecerahan acak per sel), diganti dari noise halus bawaan CSS
+      try {
+        var cvs = document.createElement('canvas'), N = 72, C = 3, SC = 2;
+        cvs.width = cvs.height = N * C * SC;
+        var cx = cvs.getContext('2d');
+        for (var gy = 0; gy < N; gy++) for (var gx = 0; gx < N; gx++) {
+          cx.fillStyle = 'rgba(0,0,0,' + (Math.pow(Math.random(), 1.4) * 0.9).toFixed(2) + ')';
+          cx.beginPath(); cx.arc((gx + .5) * C * SC, (gy + .5) * C * SC, C * SC * .42, 0, 6.2832); cx.fill();
+        }
+        document.documentElement.style.setProperty('--bubble-dots', 'url(' + cvs.toDataURL('image/png') + ')');
+        document.documentElement.style.setProperty('--bubble-dots-size', N * C + 'px ' + N * C + 'px');
+      } catch (e) {}
       document.querySelectorAll('.bubble').forEach(function (el, i) {
         function next() {
           var dur = 5000 + Math.random() * 6000;
