@@ -451,3 +451,18 @@ a{color:var(--fg)}a:hover{color:var(--accent)}
   .skills-photo{position:static;grid-column:2;grid-row:var(--pr,3);align-self:end;width:calc(100% + 20px);max-width:none;aspect-ratio:600/760;object-fit:cover;object-position:top;margin:0 -20px 0 0}
 }
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.cta,.cta-body{transition:none}.tape-track,.skills-wrap::before,.cta::before,.tagline.gridbg{animation:none}.js .stickers .st{opacity:1;scale:1;transition:none}.cursor{display:none}.pill{transform:none}.js :is(.mark,.id p,.title h1,.roles,.years,.tagline p,.sec-head,.tabs-wrap,.half>*,.skills-head>*,.group,.skills-photo,.plus,.cta-in){opacity:1;translate:none;filter:none;transition:none}}
+/* header lebar ≥600px: judul menyisakan ruang untuk tiga tombol di kanan atas, jarak ke daftar peran dirapatkan */
+@media (min-width:600px){
+  .title h1{padding-right:176px}
+  .title{row-gap:14px}
+}
+/* header 600–839px: teks nama & lokasi rata kiri, sejajar dengan baris pertama judul */
+@media (min-width:600px) and (max-width:839px){
+  .id p{align-self:flex-start;text-align:left;padding:34px 0 16px;font-size:12px}
+}
+/* tagline ≥600px: pil "7+ years" dan kalimat selalu berdampingan; kalimat boleh turun baris, tidak lagi pindah di bawah pil */
+@media (min-width:600px){
+  .tagline{flex-wrap:nowrap;justify-content:flex-start;gap:32px 40px}
+  .years{flex:none;align-self:center}
+  .tagline p{flex:1 1 0;min-width:0;font-size:clamp(28px,3.4vw,44px)}
+}
