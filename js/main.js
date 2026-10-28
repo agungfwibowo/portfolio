@@ -101,8 +101,8 @@
   }
 
   // di mobile tablist berupa strip horizontal: geser tab aktif ke kiri strip, tanpa menggulir halaman
-  // user menggeser strip sendiri: jangan ditarik kembali oleh autoplay, baru geser otomatis lagi setelah 10 detik tanpa sentuhan
-  var STRIP_IDLE = 10000;
+  // user menggeser strip sendiri: jangan ditarik kembali oleh autoplay, baru geser otomatis lagi setelah 7 detik tanpa sentuhan
+  var STRIP_IDLE = 7000;
   function scrollTab(list, tab) {
     if (list.scrollWidth <= list.clientWidth) return;
     if (performance.now() - (list._userAt || -1e9) < STRIP_IDLE) return;
@@ -121,16 +121,20 @@
   function preload(k) { DATA.pros[k].imgs.forEach(function (src) { var i = new Image(); i.src = A + src; }); }
 
   function renderCtrl(key) {
-    var b = document.querySelector('[data-ctrl="' + key + '"]'), p = state[key].paused;
+    var b = document.querySelector('[data-ctrl="' + key + '"]'), p = isPaused(key);
     b.innerHTML = p ? ICON_PLAY + UI.play : ICON_PAUSE + UI.pause;
     b.setAttribute('aria-label', p ? UI.ariaPlay : UI.ariaPause);
   }
 
   function select(key, k) { state[key].i = k; state[key].t = 0; render(key); bar(key); }
-  // dipilih user (klik / panah): autoplay istirahat 30 detik supaya isi tab sempat dibaca, lalu jalan lagi
-  var HOLD = 30000;
+  // dipilih user (klik / panah): autoplay istirahat 15 detik supaya isi tab sempat dibaca, lalu jalan lagi
+  var HOLD = 15000;
+  // tombol Pause/Play mengikuti kondisi nyata autoplay: dijeda user atau sedang istirahat setelah klik
+  function isPaused(key) { var s = state[key]; return s.paused || performance.now() < (s.hold || 0); }
   function pick(key, k) {
     state[key].hold = performance.now() + HOLD;
+    clearTimeout(state[key].holdT);
+    state[key].holdT = setTimeout(function () { renderCtrl(key); }, HOLD + 50);
     // klik/panah tetap menggeser strip ke tab aktif, meski user baru menggesernya
     document.querySelector('[data-list="' + key + '"]')._userAt = -1e9;
     select(key, k);
@@ -203,7 +207,11 @@
   ['jobs', 'pros'].forEach(function (key) {
     buildList(key); render(key); bar(key);
     document.querySelector('[data-ctrl="' + key + '"]').addEventListener('click', function () {
-      state[key].paused = !state[key].paused; renderCtrl(key);
+      var s = state[key];
+      // sedang istirahat otomatis setelah klik tab: tombol berarti "lanjut sekarang"
+      if (!s.paused && performance.now() < (s.hold || 0)) { s.hold = 0; clearTimeout(s.holdT); }
+      else { s.paused = !s.paused; if (!s.paused) { s.hold = 0; clearTimeout(s.holdT); } }
+      renderCtrl(key);
     });
     var list = document.querySelector('[data-list="' + key + '"]');
     // autoplay berhenti sementara selama kursor di atas daftar tab (mouse saja, bukan sentuhan)
