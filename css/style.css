@@ -42,7 +42,7 @@ a{color:var(--fg)}a:hover{color:var(--accent)}
 @media (prefers-reduced-motion:reduce){.bubble{transition:none}.bubbles::after{animation:none}}
 /* layar sentuh (HP): bubble diam, blur lebih kecil & grain statis, supaya GPU tidak panas (blend-mode tetap) */
 @media (hover:none),(pointer:coarse){
-  .bubble{opacity:.35;filter:blur(24px);transition:none}
+  .bubble{opacity:.40;filter:blur(65px);transition:none}
   .bubbles::after{animation:none;will-change:auto}
 }
 .panel{min-width:0;padding:32px;border-right:1px solid var(--fg);border-bottom:1px solid var(--fg)}
