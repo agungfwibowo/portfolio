@@ -732,21 +732,24 @@
   // berikutnya begitu transisi selesai, jadi polanya tidak pernah berulang persis.
   // Jarak dihitung dari ukuran .bubbles (selebar .frame), bukan vw/vh (lebar layar), supaya batas
   // kanan-kiri geraknya selalu ikut lebar frame walau di layar lebar.
+  // (tile grain dibuat di semua perangkat; gerak bubble di bawah hanya untuk perangkat dengan mouse)
+  if (document.querySelector('.bubbles')) {
+  // grain bubble berpola mosaik titik (grid sel 3px, kecerahan acak per sel), diganti dari noise halus bawaan CSS
+  try {
+    var cvs = document.createElement('canvas'), N = 72, C = 3, SC = 2;
+    cvs.width = cvs.height = N * C * SC;
+    var cx = cvs.getContext('2d');
+    for (var gy = 0; gy < N; gy++) for (var gx = 0; gx < N; gx++) {
+      cx.fillStyle = 'rgba(0,0,0,' + (Math.pow(Math.random(), 1.4) * 0.9).toFixed(2) + ')';
+      cx.beginPath(); cx.arc((gx + .5) * C * SC, (gy + .5) * C * SC, C * SC * .42, 0, 6.2832); cx.fill();
+    }
+    document.documentElement.style.setProperty('--bubble-dots', 'url(' + cvs.toDataURL('image/png') + ')');
+    document.documentElement.style.setProperty('--bubble-dots-size', N * C + 'px ' + N * C + 'px');
+  } catch (e) {}
+  }
   if (!reduce && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
     var bwrap = document.querySelector('.bubbles');
     if (bwrap) {
-      // grain bubble berpola mosaik titik (grid sel 3px, kecerahan acak per sel), diganti dari noise halus bawaan CSS
-      try {
-        var cvs = document.createElement('canvas'), N = 72, C = 3, SC = 2;
-        cvs.width = cvs.height = N * C * SC;
-        var cx = cvs.getContext('2d');
-        for (var gy = 0; gy < N; gy++) for (var gx = 0; gx < N; gx++) {
-          cx.fillStyle = 'rgba(0,0,0,' + (Math.pow(Math.random(), 1.4) * 0.9).toFixed(2) + ')';
-          cx.beginPath(); cx.arc((gx + .5) * C * SC, (gy + .5) * C * SC, C * SC * .42, 0, 6.2832); cx.fill();
-        }
-        document.documentElement.style.setProperty('--bubble-dots', 'url(' + cvs.toDataURL('image/png') + ')');
-        document.documentElement.style.setProperty('--bubble-dots-size', N * C + 'px ' + N * C + 'px');
-      } catch (e) {}
       document.querySelectorAll('.bubble').forEach(function (el, i) {
         function next() {
           var dur = 5000 + Math.random() * 6000;
