@@ -645,7 +645,7 @@
       ' float tint=smoothstep(.45,.8,fbm(q*1.3-vec2(t*.05,0.)));',
       ' vec3 c=mix(vec3(.42,.55,.58),ac,tint*.55);',
       // grain diam, hanya muncul di bagian yang terkena cahaya (area gelap tetap bersih); lebih halus di desktop
-      ' vec2 gc=gl_FragCoord.xy/cs;float dt=smoothstep(.55,.05,length(fract(gc)-.5));float g=(h(floor(gc))-.35)*dt*a*gs*1.1;',
+      ' vec2 gc=gl_FragCoord.xy/cs;float dt=smoothstep(.55,.05,length(fract(gc)-.5));float g=(h(floor(gc))-.35)*dt*a*gs*2.4;',
       ' gl_FragColor=vec4(c*a+max(g,0.),clamp(a+abs(g),0.,1.));',
       '}'
     ].join('\n');
@@ -673,7 +673,7 @@
         if (cv.width !== w || cv.height !== hgt) { cv.width = w; cv.height = hgt; gl.viewport(0, 0, w, hgt); }
         gl.uniform2f(uR, w, hgt);
         gl.uniform1f(uG, desk.matches ? .08 : .1);
-        gl.uniform1f(uC, desk.matches ? 1.5 : 3);
+        gl.uniform1f(uC, desk.matches ? 1.6 : 3.2);
         // CTA: cahaya dari tengah-atas; pita keahlian: dari kanan atas, dekat "Design + Code"
         gl.uniform1f(uL, host.classList.contains('skills-head') ? .72 : .42);
       };
