@@ -580,8 +580,7 @@
 
   // snap lembut ke CTA: hanya setelah scroll berhenti & bila tepi atas CTA sudah dekat tepi atas layar
   var cta = document.querySelector('.cta');
-  // di layar sentuh snap dimatikan: scroll halus programatik bentrok dengan momentum jari & URL bar yang muncul-hilang
-  if (cta && !reduce && !window.matchMedia('(hover:none),(pointer:coarse)').matches) {
+  if (cta && !reduce) {
     var snapT = 0, snapping = false;
     var trySnap = function () {
       if (snapping) { snapping = false; return; }
@@ -606,7 +605,10 @@
       w.classList.toggle('stack', !beside);
     });
   };
-  window.addEventListener('resize', sides);
+  // hanya saat LEBAR berubah: URL bar HP yang muncul-hilang memicu resize (tinggi saja), dan melepas/memasang .stack
+  // di tengah scroll membuat strip tab sticky & tinggi panel berganti sehingga halaman loncat
+  var sidesW = window.innerWidth;
+  window.addEventListener('resize', function () { if (window.innerWidth !== sidesW) { sidesW = window.innerWidth; sides(); } });
   window.addEventListener('load', sides);
   sides();
 

@@ -331,10 +331,9 @@ a{color:var(--fg)}a:hover{color:var(--accent)}
 }
 /* isi CTA di tengah, footer menempel di bawah section yang sama */
 .cta-body{flex:1;display:flex;flex-direction:column;justify-content:center;gap:24px;opacity:.9}
-/* HP: tinggi section dikunci ke lvh (tetap, tanpa celah di bawah), isi dikunci ke layar terkecil (svh) supaya teks tidak ikut bergeser/kejut saat URL bar muncul-hilang;
-   sisa tinggi diserap ruang di atas footer */
+/* HP: tinggi isi dikunci ke layar terkecil (svh) supaya teks tidak ikut bergeser/kejut saat URL bar muncul-hilang;
+   section tetap 100dvh, sisa tinggi diserap ruang di atas footer */
 @media (hover:none),(pointer:coarse){
-  .cta{min-height:100vh;min-height:100lvh}
   .cta-body{flex:none;min-height:calc(100vh - 230px);min-height:calc(100svh - 230px)}
   .cta .foot{margin-top:auto}
 }
