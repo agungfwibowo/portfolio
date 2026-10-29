@@ -21,22 +21,15 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23111318'/%3E%3Ctext x='16' y='22' font-family='Arial' font-weight='700' font-size='13' fill='%23fff' text-anchor='middle'%3EAFW%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>html{background:#EAE4D5}html[data-theme=dark]{background:#0d0e11}</style>
 <script>
-(function (d) {
-  d.classList.add('js');
-  // tema gelap: pilihan tersimpan, default terang; diterapkan sebelum render agar tidak berkedip
-  try { var th = localStorage.getItem('afw-theme'); if (th === 'dark') d.dataset.theme = 'dark'; } catch (e) {}
-  // loader hanya di kunjungan pertama per tab
-  try { if (!sessionStorage.getItem('afw-seen')) d.classList.add('loading'); } catch (e) {}
-  // cadangan: kalau main.js gagal dimuat, tampilkan semua konten
-  setTimeout(function () { if (!window.__rv) d.classList.remove('js', 'loading'); }, 2500);
-})(document.documentElement);
+// mode gelap: pilihan tersimpan, default terang; diterapkan sebelum render agar tidak berkedip
+try { if (localStorage.getItem('afw-theme') === 'dark') document.documentElement.dataset.theme = 'dark'; } catch (e) {}
 </script>
 <script src="js/data.js?v=26" defer></script>
 <script src="js/icons.js?v=2" defer></script>
-<script src="themes/registry.js?v=2" defer></script>
-<script src="js/core.js?v=1" defer></script>
+<script src="themes/registry.js?v=3" defer></script>
+<script src="js/core.js?v=2" defer></script>
 </head>
 <body>
 </body>

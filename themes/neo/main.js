@@ -1,39 +1,15 @@
 (function () {
-  // bahasa: `en` hanya menimpa teks; sisanya (gambar, kontak, dll.) diambil dari `id`
-  function merge(a, b) {
-    if (b === undefined) return a;
-    if (Array.isArray(a)) return a.map(function (x, i) { return merge(x, b[i]); });
-    if (a && typeof a === 'object') {
-      var o = {}; Object.keys(a).forEach(function (k) { o[k] = merge(a[k], b[k]); }); return o;
-    }
-    return b;
-  }
-  var LANGS = ['id', 'en'], lang = 'en';
-  try { lang = new URLSearchParams(location.search).get('lang') || localStorage.getItem('afw-lang') || ''; } catch (e) {}
-  if (LANGS.indexOf(lang) < 0) lang = 'en'; // default English
-
-  var SITE, A, UI, DATA = {};
-  function useLang(code) {
-    lang = code;
-    SITE = code === 'id' ? window.SITE.id : merge(window.SITE.id, window.SITE[code]);
-    A = SITE.assets; UI = SITE.ui;
+  // bahasa, mode gelap, dan warna aksen dikelola inti (js/core.js, window.AFW); tampilan ini hanya memakainya
+  var AFW = window.AFW, SITE, A, UI, DATA = {};
+  function useLang() {
+    SITE = AFW.site; A = SITE.assets; UI = SITE.ui;
     DATA.jobs = SITE.jobs;
     DATA.pros = SITE.projects.map(function (p, i) {
       var no = (i < 9 ? '0' : '') + (i + 1);
       return Object.assign({}, p, { no: no, label: no + ' · ' + p.cat });
     });
   }
-  useLang(lang);
-
-  // URL mengikuti bahasa yang tampil: English (default) tanpa parameter, Indonesia pakai ?lang=id
-  function syncUrl() {
-    try {
-      var u = new URL(location.href);
-      if (lang === 'en') u.searchParams.delete('lang'); else u.searchParams.set('lang', lang);
-      history.replaceState(null, '', u.pathname + u.search + u.hash);
-    } catch (e) {}
-  }
-  syncUrl();
+  useLang();
 
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var CFG = { jobs: { dur: 6000 }, pros: { dur: 5000 } };
@@ -125,43 +101,19 @@
     b.innerHTML = p ? ICON_PLAY + UI.play : ICON_PAUSE + UI.pause;
     b.setAttribute('aria-label', p ? UI.ariaPlay : UI.ariaPause);
     b.setAttribute('data-tip', p ? UI.tipPlay : UI.tipPause);
-    if (tipFor === b) { tipEl.textContent = b.getAttribute('data-tip'); placeTip(); }
+    tip.refresh(b);
   }
   // tooltip tombol Pause/Play: satu elemen di <body>. Desktop: muncul saat hover/fokus. Layar sentuh (tanpa hover):
   // sekali otomatis ±3,5 dtk di awal sesi saat bagiannya pertama kali terlihat supaya user tahu geser otomatis bisa dijeda.
-  var canHover = window.matchMedia('(hover:hover) and (pointer:fine)').matches;
-  var tipEl = document.createElement('div'), tipFor = null, tipDone = false;
-  tipEl.className = 'tip'; tipEl.setAttribute('role', 'tooltip'); tipEl.setAttribute('aria-hidden', 'true');
-  document.body.appendChild(tipEl);
-  function placeTip() {
-    if (!tipFor) return;
-    var r = tipFor.getBoundingClientRect(), w = tipEl.offsetWidth, vw = document.documentElement.clientWidth;
-    var left = Math.max(8, Math.min(r.right - w, vw - w - 8));
-    tipEl.style.left = left + 'px';
-    tipEl.style.top = (r.top - tipEl.offsetHeight - 12) + 'px';
-    tipEl.style.setProperty('--ax', Math.max(14, Math.min(w - 14, r.left + r.width / 2 - left)) + 'px');
-  }
-  // tombol bisa masih bergerak (animasi reveal saat bagian pertama terlihat), jadi posisi dilacak per frame ±1,3 dtk
-  function trackTip() { var t0 = performance.now(); (function f() { if (!tipFor || performance.now() - t0 > 1300) return; placeTip(); requestAnimationFrame(f); })(); }
-  function showTip(b) { tipFor = b; tipEl.textContent = b.getAttribute('data-tip'); placeTip(); tipEl.classList.add('on'); trackTip(); }
-  function hideTip(b) { if (tipFor === b) { tipFor = null; tipEl.classList.remove('on'); } }
-  window.addEventListener('scroll', placeTip, { passive: true });
-  window.addEventListener('resize', placeTip);
-  function bindTip(b) {
-    if (!canHover) return;
-    b.addEventListener('mouseenter', function () { showTip(b); });
-    b.addEventListener('mouseleave', function () { hideTip(b); });
-    b.addEventListener('focus', function () { if (b.matches(':focus-visible')) showTip(b); });
-    b.addEventListener('blur', function () { hideTip(b); });
-  }
+  var canHover = AFW.canHover, tip = AFW.tip, tipDone = false; // mesin tooltip ada di inti (AFW.tip)
   function introTip(key) {
     // hanya sekali per sesi (satu tooltip, di tombol Pause yang pertama terlihat), bukan tiap bagian / tiap muat ulang
     if (canHover || tipDone) return;
     tipDone = true;
     try { if (sessionStorage.getItem('afw-tip')) return; sessionStorage.setItem('afw-tip', '1'); } catch (e) {}
     var b = document.querySelector('[data-ctrl="' + key + '"]');
-    showTip(b);
-    var off = function () { hideTip(b); b.removeEventListener('click', off); };
+    tip.show(b);
+    var off = function () { tip.hide(b); b.removeEventListener('click', off); };
     b.addEventListener('click', off);
     setTimeout(off, 3500);
   }
@@ -208,7 +160,7 @@
     document.querySelector('[data-list="jobs"]').setAttribute('aria-label', UI.jobsList);
     document.querySelector('[data-list="pros"]').setAttribute('aria-label', UI.prosList);
     var lb = document.querySelector('[data-lang]'); lb.textContent = UI.lang; lb.setAttribute('aria-label', UI.langAria);
-    document.documentElement.lang = lang; document.title = SITE.meta.title;
+    document.documentElement.lang = AFW.lang; document.title = SITE.meta.title;
     var PLUS = '<svg class="tape-plus" aria-hidden="true" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c.7 6.4 5.6 11.3 12 12-6.4.7-11.3 5.6-12 12-.7-6.4-5.6-11.3-12-12C6.4 11.3 11.3 6.4 12 0z"/></svg>';
     var groups = SITE.skills.groups, list = groups.filter(function (g) { return !g.marquee; });
     document.querySelector('[data-skills]').innerHTML = list.map(function (g) {
@@ -262,7 +214,7 @@
 
   ['jobs', 'pros'].forEach(function (key) {
     buildList(key); render(key); bar(key);
-    bindTip(document.querySelector('[data-ctrl="' + key + '"]'));
+    tip.bind(document.querySelector('[data-ctrl="' + key + '"]'));
     document.querySelector('[data-ctrl="' + key + '"]').addEventListener('click', function () {
       var s = state[key];
       // sedang istirahat otomatis setelah klik tab: tombol berarti "lanjut sekarang"
@@ -305,68 +257,27 @@
     toneBtn.innerHTML = ICON_TONE + (mono ? UI.mono : UI.color);
     toneBtn.setAttribute('aria-label', mono ? UI.ariaColor : UI.ariaMono);
     toneBtn.setAttribute('data-tip', mono ? UI.tipColor : UI.tipMono);
-    if (tipFor === toneBtn) { tipEl.textContent = toneBtn.getAttribute('data-tip'); placeTip(); }
+    tip.refresh(toneBtn);
     try { localStorage.setItem('afw-tone', mono ? 'mono' : 'warna'); } catch (e) {}
   }
   var savedTone = null;
   try { savedTone = localStorage.getItem('afw-tone'); } catch (e) {}
   setTone(savedTone !== 'warna'); // default mono
-  bindTip(toneBtn);
+  tip.bind(toneBtn);
   toneBtn.addEventListener('click', function () { setTone(!proPanel.classList.contains('mono')); });
 
-  // warna aksen acak (hue bebas: merah, hijau, oranye, biru, ...) dengan kontras setara biru awal #1D4ED8:
-  // lightness dicari per-hue supaya luminans relatifnya ~0.10 (teks putih di atasnya tetap terbaca); tidak disimpan.
-  // accentRGB dipakai shader kain (sedikit lebih terang karena latarnya hitam)
-  var accentRGB = [0.26, 0.42, 0.93];
-  function hsl2rgb(h, s, l) {
-    var a = s * Math.min(l, 1 - l);
-    var f = function (n) { var k = (n + h / 30) % 12; return l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1)); };
-    return [f(0), f(8), f(4)];
-  }
-  function lum(c) {
-    var q = c.map(function (v) { return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); });
-    return 0.2126 * q[0] + 0.7152 * q[1] + 0.0722 * q[2];
-  }
-  document.querySelector('[data-accent]').addEventListener('click', function () {
-    var h = Math.random() * 360, sat = 0.72 + Math.random() * 0.12, lo = 0.12, hi = 0.65, rgb;
-    for (var k = 0; k < 18; k++) {
-      var mid = (lo + hi) / 2; rgb = hsl2rgb(h, sat, mid);
-      if (lum(rgb) > 0.10) hi = mid; else lo = mid;
-    }
-    rgb = hsl2rgb(h, sat, (lo + hi) / 2);
-    document.documentElement.style.setProperty('--ab', 'rgb(' + rgb.map(function (v) { return Math.round(v * 255); }).join(' ') + ')');
-    accentRGB = rgb.map(function (v) { return v + (1 - v) * 0.15; });
-    setHue(rgb);
-    document.documentElement.classList.add('accent-picked');
-  });
-
-  // tema gelap: hue latar mengikuti aksen; toggle menyimpan pilihan
-  function setHue(c) {
-    var mx = Math.max(c[0], c[1], c[2]), mn = Math.min(c[0], c[1], c[2]), d = mx - mn, hue = 0;
-    if (d) hue = mx === c[0] ? ((c[1] - c[2]) / d) % 6 : mx === c[1] ? (c[2] - c[0]) / d + 2 : (c[0] - c[1]) / d + 4;
-    document.documentElement.style.setProperty('--h', Math.round(((hue * 60) + 360) % 360));
-  }
-  var themeBtn = document.querySelector('[data-theme-toggle]'), metaTheme = document.querySelector('meta[name=theme-color]');
-  function applyTheme(dark) {
-    if (dark) document.documentElement.dataset.theme = 'dark'; else delete document.documentElement.dataset.theme;
-    themeBtn.setAttribute('aria-pressed', dark ? 'true' : 'false');
-    if (metaTheme) metaTheme.setAttribute('content', dark ? '#0a0b0f' : '#111318');
-  }
-  applyTheme(document.documentElement.dataset.theme === 'dark');
-  themeBtn.addEventListener('click', function () {
-    var dark = document.documentElement.dataset.theme !== 'dark', root = document.documentElement;
-    root.classList.add('theme-switch');
-    applyTheme(dark);
-    void root.offsetWidth;
-    requestAnimationFrame(function () { requestAnimationFrame(function () { root.classList.remove('theme-switch'); }); });
-    try { localStorage.setItem('afw-theme', dark ? 'dark' : 'light'); } catch (e) {}
-  });
+  // warna aksen acak dan mode gelap: logikanya di inti (AFW.randomAccent / AFW.setDark)
+  document.querySelector('[data-accent]').addEventListener('click', function () { AFW.randomAccent(); });
+  var themeBtn = document.querySelector('[data-theme-toggle]');
+  function syncThemeBtn() { themeBtn.setAttribute('aria-pressed', AFW.dark ? 'true' : 'false'); }
+  syncThemeBtn();
+  window.addEventListener('afw:theme', syncThemeBtn);
+  themeBtn.addEventListener('click', function () { AFW.setDark(!AFW.dark); });
 
   // ganti bahasa: isi ulang konten tanpa reload, posisi tab tetap
   document.querySelector('[data-lang]').addEventListener('click', function () {
-    useLang(lang === 'id' ? 'en' : 'id');
-    try { localStorage.setItem('afw-lang', lang); } catch (e) {}
-    syncUrl();
+    AFW.setLang(AFW.lang === 'id' ? 'en' : 'id');
+    useLang();
     fillStatic();
     document.querySelectorAll('.group').forEach(function (g) { g.classList.add('rv', 'in'); }); // grup baru tidak perlu reveal ulang
     ['jobs', 'pros'].forEach(function (key) {
@@ -773,7 +684,7 @@
         // waktu dijaga tetap kecil (diputar ulang tiap 5 menit) supaya presisi float di GPU ponsel tidak habis
         var tt = reduce ? 12 : ((now - t0) / 1000 * 1.6) % 480;
         gl.uniform1f(uT, tt);
-        gl.uniform3f(uA, accentRGB[0], accentRGB[1], accentRGB[2]);
+        gl.uniform3f(uA, AFW.accentRGB[0], AFW.accentRGB[1], AFW.accentRGB[2]);
         // kain memudar ke transparan menjelang waktu diputar ulang (480) lalu muncul lagi, jadi lompatannya tak terlihat
         cv.style.opacity = reduce ? '' : Math.max(0, Math.min(1, tt / 12, (480 - tt) / 12)).toFixed(3);
         gl.drawArrays(gl.TRIANGLES, 0, 3);
