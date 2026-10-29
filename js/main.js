@@ -580,7 +580,8 @@
 
   // snap lembut ke CTA: hanya setelah scroll berhenti & bila tepi atas CTA sudah dekat tepi atas layar
   var cta = document.querySelector('.cta');
-  if (cta && !reduce) {
+  // di layar sentuh snap dimatikan: scroll halus programatik bentrok dengan momentum jari & URL bar yang muncul-hilang
+  if (cta && !reduce && !window.matchMedia('(hover:none),(pointer:coarse)').matches) {
     var snapT = 0, snapping = false;
     var trySnap = function () {
       if (snapping) { snapping = false; return; }

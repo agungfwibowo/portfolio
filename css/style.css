@@ -1,5 +1,5 @@
 :root{--ink:#111318;--fg:#111318;--h:224;--muted:#5A5F6B;--soft:#3A3F4B;--line:#DADDE3;--grid:#D9D2BF;--ab:#1D4ED8;--accent:var(--ab);--paper:#EAE4D5;--card:#F6F2E8;
-  --display:'Space Grotesk',sans-serif;--mono:'IBM Plex Mono',monospace}
+  --display:'Space Grotesk',sans-serif;--mono:'Geist Mono',monospace}
 /* tema gelap: rona latar mengikuti hue aksen (--h diisi JS); CTA memakai warna tetap sendiri */
 html[data-theme=dark]{color-scheme:dark;--paper:hsl(var(--h) 14% 6%);--card:hsl(var(--h) 14% 10%);--ink:hsl(var(--h) 18% 3%);--fg:hsl(var(--h) 20% 92%);--muted:hsl(var(--h) 8% 68%);--soft:hsl(var(--h) 10% 80%);--line:hsl(var(--h) 12% 18%);--grid:hsl(var(--h) 14% 11%);--accent:color-mix(in srgb,var(--ab) 55%,#fff)}
 html[data-theme=dark] .skills-head,html[data-theme=dark] .cta{--ink:color-mix(in srgb,var(--ab) 26%,#000)}
@@ -124,7 +124,7 @@ a{color:var(--fg)}a:hover{color:var(--accent)}
 .jobs{flex:1 1 220px}
 .job{display:flex;flex-direction:column;gap:4px;padding:14px 16px;border-bottom:1px solid var(--fg)}
 .job .period{font-family:var(--mono);font-size:12px;color:var(--muted)}
-.job .co{font-family:var(--display);font-size:17px}
+.job .co{font-family:var(--display);font-size:17px;font-weight:500}
 .job[aria-selected="true"] .period{color:#C9CDD6}
 .job-panel{flex:999 1 320px;min-width:0;min-height:230px;display:flex;flex-direction:column;gap:12px}
 .job-panel .when{margin:8px 0 0;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
@@ -237,7 +237,7 @@ a{color:var(--fg)}a:hover{color:var(--accent)}
 .pro{display:grid;grid-template-columns:28px minmax(0,1fr);column-gap:8px;align-items:baseline;padding:11px 14px;border-bottom:1px solid var(--fg)}
 .pro .no{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--accent)}
 .pro .nm{display:flex;flex-direction:column;gap:2px}
-.pro .nm b{font-family:var(--display);font-size:16px;font-weight:400}
+.pro .nm b{font-family:var(--display);font-size:16px;font-weight:500}
 .pro .nm small{font-family:var(--mono);font-size:12px;color:var(--muted)}
 .pro[aria-selected="true"] .no{color:#fff}
 .pro[aria-selected="true"] .nm small{color:#C9CDD6}
@@ -331,9 +331,10 @@ a{color:var(--fg)}a:hover{color:var(--accent)}
 }
 /* isi CTA di tengah, footer menempel di bawah section yang sama */
 .cta-body{flex:1;display:flex;flex-direction:column;justify-content:center;gap:24px;opacity:.9}
-/* HP: tinggi isi dikunci ke layar terkecil (svh) supaya teks tidak ikut bergeser/kejut saat URL bar muncul-hilang;
-   section tetap 100dvh, sisa tinggi diserap ruang di atas footer */
+/* HP: tinggi section dikunci ke lvh (tetap, tanpa celah di bawah), isi dikunci ke layar terkecil (svh) supaya teks tidak ikut bergeser/kejut saat URL bar muncul-hilang;
+   sisa tinggi diserap ruang di atas footer */
 @media (hover:none),(pointer:coarse){
+  .cta{min-height:100vh;min-height:100lvh}
   .cta-body{flex:none;min-height:calc(100vh - 230px);min-height:calc(100svh - 230px)}
   .cta .foot{margin-top:auto}
 }
@@ -473,4 +474,9 @@ a{color:var(--fg)}a:hover{color:var(--accent)}
   .tagline{flex-wrap:nowrap;justify-content:flex-start;gap:32px 40px}
   .years{flex:none;align-self:center}
   .tagline p{flex:1 1 0;min-width:0;font-size:clamp(28px,3.4vw,44px)}
+}
+/* desktop: pil di kiri, kalimat di kanan (space-between) */
+@media (min-width:840px){
+  .tagline{justify-content:space-between}
+  .tagline p{flex:0 1 auto}
 }
