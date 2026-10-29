@@ -5,7 +5,7 @@ window.SITE = {};
 window.SITE.id = {
   assets: 'assets/',
 
-  meta: { title: 'Agung Fitrah Wibowo — Front-End Developer & UI/UX Designer' },
+  meta: { title: 'Agung Fitrah Wibowo · Front-End Developer & UI/UX Designer' },
 
   // teks antarmuka
   ui: {
@@ -20,13 +20,13 @@ window.SITE.id = {
     tipPlay: 'Lanjutkan geser otomatis', tipPause: 'Jeda geser otomatis',
     color: 'Warna', mono: 'Mono', ariaColor: 'Tampilkan screenshot berwarna', ariaMono: 'Tampilkan screenshot hitam-putih',
     jobsList: 'Riwayat kerja', prosList: 'Daftar proyek', mainView: 'tampilan utama', view: 'tampilan',
-    top: 'Kembali ke atas ↑',
+    top: 'Kembali ke atas',
     linkedin: 'LinkedIn ↗', whatsapp: 'WhatsApp ↗',
     // pesan pembuka saat chat WhatsApp dibuka (bisa diedit pengunjung sebelum dikirim)
     waText: 'Halo Agung, saya lihat portofolio kamu dan ingin ngobrol soal ',
     photoLink: 'Buka profil LinkedIn Agung', cursorIn: 'Lihat LinkedIn ↗',
     // CTA besar sebelum footer: title = [baris 1, baris 2 (di kotak biru)]
-    cta: { kicker: 'Hubungi saya', title: ['Ayo bikin', 'sesuatu yang keren.'], text: 'Punya proyek, lowongan, atau sekadar ide? Yuk ngobrol.' }
+    cta: { title: ['Ada proyek', 'atau lowongan?'], text: 'Saya mengerjakan desain UI, front-end, dan WordPress. Ceritakan kebutuhannya lewat email atau WhatsApp.' }
   },
 
   profile: {
@@ -42,7 +42,7 @@ window.SITE.id = {
   },
 
   education: {
-    period: 'Okt 2012 — Nov 2016',
+    period: 'Okt 2012 – Nov 2016',
     school: 'Universitas Potensi Utama, Medan',
     degree: 'Sarjana Komputer (S.Kom)'
   },
@@ -56,11 +56,11 @@ window.SITE.id = {
   },
 
   skills: {
-    title: ['Keahlian & tools', 'yang dikuasai :'],
+    title: ['Keahlian & tools', 'yang dikuasai:'],
     badge: 'Desain + Kode',
     photo: { src: 'foto-agung.webp', alt: 'Agung Fitrah Wibowo duduk di kursi kerja', width: 600, height: 1094 },
-    // stiker di sekitar foto: [pill putih, lingkaran hitam (2 baris), badge biru]
-    stickers: ['Halo, saya Agung!', ['Tinggal di', 'Medan'], 'Figma → Kode'],
+    // stiker di sekitar foto: [lingkaran hitam (2 baris)]
+    stickers: [['Siap', 'kerja']],
     // style: 'dark' | 'light' | 'ai'; icon = kunci di js/icons.js (boleh dikosongkan); marquee: true = jadi slider berjalan
     groups: [
       { label: 'Mahir', style: 'dark', marquee: true, items: [
@@ -79,15 +79,15 @@ window.SITE.id = {
   },
 
   jobs: [
-    { period: 'Mei 2021 — Sekarang', company: 'RSUP H. Adam Malik Medan', role: 'Programmer / Developer · Unit SIMRS', desc: 'Mendesain UI modul SIMRS, membangun front-end aplikasi, mengembangkan backend dengan PHP (Yii2), dan membuat layout print formulir & laporan — dibantu AI (Claude, ChatGPT, Claude Code).' },
-    { period: 'Feb 2022 — Okt 2024', company: 'Faria Edu', role: 'WordPress Developer (Remote)', desc: 'Situs produk Faria Education Group (ManageBac, SchoolsBuddy, OpenApply, dan lainnya) sebelumnya dibangun dengan WordPress + Divi Builder, lalu bermigrasi ke Svelte + Tailwind CSS — mengerjakan slicing desain dan logic animasinya.' },
-    { period: 'Okt 2019 — Mei 2021', company: 'Freelancer', role: 'Web Front-End Developer / UI/UX Designer', desc: 'Merancang dan membangun 9 website & web app untuk klien ritel, interior, gaming, industri, edukasi, energi, dan kesehatan.' },
-    { period: 'Jun 2019 — Okt 2019', company: 'Xtend Indonesia', role: 'Web Front-End Developer / UI/UX Designer', desc: 'Komp. Setia Budi, Medan. Front-end website, mobile UI/UX design, dan WordPress dengan Divi Builder.' }
+    { period: 'Mei 2021 – Sekarang', company: 'RSUP H. Adam Malik Medan', role: 'Programmer / Developer · Unit SIMRS', desc: 'Mendesain UI modul SIMRS, membangun front-end aplikasi, mengembangkan backend dengan PHP (Yii2), dan membuat layout print formulir & laporan, dibantu AI (Claude, ChatGPT, Claude Code).' },
+    { period: 'Feb 2022 – Okt 2024', company: 'Faria Edu', role: 'WordPress Developer (Remote)', desc: 'Situs produk Faria Education Group (ManageBac, SchoolsBuddy, OpenApply, dan lainnya) sebelumnya dibangun dengan WordPress + Divi Builder, lalu bermigrasi ke Svelte + Tailwind CSS. Saya mengerjakan slicing desain dan logic animasinya.' },
+    { period: 'Okt 2019 – Mei 2021', company: 'Freelancer', role: 'Web Front-End Developer / UI/UX Designer', desc: 'Merancang dan membangun 9 website & web app untuk klien ritel, interior, gaming, industri, edukasi, energi, dan kesehatan.' },
+    { period: 'Jun 2019 – Okt 2019', company: 'Xtend Indonesia', role: 'Web Front-End Developer / UI/UX Designer', desc: 'Komp. Setia Budi, Medan. Front-end website, mobile UI/UX design, dan WordPress dengan Divi Builder.' }
   ],
 
   // nomor proyek (01, 02, ...) dibuat otomatis dari urutan
   projects: [
-    { name: 'Faria Education Group', cat: 'Website Produk', client: 'Faria Education Group', role: 'Situs sebelumnya dibangun dengan WordPress + Divi Builder, lalu bermigrasi ke Svelte + Tailwind CSS — mengerjakan slicing desain & logic animasinya untuk ManageBac, SchoolsBuddy, OpenApply, dan lainnya', tools: 'Svelte · Tailwind CSS · JavaScript', imgs: ['faria-managebac.webp', 'faria-schoolsbuddy.webp', 'faria-openapply.webp'] },
+    { name: 'Faria Education Group', cat: 'Website Produk', client: 'Faria Education Group', role: 'Situs sebelumnya dibangun dengan WordPress + Divi Builder, lalu bermigrasi ke Svelte + Tailwind CSS. Mengerjakan slicing desain & logic animasinya untuk ManageBac, SchoolsBuddy, OpenApply, dan lainnya', tools: 'Svelte · Tailwind CSS · JavaScript', imgs: ['faria-managebac.webp', 'faria-schoolsbuddy.webp', 'faria-openapply.webp'] },
     { name: 'STARS Mandiri', cat: 'Sistem Informasi', client: 'RSUP H. Adam Malik Medan', role: 'Membuat layout print, mendesain informasi tempat tidur pasien, dan backend dengan framework Yii2', tools: 'UI Design · Layout Print · Yii2', imgs: ['stars-1.webp', 'stars-2.webp', 'stars-3.webp'] },
     { name: 'Kimy Kuky Cookies', cat: 'Website E-Commerce', client: 'Kimy Kuky', role: 'Mendesain UI website & membangunnya dengan WordPress + Divi Builder', tools: 'UI Design · WordPress · Divi Builder', imgs: ['kimy-1.webp', 'kimy-2.webp', 'kimy-3.webp'] },
     { name: 'Barik.id', cat: 'Company Profile', client: 'Barik Home & Interior', role: 'Mendesain UI website & membangunnya dengan WordPress + Divi Builder', tools: 'UI Design · WordPress · Divi Builder', imgs: ['barik-1.webp', 'barik-2.webp', 'barik-3.webp'] },
@@ -104,7 +104,7 @@ window.SITE.id = {
 };
 
 window.SITE.en = {
-  meta: { title: 'Agung Fitrah Wibowo — Front-End Developer & UI/UX Designer' },
+  meta: { title: 'Agung Fitrah Wibowo · Front-End Developer & UI/UX Designer' },
 
   ui: {
     lang: 'ID', langAria: 'Ganti ke Bahasa Indonesia',
@@ -118,10 +118,10 @@ window.SITE.en = {
     tipPlay: 'Resume auto-slide', tipPause: 'Pause auto-slide',
     color: 'Color', mono: 'Mono', ariaColor: 'Show screenshots in color', ariaMono: 'Show screenshots in black & white',
     jobsList: 'Work history', prosList: 'Project list', mainView: 'main view', view: 'view',
-    top: 'Back to top ↑',
+    top: 'Back to top',
     waText: 'Hi Agung, I came across your portfolio and would like to talk about ',
     photoLink: 'Open Agung\'s LinkedIn profile', cursorIn: 'View LinkedIn ↗',
-    cta: { kicker: 'Get in touch', title: ['Let\'s build', 'something great.'], text: 'Got a project, a role, or just an idea? Let\'s talk.' }
+    cta: { title: ['Got a project', 'or an opening?'], text: 'I do UI design, front-end, and WordPress. Tell me what you need by email or WhatsApp.' }
   },
 
   profile: {
@@ -132,7 +132,7 @@ window.SITE.en = {
   },
 
   education: {
-    period: 'Oct 2012 — Nov 2016',
+    period: 'Oct 2012 – Nov 2016',
     degree: 'Bachelor of Computer Science (S.Kom)'
   },
 
@@ -140,7 +140,7 @@ window.SITE.en = {
     title: ['Skills & tools', 'I work with:'],
     badge: 'Design + Code',
     photo: { alt: 'Agung Fitrah Wibowo sitting in an office chair' },
-    stickers: ["Hi, I'm Agung!", ['Based in', 'Medan'], 'Figma → Code'],
+    stickers: [['Open to', 'work']],
     groups: [
       { label: 'Advanced' },
       { label: 'Intermediate' },
@@ -149,14 +149,14 @@ window.SITE.en = {
   },
 
   jobs: [
-    { period: 'May 2021 — Present', role: 'Programmer / Developer · SIMRS Unit', desc: 'Designing UI for hospital information system (SIMRS) modules, building application front-ends, developing the backend with PHP (Yii2), and creating print layouts for forms & reports — assisted by AI (Claude, ChatGPT, Claude Code).' },
-    { period: 'Feb 2022 — Oct 2024', role: 'WordPress Developer (Full-time · Remote)', desc: 'Faria Education Group product sites (ManageBac, SchoolsBuddy, OpenApply, and more) were previously built with WordPress + Divi Builder, then migrated to Svelte + Tailwind CSS — worked on the design slicing and animation logic.' },
-    { period: 'Oct 2019 — May 2021', desc: 'Designed and built 9 websites & web apps for clients in retail, interior design, gaming, industry, education, energy, and healthcare.' },
-    { period: 'Jun 2019 — Oct 2019', desc: 'Setia Budi Complex, Medan. Website front-end, mobile UI/UX design, and WordPress with Divi Builder.' }
+    { period: 'May 2021 – Present', role: 'Programmer / Developer · SIMRS Unit', desc: 'Designing UI for hospital information system (SIMRS) modules, building application front-ends, developing the backend with PHP (Yii2), and creating print layouts for forms & reports, assisted by AI (Claude, ChatGPT, Claude Code).' },
+    { period: 'Feb 2022 – Oct 2024', role: 'WordPress Developer (Full-time · Remote)', desc: 'Faria Education Group product sites (ManageBac, SchoolsBuddy, OpenApply, and more) were previously built with WordPress + Divi Builder, then migrated to Svelte + Tailwind CSS. I worked on the design slicing and animation logic.' },
+    { period: 'Oct 2019 – May 2021', desc: 'Designed and built 9 websites & web apps for clients in retail, interior design, gaming, industry, education, energy, and healthcare.' },
+    { period: 'Jun 2019 – Oct 2019', desc: 'Setia Budi Complex, Medan. Website front-end, mobile UI/UX design, and WordPress with Divi Builder.' }
   ],
 
   projects: [
-    { cat: 'Product Websites', role: 'These sites were previously built with WordPress + Divi Builder, then migrated to Svelte + Tailwind CSS — worked on the design slicing & animation logic for ManageBac, SchoolsBuddy, OpenApply, and more' },
+    { cat: 'Product Websites', role: 'These sites were previously built with WordPress + Divi Builder, then migrated to Svelte + Tailwind CSS. Worked on the design slicing & animation logic for ManageBac, SchoolsBuddy, OpenApply, and more' },
     { cat: 'Information System', role: 'Built print layouts, designed the patient bed information display, and developed the backend with the Yii2 framework' },
     { cat: 'E-Commerce Website', role: 'Designed the website UI & built it with WordPress + Divi Builder' },
     { role: 'Designed the website UI & built it with WordPress + Divi Builder' },

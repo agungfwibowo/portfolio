@@ -4,7 +4,7 @@
 html[data-theme=dark]{color-scheme:dark;--paper:hsl(var(--h) 14% 6%);--card:hsl(var(--h) 14% 10%);--ink:hsl(var(--h) 18% 3%);--fg:hsl(var(--h) 20% 92%);--muted:hsl(var(--h) 8% 68%);--soft:hsl(var(--h) 10% 80%);--line:hsl(var(--h) 12% 18%);--grid:hsl(var(--h) 14% 11%);--accent:color-mix(in srgb,var(--ab) 55%,#fff)}
 html[data-theme=dark] .skills-head,html[data-theme=dark] .cta{--ink:color-mix(in srgb,var(--ab) 26%,#000)}
 html[data-theme=dark] .cta{--accent:color-mix(in srgb,var(--ab) 78%,#000)}
-html[data-theme=dark] .st-blue,html[data-theme=dark] .st-in{color:#111318}
+html[data-theme=dark] .st-in{color:#111318}
 html[data-theme=dark] .tab[aria-selected="true"]{background:var(--accent);color:#07080b}
 html[data-theme=dark] .job[aria-selected="true"] .period,html[data-theme=dark] .pro[aria-selected="true"] .nm small{color:#07080b;opacity:.72}
 html[data-theme=dark] .pro[aria-selected="true"] .no{color:#07080b}
@@ -170,7 +170,8 @@ a{color:var(--fg)}a:hover{color:var(--accent)}
 .skills-wrap{position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;min-height:520px;padding:40px 32px}
 .skills-list{position:relative;z-index:1;width:60%;min-width:0;display:flex;flex-direction:column;gap:32px}
 .group{display:flex;flex-direction:column;gap:14px}
-.group-label{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase}
+/* judul & isi pita keahlian memakai Red Hat Mono di semua layout (dimuat di tiap entri themes/registry.js) */
+.group-label{font-family:'Red Hat Mono',monospace;font-size:13px;font-weight:600}
 .group-label.accent{color:var(--accent)}
 .pills{display:flex;flex-wrap:wrap;gap:16px 14px;margin:0;padding:0;list-style:none}
 .pill{display:inline-flex;align-items:center;gap:8px;padding:10px 22px;border:1.5px solid var(--fg);border-radius:999px;background:var(--card);box-shadow:4px 4px 0 var(--fg);font-family:var(--mono);font-size:14px;font-weight:500}
@@ -186,22 +187,24 @@ a{color:var(--fg)}a:hover{color:var(--accent)}
 .off *,.off *::before,.off *::after{animation-play-state:paused!important}
 .tape-track{display:flex;width:max-content;animation:mq var(--mq-dur,25s) linear infinite}
 .tape-seg{display:flex;align-items:center;gap:22px;padding:14px 22px 14px 0}
-.tape-item{display:inline-flex;align-items:center;gap:10px;white-space:nowrap;font-family:var(--mono);font-size:15px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+.tape-item{display:inline-flex;align-items:center;gap:10px;white-space:nowrap;font-family:'Red Hat Mono',monospace;font-size:15px;font-weight:600}
 .tape-item .ico{width:17px;height:17px}
-.tape-plus{width:14px;height:14px;flex-shrink:0;color:var(--accent)}
+.tape-plus{width:14px;height:14px;flex-shrink:0;color:#7C8190}
 /* desktop: pita memudar ke kanan saat lewat di belakang foto */
 @media (min-width:600px){.tape{-webkit-mask-image:linear-gradient(90deg,#000 55%,transparent 82%);mask-image:linear-gradient(90deg,#000 55%,transparent 82%)}}
 /* variasi: menengah = pita putih miring kanan & berjalan berlawanan; AI = pita biru */
 .tape-light .tape{rotate:1.5deg;background:var(--card);color:var(--fg);border-block:1.5px solid var(--fg);box-shadow:0 5px 0 var(--fg)}
 .tape-light .tape-track{animation-direction:reverse}
 .tape-light .tape-title{padding-bottom:26px}
-.tape-light .tape-plus{color:var(--accent)}
+.tape-light .tape-plus{color:#A7ABB6}
+.tape-ai .tape-plus{color:#A7ABB6}
 .tape-ai .tape-title{color:var(--accent)}
 .tape-ai .tape{rotate:-1deg;background:var(--accent);box-shadow:0 5px 0 var(--fg)}
-.tape-ai .tape-plus{color:#fff}
 @keyframes mq{to{transform:translateX(-50%)}}
 .r1{transform:rotate(-4deg)}.r2{transform:rotate(3deg)}.r3{transform:rotate(-2deg)}.r4{transform:rotate(5deg)}.r5{transform:rotate(-3deg)}.r6{transform:rotate(2deg)}.r7{transform:rotate(-5deg)}.r8{transform:rotate(4deg)}
-.skills-photo{position:absolute;right:-2%;top:32px;width:30%;height:auto;display:block;cursor:pointer;
+/* foto = <a> ke LinkedIn berisi <img>; gambar mengisi kotak link */
+.skills-photo img{display:block;width:100%;height:100%;object-fit:cover;object-position:top}
+.skills-photo{position:absolute;right:-2%;top:32px;width:30%;height:auto;aspect-ratio:600/1094;display:block;cursor:pointer;
   /* stiker potong (die-cut): garis putih tebal mengikuti siluet foto, lalu bayangan tilt di belakangnya;
      tumpukan drop-shadow tanpa blur (bukan filter SVG url()) supaya transisi tilt tetap mulus;
      foto sedikit digelapkan & dikontraskan dulu sebelum garis putih supaya garisnya tetap putih bersih */
@@ -218,10 +221,8 @@ a{color:var(--fg)}a:hover{color:var(--accent)}
 .stickers.tilting{transition:transform .12s linear}
 .st{position:absolute;display:inline-flex;align-items:center;justify-content:center;text-align:center;border:3px solid #fff;
   box-shadow:0 0 0 1.5px var(--fg),5px 5px 0 1.5px var(--fg);font-family:var(--display);line-height:1.05;letter-spacing:-.01em;white-space:nowrap}
-.st-pill{top:9%;left:-18%;padding:8px 18px;border-radius:999px;background:var(--card);font-size:19px;rotate:-9deg}
 .st-dark{top:34%;right:12%;width:96px;height:96px;border-radius:50%;background:var(--ink);color:#fff;font-family:var(--mono);font-size:12px;font-weight:600;
   letter-spacing:.06em;text-transform:uppercase;line-height:1.35;rotate:12deg}
-.st-blue{bottom:30%;left:-10%;padding:10px 16px;border-radius:14px;background:var(--accent);color:#fff;font-size:18px;font-weight:500;rotate:6deg}
 /* pop-in saat reveal */
 .js .stickers:not(.in) .st{opacity:0;scale:.4}
 .stickers .st{transition:opacity .4s ease,scale .6s cubic-bezier(.34,1.56,.64,1)}
@@ -231,12 +232,10 @@ a{color:var(--fg)}a:hover{color:var(--accent)}
 @media (min-width:600px){
   .skills-photo,.stickers{top:32px;right:4%;height:calc(100% - 64px);width:auto;aspect-ratio:600/1094}
   /* foto lebih kecil: stiker ikut mengecil dan digeser ke tepi supaya tidak menutupi wajah */
-  .st-pill{top:4%;left:-48%;padding:6px 14px;font-size:15px}
   .st-dark{top:40%;right:-8%;width:76px;height:76px;font-size:10px}
-  .st-blue{bottom:14%;left:-30%;padding:8px 13px;font-size:14px}
 }
 /* stiker LinkedIn: tampil di perangkat sentuh (tanpa kursor berlabel) dan di tata letak ponsel */
-.st-in{right:4%;bottom:16%;padding:8px 14px;border-radius:999px;background:var(--accent);color:#fff;
+.st-in{left:-12%;bottom:16%;padding:8px 14px;border-radius:999px;background:var(--accent);color:#fff;
   font-family:var(--mono);font-size:13px;font-weight:600;text-decoration:none;pointer-events:auto;rotate:-5deg}
 @media (hover:none),(max-width:599px){.stickers .st-in{display:inline-flex}}
 .stickers.in .st:nth-child(1){transition-delay:.35s}.stickers.in .st:nth-child(2){transition-delay:.5s}.stickers.in .st:nth-child(3){transition-delay:.65s}.stickers.in .st:nth-child(4){transition-delay:.8s}
@@ -371,14 +370,13 @@ a{color:var(--fg)}a:hover{color:var(--accent)}
    judul selebar baris terpanjangnya (align-self) supaya float kanan jatuh tepat di tepi kotak itu */
 .cta-title{align-self:flex-start}
 .cta-mark{float:right;margin:.72em 0 0 .3em;padding:.14em .26em;background:var(--card);color:var(--fg);font-size:.36em;font-weight:600;letter-spacing:-.04em;line-height:1}
-/* mobile: logo AFW pindah ke atas "GET IN TOUCH" (lebih mudah dibaca di layar sempit daripada mengambang di judul) */
+/* mobile: logo AFW pindah ke atas judul CTA (lebih mudah dibaca di layar sempit daripada mengambang di judul) */
 .cta-mark-top{display:none;align-self:flex-start;margin:0 0 12px;padding:6px 12px;background:var(--card);color:var(--fg);font-family:var(--display);font-size:20px;font-weight:600;letter-spacing:-.04em;line-height:1}
 @media (max-width:839px){
   .cta-mark-top{display:inline-block}
   .cta-title .cta-mark{display:none}
 }
-.cta-kick{margin:0;font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:color-mix(in srgb,var(--ab) 55%,#fff)}
-.cta-title{margin:0;font-family:var(--display);font-size:clamp(46px,9vw,128px);font-weight:300;line-height:.98;letter-spacing:-.04em}
+.cta-title{margin:0;font-family:var(--display);font-size:clamp(46px,9vw,128px);font-weight:300;line-height:1.2;letter-spacing:-.04em} /* cukup longgar agar kotak sorotan baris 2 tidak menutup kaki huruf baris 1 (p, y, j) */
 .cta-hl{padding:0 .14em;background:var(--accent);font-weight:400;-webkit-box-decoration-break:clone;box-decoration-break:clone}
 .cta-text{margin:0;max-width:560px;font-family:var(--mono);font-size:15px;line-height:1.7;color:#C9CDD6}
 .cta-btns{display:flex;flex-wrap:wrap;gap:16px 20px;margin-top:16px}
@@ -463,10 +461,8 @@ a{color:var(--fg)}a:hover{color:var(--accent)}
   .stickers{position:relative;right:auto;top:auto;grid-column:2;grid-row:var(--pr,3);align-self:end;width:calc(100% + 20px);margin-right:-20px;aspect-ratio:600/760}
   /* stiker mobile: lebih kecil & tidak saling menumpuk */
   .st{border-width:2px;box-shadow:0 0 0 1px var(--fg),3px 3px 0 1px var(--fg)}
-  .st-pill{top:4%;left:-2%;font-size:11px;padding:4px 9px}
   .st-dark{top:28%;right:3%;width:52px;height:52px;font-size:7px;letter-spacing:.04em}
-  .st-blue{bottom:26%;left:-6%;font-size:11px;padding:4px 9px;border-radius:9px}
-  .st-in{right:-2%;left:auto;bottom:12%;font-size:10px;padding:4px 9px}
+  .st-in{left:-8%;right:auto;bottom:12%;font-size:10px;padding:4px 9px}
   .skills-photo{position:static;grid-column:2;grid-row:var(--pr,3);align-self:end;width:calc(100% + 20px);max-width:none;aspect-ratio:600/760;object-fit:cover;object-position:top;margin:0 -20px 0 0}
 }
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.cta,.cta-body{transition:none}.tape-track,.skills-wrap::before,.cta::before,.tagline.gridbg{animation:none}.js .stickers .st{opacity:1;scale:1;transition:none}.cursor{display:none}.pill{transform:none}.js :is(.mark,.id p,.title h1,.roles,.years,.tagline p,.sec-head,.tabs-wrap,.half>*,.skills-head>*,.group,.skills-photo,.plus,.cta-in){opacity:1;translate:none;filter:none;transition:none}}
@@ -520,6 +516,8 @@ html:is([data-skin=glass],[data-skin=flat]) :is(.ctrl:not(.swatch):not(.theme),.
 html:is([data-skin=glass],[data-skin=flat]) .ctrl.swatch,html:is([data-skin=glass],[data-skin=flat]) .ctrl.theme{border:1px solid rgba(255,255,255,.6);
   box-shadow:0 0 0 .5px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.45),0 6px 14px -6px rgba(0,0,0,.45)}
 html:is([data-skin=glass],[data-skin=flat]) .ctrl.theme{background:linear-gradient(90deg,#F6F2E8 50%,#2b2c34 50%)}
+/* tombol bahasa lebar tetap 44px → jarak ke tombol aksen 12px, sama dengan jarak aksen–tema (16+44+12 = right 72) */
+html:is([data-skin=glass],[data-skin=flat]) .ctrl.lang{width:44px;padding:0;justify-content:center}
 /* strip tab yang menempel di bawah layar (HP): tiap tab berlatar kaca supaya isi di belakangnya tidak menembus jelas */
 html:is([data-skin=glass],[data-skin=flat]) .tabs-wrap.stack .tab:not([aria-selected="true"]){background:var(--glass);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
 /* garis bingkai, takik sambungan, garis titik penghubung, dan bubble dekoratif tidak dipakai saat panel terpisah */
@@ -546,6 +544,17 @@ html:is([data-skin=glass],[data-skin=flat]) :is(.pro[aria-selected="true"] .nm s
 html:is([data-skin=glass],[data-skin=flat]) .tabs-wrap.stack .tablist{border:0;border-radius:0;background:none;box-shadow:none;overflow-x:auto}
 html:is([data-skin=glass],[data-skin=flat]) .tabs-wrap.stack .tab,html:is([data-skin=glass],[data-skin=flat]) .tabs-wrap.stack .tablist>:first-child{border-color:var(--glass-brd)}
 html:is([data-skin=glass],[data-skin=flat]) .tabs-wrap.stack .tab[aria-selected="true"]{box-shadow:inset 0 -3px 0 var(--accent)}
+/* Glass (strip tab HP): latar tab hampir pekat. Kartu .panel ber-backdrop-filter menjadi batas blur, jadi blur di tab
+   tidak bisa memburamkan teks di belakang strip yang menempel; tanpa latar pekat teksnya tembus */
+html[data-skin=glass] .tabs-wrap.stack .tab:not([aria-selected="true"]){background:color-mix(in srgb,var(--desk) 97%,transparent)}
+html[data-skin=glass] .tabs-wrap.stack .tab[aria-selected="true"]{background:color-mix(in srgb,#fff 75%,var(--desk))}
+/* Glass mode gelap: tab aktif lebih gelap dari tab lain (daftar desktop & strip HP) */
+html[data-skin=glass][data-theme=dark] .tab[aria-selected="true"]{background:rgba(0,0,0,.32)}
+html[data-skin=glass][data-theme=dark] .tabs-wrap.stack .tab:not([aria-selected="true"]){background:color-mix(in srgb,#fff 8%,var(--desk))}
+html[data-skin=glass][data-theme=dark] .tabs-wrap.stack .tab[aria-selected="true"]{background:color-mix(in srgb,#000 45%,var(--desk))}
+/* Glass (strip tab HP): ujung strip membulat, tab pertama di kiri, tab terakhir di kanan */
+html[data-skin=glass] .tabs-wrap.stack .tab:first-child{border-radius:14px 0 0 14px}
+html[data-skin=glass] .tabs-wrap.stack .tab:last-child{border-radius:0 14px 14px 0}
 /* screenshot proyek & garis progres: sudut membulat, bayangan lembut */
 html:is([data-skin=glass],[data-skin=flat]) .shot{border:1px solid var(--glass-brd);border-radius:14px;background:var(--glass)}
 html:is([data-skin=glass],[data-skin=flat]) .shot.hero{box-shadow:0 10px 24px -14px rgba(0,0,0,.35)}
@@ -559,17 +568,16 @@ html[data-skin=flat] .bar>i::before{display:none}
 /* pemisah pita keahlian: bintang svg disembunyikan, svg-nya sendiri jadi titik (bulat glass / kotak flat) */
 html:is([data-skin=glass],[data-skin=flat]) .tape-plus{width:8px;height:8px;background:currentColor;border-radius:50%}
 html:is([data-skin=glass],[data-skin=flat]) .tape-plus path{display:none}
-html[data-skin=flat] .tape-plus{border-radius:0;color:#fff} /* pita pertama berlatar aksen → kotak putih */
-html[data-skin=flat] .tape-light .tape-plus{color:var(--accent)}
+html[data-skin=flat] .tape-plus{border-radius:0;color:#A7ABB6} /* kotak abu muda di semua pita, senada dengan bintang abu neo */
+html[data-skin=flat] .tape-light .tape-plus{color:#A7ABB6}
 /* keahlian: tanpa latar grid; pita & stiker jadi kaca (tembus + buram, bayangan lembut), bukan bayangan keras */
 html:is([data-skin=glass],[data-skin=flat]) .skills-wrap::before,html:is([data-skin=glass],[data-skin=flat]) .cta::before{display:none} /* latar grid di keahlian & CTA */
 html:is([data-skin=glass],[data-skin=flat]) .tape{background:color-mix(in srgb,var(--ink) 80%,transparent);box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 8px 18px -12px rgba(0,0,0,.4);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
 html:is([data-skin=glass],[data-skin=flat]) .tape-light .tape{background:var(--glass);border-block:1px solid var(--glass-brd);box-shadow:inset 0 1px 0 var(--glass-hi),0 8px 18px -12px rgba(0,0,0,.25)}
 html:is([data-skin=glass],[data-skin=flat]) .tape-ai .tape{background:color-mix(in srgb,var(--accent) 82%,transparent);box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 8px 18px -12px var(--accent)}
 html:is([data-skin=glass],[data-skin=flat]) .st{border:1px solid var(--glass-brd);box-shadow:inset 0 1px 0 var(--glass-hi),0 8px 18px -12px rgba(0,0,0,.35);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
-html:is([data-skin=glass],[data-skin=flat]) .st-pill{background:var(--glass)}
 html:is([data-skin=glass],[data-skin=flat]) .st-dark{background:color-mix(in srgb,var(--ink) 75%,transparent);border-color:rgba(255,255,255,.2)}
-html:is([data-skin=glass],[data-skin=flat]) :is(.st-blue,.st-in){background:color-mix(in srgb,var(--accent) 85%,transparent);border-color:rgba(255,255,255,.3)}
+html:is([data-skin=glass],[data-skin=flat]) .st-in{background:color-mix(in srgb,var(--accent) 85%,transparent);border-color:rgba(255,255,255,.3)}
 /* tooltip: kaca gelap tanpa panah & bayangan keras */
 html:is([data-skin=glass],[data-skin=flat]) .tip{background:color-mix(in srgb,#111318 72%,transparent);color:#fff;border:1px solid rgba(255,255,255,.18);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 12px 28px -12px rgba(0,0,0,.45);-webkit-backdrop-filter:blur(16px) saturate(160%);backdrop-filter:blur(16px) saturate(160%)}
@@ -603,8 +611,8 @@ html[data-skin=flat]{--display:'Manrope',system-ui,sans-serif;--mono:'Manrope',s
 html[data-skin=flat][data-theme=dark]{--glass:#1a1c1b;--glass-brd:#2b2e2c;--desk:#0f1110;--paper:#0f1110;--card:#1f2221;--lime:color-mix(in srgb,var(--accent) 22%,#0f1110)}
 html[data-skin=flat] body::before{background:var(--desk)}
 html[data-skin=flat] .panel:not(.cta){--paper:transparent;border-color:transparent;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none} /* kartu tanpa border: dibedakan dari latar putih lewat warna abu muda saja */
-html[data-skin=flat] :is(.ctrl:not(.swatch):not(.theme),.pill,.mail,.years,.st-pill){--card:#fff;background:#fff;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
-html[data-skin=flat][data-theme=dark] :is(.ctrl:not(.swatch):not(.theme),.pill,.mail,.years,.st-pill){--card:#1f2221;background:#1f2221}
+html[data-skin=flat] :is(.ctrl:not(.swatch):not(.theme),.pill,.mail,.years){--card:#fff;background:#fff;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
+html[data-skin=flat][data-theme=dark] :is(.ctrl:not(.swatch):not(.theme),.pill,.mail,.years){--card:#1f2221;background:#1f2221}
 html:is([data-skin=glass],[data-skin=flat]) .ctrl:not(.swatch):not(.theme)[aria-pressed="true"]{--card:var(--ab);background:var(--ab);border-color:var(--ab);color:#fff} /* tombol aktif (Mono): latar aksen, bukan putih-di-atas-putih */
 html[data-skin=flat] .ctrl.swatch,html[data-skin=flat] .ctrl.theme{border-color:var(--glass-brd);box-shadow:none}
 html[data-skin=flat] .tablist{background:none;box-shadow:none;border:0;gap:2px} /* tanpa border: tiap tab blok putih terpisah celah tipis */
@@ -614,13 +622,13 @@ html[data-skin=flat] .tab[aria-selected="true"],html[data-skin=flat][data-theme=
 html[data-skin=flat] .tabs-wrap.stack .tab:not([aria-selected="true"]){background:var(--card);-webkit-backdrop-filter:none;backdrop-filter:none}
 html[data-skin=flat] .tabs-wrap.stack .tab[aria-selected="true"]{box-shadow:inset 0 -2px 0 var(--accent)}
 html[data-skin=flat] .shot.hero{box-shadow:none}
-html[data-skin=flat] .tape{background:var(--ab);box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
+html[data-skin=flat] .tape{background:var(--lime);color:var(--fg);box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
 html[data-skin=flat] .tape-light .tape{background:var(--card);box-shadow:none}
-html[data-skin=flat] .tape-ai .tape{background:var(--lime);color:var(--fg);box-shadow:none}
-html[data-skin=flat] .tape-ai .tape-plus{color:var(--accent)}
+html[data-skin=flat] .tape-ai .tape{background:var(--ab);color:#fff;box-shadow:none} /* urutan warna seperti neo: pita biru di AI, pita pertama pastel */
+html[data-skin=flat] .tape-ai .tape-plus{color:#A7ABB6}
 html[data-skin=flat] .st{box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
 html[data-skin=flat] .st-dark{background:var(--ab);border-color:var(--ab)}
-html[data-skin=flat] :is(.st-blue,.st-in){background:var(--lime);color:var(--fg);border-color:var(--glass-brd)}
+html[data-skin=flat] .st-in{background:var(--lime);color:var(--fg);border-color:var(--glass-brd)}
 /* CTA & pita gelap ikut warna aksen (terang maupun gelap); kotak aksen judul CTA dibuat lebih gelap supaya tetap kontras */
 html[data-skin=flat] .cta{--accent:color-mix(in srgb,var(--ab) 58%,#000);background:var(--ab);-webkit-backdrop-filter:none;backdrop-filter:none}
 /* pita "Skills & tools" (latar hitam neo) juga ikut aksen */
@@ -645,11 +653,20 @@ html:is([data-skin=glass],[data-skin=flat]) .cta-btn.ghost:hover{background:rgba
 html:is([data-skin=glass],[data-skin=flat]) .cta-btn:not(.ghost):hover{background:#fff}
 html[data-skin=glass] .cta-btn{border:1px solid rgba(255,255,255,.5);box-shadow:inset 0 1px 0 rgba(255,255,255,.4);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
 html[data-skin=glass] .cta-btn:not(.ghost){background:rgba(255,255,255,.88)}
+/* Flat: semua tombol solid tanpa border; CTA email putih, WhatsApp & LinkedIn hitam (hover sedikit berubah warna) */
+html[data-skin=flat] :is(.ctrl:not(.swatch):not(.theme),.mail,.cta-btn),html[data-skin=flat] .ctrl:is(.swatch,.theme){border:0}
+html[data-skin=flat] .cta-btn:not(.ghost){background:#fff;color:#111318}
+html[data-skin=flat] .cta-btn:not(.ghost):hover{background:#e6e7eb;color:#111318}
+html[data-skin=flat] .cta-btn.ghost{background:#111318;color:#fff}
+html[data-skin=flat] .cta-btn.ghost:hover{background:#2b2e36;color:#fff}
+/* tombol tema Flat tanpa border: separuh terang/gelap dibuat kontras dengan latar agar bentuknya tetap terbaca */
+html[data-skin=flat] .ctrl.theme{background:linear-gradient(90deg,#d9dad4 50%,#2b2c34 50%)}
+html[data-skin=flat][data-theme=dark] .ctrl.theme{background:linear-gradient(90deg,#F6F2E8 50%,#4a4d57 50%)}
 /* kotak aksen baris kedua judul CTA: latar inline mengikuti tinggi glyph font (Geist/Manrope lebih tinggi dari Space Grotesk)
    sehingga menimpa baris pertama; inline-block membuat tingginya mengikuti tinggi baris */
 html:is([data-skin=glass],[data-skin=flat]) .cta-hl{display:inline-block;line-height:1.04;margin-top:.04em}
 /* Flat: tanpa sudut membulat — kartu, tab, tombol, pil, stiker & screenshot siku semua (kursor tetap bulat) */
-html[data-skin=flat] :is(.panel,.tablist,.tab,.shot,.ctrl,.mail,.cta-btn,.pill,.hl,.tip,.years,.st-pill,.st-dark,.st-blue,.st-in,.cursor.label){border-radius:0!important}
+html[data-skin=flat] :is(.panel,.tablist,.tab,.shot,.ctrl,.mail,.cta-btn,.pill,.hl,.tip,.years,.st-dark,.st-in,.cursor.label){border-radius:0!important}
 /* Flat: kartu tagline jadi bidang aksen bergradasi + noise halus (pemanis satu-satunya di layout datar) */
 html[data-skin=flat] .panel.tagline{position:relative;isolation:isolate;
   background:radial-gradient(80% 140% at 0% 0%,color-mix(in srgb,var(--ab) 45%,#fff) 0%,transparent 60%),linear-gradient(300deg,color-mix(in srgb,var(--ab) 80%,#000),var(--ab) 55%,color-mix(in srgb,var(--ab) 70%,#fff));color:#fff}

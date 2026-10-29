@@ -55,10 +55,10 @@
     });
     if (key === 'pros') {
       var hero = document.querySelector('[data-hero]');
-      hero.src = A + d.imgs[0]; hero.alt = d.name + ' — ' + UI.mainView; hero.decoding = 'async';
+      hero.src = A + d.imgs[0]; hero.alt = d.name + ', ' + UI.mainView; hero.decoding = 'async';
       var th = document.querySelector('[data-thumbs]'); th.innerHTML = '';
       d.imgs.slice(1).forEach(function (src, k) {
-        var im = el('img', 'shot'); im.src = A + src; im.alt = d.name + ' — ' + UI.view + ' ' + (k + 2); im.loading = 'lazy'; im.decoding = 'async'; th.appendChild(im);
+        var im = el('img', 'shot'); im.src = A + src; im.alt = d.name + ', ' + UI.view + ' ' + (k + 2); im.loading = 'lazy'; im.decoding = 'async'; th.appendChild(im);
       });
     }
     renderCtrl(key);
@@ -201,10 +201,11 @@
     var wrap = document.querySelector('.skills-wrap');
     wrap.style.setProperty('--pr', list.length ? list.length + off : off + 1);
     wrap.classList.toggle('only-tapes', !list.length);
-    var ph = SITE.skills.photo, img = document.querySelector('[data-photo]');
+    var ph = SITE.skills.photo, img = document.querySelector('[data-photo]'), phLink = document.querySelector('[data-photo-link]');
     img.src = A + ph.src; img.alt = ph.alt; img.width = ph.width; img.height = ph.height;
-    img.setAttribute('aria-label', UI.photoLink);
-    img.setAttribute('data-cursor', UI.cursorIn);
+    phLink.href = C.linkedin;
+    phLink.setAttribute('aria-label', UI.photoLink);
+    phLink.setAttribute('data-cursor', UI.cursorIn);
     var st = document.querySelectorAll('.stickers .st'), sk = SITE.skills.stickers;
     st.forEach(function (n, i) { var v = sk[i] || ''; n.innerHTML = (Array.isArray(v) ? v : [v]).map(esc).join('<br>'); });
     document.querySelectorAll('[data-in]').forEach(function (li) { li.href = C.linkedin; li.textContent = UI.linkedin; });
@@ -428,11 +429,8 @@
     document.documentElement.addEventListener('mouseleave', function () { cur.classList.remove('on'); });
   }
 
-  // foto profil: klik membuka LinkedIn; di desktop miring 3D mengikuti arah mouse
-  var photo = document.querySelector('[data-photo]'), stk = document.querySelector('.stickers');
-  var openIn = function () { window.open(SITE.contact.linkedin, '_blank', 'noopener'); };
-  photo.addEventListener('click', openIn);
-  photo.addEventListener('keydown', function (e) { if (e.key === 'Enter') openIn(); });
+  // foto profil (link ke LinkedIn): di desktop miring 3D mengikuti arah mouse
+  var photo = document.querySelector('[data-photo-link]'), stk = document.querySelector('.stickers');
   if (!reduce && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
     photo.addEventListener('mousemove', function (e) {
       var r = photo.getBoundingClientRect();
