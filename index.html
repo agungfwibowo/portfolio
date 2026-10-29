@@ -22,7 +22,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=232">
 <script>
 (function (d) {
   d.classList.add('js');
@@ -36,131 +35,9 @@
 </script>
 <script src="js/data.js?v=26" defer></script>
 <script src="js/icons.js?v=2" defer></script>
-<script src="js/main.js?v=122" defer></script>
+<script src="themes/registry.js?v=2" defer></script>
+<script src="js/core.js?v=1" defer></script>
 </head>
 <body>
-<div class="loader" aria-hidden="true"><b data-t="profile.mark"></b><i></i><span data-pct>0%</span></div>
-<div class="cursor" aria-hidden="true"></div>
-<div class="page" id="top">
-<main class="frame">
-
-<div class="bubbles" aria-hidden="true">
-<span class="bubble bubble-1"></span>
-<span class="bubble bubble-2"></span>
-<span class="bubble bubble-3"></span>
-</div>
-
-<!-- Header -->
-<div class="panel id">
-<span class="mark" data-t="profile.mark"></span>
-<p data-lines="profile.name,profile.location,profile.since"></p>
-</div>
-<header class="panel title">
-<button type="button" class="ctrl swatch" data-accent aria-label="Ganti warna aksen (acak biru)"></button>
-<button type="button" class="ctrl theme" data-theme-toggle aria-label="Tema gelap / terang" aria-pressed="false"></button>
-<button type="button" class="ctrl lang" data-lang></button>
-<h1 data-headline></h1>
-<ul class="roles" data-roles></ul>
-</header>
-
-<!-- Tagline -->
-<div class="panel full gridbg tagline">
-<span class="years" data-t="profile.years"></span>
-<p data-t="profile.tagline"></p>
-</div>
-
-<!-- Pengalaman -->
-<section class="panel full sec" id="pengalaman" aria-labelledby="h-exp">
-<div class="sec-head">
-<h2 class="h2" id="h-exp" data-lines="ui.exp"></h2>
-<button type="button" class="ctrl" data-ctrl="jobs"></button>
-</div>
-<div class="tabs-wrap">
-<div class="tablist jobs" role="tablist" data-list="jobs"></div>
-<div class="job-panel" role="tabpanel" aria-live="polite">
-<div class="bar" aria-hidden="true"><i data-bar="jobs"></i></div>
-<p class="when" data-f="jobs.period"></p>
-<h3 data-f="jobs.company"></h3>
-<p class="role" data-f="jobs.role"></p>
-<p class="desc" data-f="jobs.desc"></p>
-</div>
-</div>
-</section>
-
-<!-- Pendidikan + Kontak -->
-<section class="panel half" aria-labelledby="h-edu">
-<h2 class="h2" id="h-edu" data-t="ui.edu"></h2>
-<div class="edu">
-<p><strong data-t="education.period"></strong><strong> :</strong> <span data-t="education.school"></span></p>
-<p data-t="education.degree"></p>
-</div>
-</section>
-<section class="panel half contact" aria-labelledby="h-contact">
-<h2 class="h2" id="h-contact" data-t="ui.contact"></h2>
-<a class="mail" data-mail></a>
-<p><a class="tel" data-tel></a><br><span data-t="contact.address"></span><br><a class="in" data-in target="_blank" rel="noopener"></a> · <a class="in" data-wa target="_blank" rel="noopener"></a></p>
-</section>
-
-<!-- Keahlian -->
-<section class="panel full skills" aria-labelledby="h-skills">
-<div class="skills-head">
-<h2 id="h-skills" data-lines="skills.title"></h2>
-<span data-t="skills.badge"></span>
-</div>
-<div class="gridbg skills-wrap">
-<div class="tapes" data-tapes></div>
-<div class="skills-list" data-skills></div>
-<img class="skills-photo" data-photo alt="" loading="lazy" decoding="async" role="link" tabindex="0">
-<div class="stickers"><span class="st st-pill" aria-hidden="true"></span><span class="st st-dark" aria-hidden="true"></span><span class="st st-blue" aria-hidden="true"></span><a class="st st-in" data-in target="_blank" rel="noopener"></a></div>
-</div>
-</section>
-
-<!-- Proyek -->
-<section class="panel full sec" id="proyek" aria-labelledby="h-pro">
-<div class="sec-head">
-<h2 class="h2" id="h-pro" data-t="ui.projects"></h2>
-<div class="ctrls">
-<button type="button" class="ctrl" data-tone aria-pressed="false"></button>
-<button type="button" class="ctrl" data-ctrl="pros"></button>
-</div>
-</div>
-<div class="tabs-wrap wide">
-<div class="tablist pros" role="tablist" data-list="pros"></div>
-<div class="pro-panel mono" role="tabpanel" aria-live="polite">
-<div class="bar" aria-hidden="true"><i data-bar="pros"></i></div>
-<div class="pro-top"><h3 data-f="pros.name"></h3><span data-f="pros.label"></span></div>
-<img class="shot hero" data-hero alt="" width="1100" height="619">
-<div class="thumbs" data-thumbs></div>
-<dl class="meta">
-<div><dt data-t="ui.client"></dt><dd class="client" data-f="pros.client"></dd></div>
-<div><dt data-t="ui.role"></dt><dd data-f="pros.role"></dd></div>
-<div><dt data-t="ui.tools"></dt><dd class="tools" data-f="pros.tools"></dd></div>
-</dl>
-</div>
-</div>
-</section>
-
-<!-- CTA -->
-<section class="panel full cta last" id="kontak-cta" aria-labelledby="h-cta">
-<div class="cta-body">
-<b class="cta-mark cta-mark-top cta-in" data-t="profile.mark" aria-hidden="true"></b>
-<p class="cta-kick cta-in" data-t="ui.cta.kicker"></p>
-<h2 class="cta-title cta-in" id="h-cta" data-cta-title></h2>
-<p class="cta-text cta-in" data-t="ui.cta.text"></p>
-<div class="cta-btns cta-in">
-<a class="cta-btn" data-mail></a>
-<a class="cta-btn ghost" data-wa target="_blank" rel="noopener"></a>
-<a class="cta-btn ghost" data-in target="_blank" rel="noopener"></a>
-</div>
-</div>
-<footer class="foot">
-<span data-t="footer"></span>
-<a href="#top" data-t="ui.top"></a>
-</footer>
-</section>
-
-</main>
-</div>
-
 </body>
 </html>

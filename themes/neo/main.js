@@ -227,6 +227,22 @@
         '</div><div class="tape-seg" aria-hidden="true">' + seg + '</div></div></div></div>';
     }).join('');
     document.querySelector('.skills-list').hidden = !list.length;
+    // hover pita: melambat perlahan sampai berhenti (seperti mengerem), lalu berakselerasi perlahan saat dilepas.
+    // animation-play-state:paused berhenti seketika, jadi kecepatan animasi (playbackRate) dihaluskan lewat rAF
+    tapesEl.querySelectorAll('.tape').forEach(function (tape) {
+      var an = tape.querySelector('.tape-track').getAnimations()[0];
+      if (!an) return;
+      var rate = 1, goal = 1, raf = 0, prev = 0, TAU = 380; // ms: makin besar makin pelan
+      var step = function (now) {
+        var dt = Math.min(64, now - prev); prev = now;
+        rate += (goal - rate) * (1 - Math.exp(-dt / TAU));
+        if (Math.abs(goal - rate) < 0.005) { rate = goal; raf = 0; } else raf = requestAnimationFrame(step);
+        an.playbackRate = rate;
+      };
+      var to = function (g) { goal = g; if (!raf) { prev = performance.now(); raf = requestAnimationFrame(step); } };
+      tape.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') to(0); });
+      tape.addEventListener('pointerleave', function (e) { if (e.pointerType === 'mouse') to(1); });
+    });
     // baris foto di grid mobile: pita di baris 1, grup biasa sesudahnya; foto sebaris dengan grup terakhir,
     // atau di baris sendiri di bawah pita kalau semua grup berupa pita
     var off = tapes.length ? 1 : 0;
@@ -382,7 +398,7 @@
   checkSeen();
 
   // reveal saat scroll: elemen yang masuk layar bersamaan muncul berurutan
-  // daftar selector sama dengan di css/style.css
+  // daftar selector sama dengan di themes/neo/style.css
   var RV = '.mark, .id p, .title h1, .roles, .years, .tagline p, .sec-head, .tabs-wrap, .half > *, .skills-head > *, .group, .skills-photo, .stickers, .plus, .cta-in';
   var rvs = document.querySelectorAll(RV);
   window.__rv = true;

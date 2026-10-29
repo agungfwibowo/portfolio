@@ -26,7 +26,7 @@ jobs:
       - name: Siapkan file situs
         run: |
           mkdir _site
-          cp -r index.html css js assets _site/
+          cp -r index.html themes js assets _site/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site

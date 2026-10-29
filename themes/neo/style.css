@@ -182,7 +182,6 @@ a{color:var(--fg)}a:hover{color:var(--accent)}
 /* layar mati / tab tersembunyi: semua animasi CSS dijeda (JS memasang .off di <html>) */
 .off *,.off *::before,.off *::after{animation-play-state:paused!important}
 .tape-track{display:flex;width:max-content;animation:mq var(--mq-dur,25s) linear infinite}
-.tape:hover .tape-track{animation-play-state:paused}
 .tape-seg{display:flex;align-items:center;gap:22px;padding:14px 22px 14px 0}
 .tape-item{display:inline-flex;align-items:center;gap:10px;white-space:nowrap;font-family:var(--mono);font-size:15px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
 .tape-item .ico{width:17px;height:17px}
@@ -431,7 +430,7 @@ a{color:var(--fg)}a:hover{color:var(--accent)}
 .tabs-wrap.stack .tablist::-webkit-scrollbar{display:none}
 .tabs-wrap.stack .tab{flex:0 0 auto;width:auto;scroll-snap-align:start;border:1px solid var(--fg);border-left:0}
 /* strip tab menempel di dasar layar selama bagian ini terlihat: diletakkan di bawah isi, lalu sticky bottom */
-.tabs-wrap.stack .tablist{order:2;position:sticky;bottom:0;z-index:6;background:var(--paper);border-top:0;padding-bottom:env(safe-area-inset-bottom)}
+.tabs-wrap.stack .tablist{order:2;position:sticky;bottom:0;z-index:6;border-top:0;padding-bottom:env(safe-area-inset-bottom)}
 .tabs-wrap.stack .job{min-width:170px}
 .tabs-wrap.stack .pro{min-width:190px;border-color:var(--fg)}
 .tabs-wrap.stack .job-panel{min-height:0}
