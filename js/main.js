@@ -124,6 +124,46 @@
     var b = document.querySelector('[data-ctrl="' + key + '"]'), p = isPaused(key);
     b.innerHTML = p ? ICON_PLAY + UI.play : ICON_PAUSE + UI.pause;
     b.setAttribute('aria-label', p ? UI.ariaPlay : UI.ariaPause);
+    b.setAttribute('data-tip', p ? UI.tipPlay : UI.tipPause);
+    if (tipFor === b) { tipEl.textContent = b.getAttribute('data-tip'); placeTip(); }
+  }
+  // tooltip tombol Pause/Play: satu elemen di <body>. Desktop: muncul saat hover/fokus. Layar sentuh (tanpa hover):
+  // sekali otomatis ±3,5 dtk di awal sesi saat bagiannya pertama kali terlihat supaya user tahu geser otomatis bisa dijeda.
+  var canHover = window.matchMedia('(hover:hover) and (pointer:fine)').matches;
+  var tipEl = document.createElement('div'), tipFor = null, tipDone = false;
+  tipEl.className = 'tip'; tipEl.setAttribute('role', 'tooltip'); tipEl.setAttribute('aria-hidden', 'true');
+  document.body.appendChild(tipEl);
+  function placeTip() {
+    if (!tipFor) return;
+    var r = tipFor.getBoundingClientRect(), w = tipEl.offsetWidth, vw = document.documentElement.clientWidth;
+    var left = Math.max(8, Math.min(r.right - w, vw - w - 8));
+    tipEl.style.left = left + 'px';
+    tipEl.style.top = (r.top - tipEl.offsetHeight - 12) + 'px';
+    tipEl.style.setProperty('--ax', Math.max(14, Math.min(w - 14, r.left + r.width / 2 - left)) + 'px');
+  }
+  // tombol bisa masih bergerak (animasi reveal saat bagian pertama terlihat), jadi posisi dilacak per frame ±1,3 dtk
+  function trackTip() { var t0 = performance.now(); (function f() { if (!tipFor || performance.now() - t0 > 1300) return; placeTip(); requestAnimationFrame(f); })(); }
+  function showTip(b) { tipFor = b; tipEl.textContent = b.getAttribute('data-tip'); placeTip(); tipEl.classList.add('on'); trackTip(); }
+  function hideTip(b) { if (tipFor === b) { tipFor = null; tipEl.classList.remove('on'); } }
+  window.addEventListener('scroll', placeTip, { passive: true });
+  window.addEventListener('resize', placeTip);
+  function bindTip(b) {
+    if (!canHover) return;
+    b.addEventListener('mouseenter', function () { showTip(b); });
+    b.addEventListener('mouseleave', function () { hideTip(b); });
+    b.addEventListener('focus', function () { if (b.matches(':focus-visible')) showTip(b); });
+    b.addEventListener('blur', function () { hideTip(b); });
+  }
+  function introTip(key) {
+    // hanya sekali per sesi (satu tooltip, di tombol Pause yang pertama terlihat), bukan tiap bagian / tiap muat ulang
+    if (canHover || tipDone) return;
+    tipDone = true;
+    try { if (sessionStorage.getItem('afw-tip')) return; sessionStorage.setItem('afw-tip', '1'); } catch (e) {}
+    var b = document.querySelector('[data-ctrl="' + key + '"]');
+    showTip(b);
+    var off = function () { hideTip(b); b.removeEventListener('click', off); };
+    b.addEventListener('click', off);
+    setTimeout(off, 3500);
   }
 
   function select(key, k) { state[key].i = k; state[key].t = 0; render(key); bar(key); }
@@ -160,7 +200,7 @@
     document.querySelector('[data-headline]').innerHTML =
       '<span class="hl">' + esc(P.headline.highlight) + '</span> ' + esc(P.headline.rest) + '<br>' + esc(P.headline.line2);
     document.querySelector('[data-roles]').innerHTML = P.roles.map(function (r) { return '<li>' + esc(r) + '</li>'; }).join('');
-    document.querySelectorAll('[data-mail]').forEach(function (m) { m.href = 'mailto:' + C.email; m.textContent = C.email; });
+    document.querySelectorAll('[data-mail]').forEach(function (m) { m.href = 'mailto:' + C.email + '?subject=' + encodeURIComponent(UI.mailSubject) + '&body=' + encodeURIComponent(UI.mailBody); m.textContent = C.email; });
     var ct = UI.cta.title;
     document.querySelector('[data-cta-title]').innerHTML = esc(ct[0]) + ' <b class="cta-mark" aria-hidden="true">' + esc(get('profile.mark')) + '</b><br><span class="cta-hl">' + esc(ct[1]) + '</span>';
     var tel = document.querySelector('[data-tel]'); tel.href = 'tel:' + C.phone.replace(/[^+\d]/g, ''); tel.textContent = C.phone;
@@ -206,6 +246,7 @@
 
   ['jobs', 'pros'].forEach(function (key) {
     buildList(key); render(key); bar(key);
+    bindTip(document.querySelector('[data-ctrl="' + key + '"]'));
     document.querySelector('[data-ctrl="' + key + '"]').addEventListener('click', function () {
       var s = state[key];
       // sedang istirahat otomatis setelah klik tab: tombol berarti "lanjut sekarang"
@@ -247,11 +288,14 @@
     toneBtn.setAttribute('aria-pressed', mono ? 'true' : 'false');
     toneBtn.innerHTML = ICON_TONE + (mono ? UI.mono : UI.color);
     toneBtn.setAttribute('aria-label', mono ? UI.ariaColor : UI.ariaMono);
+    toneBtn.setAttribute('data-tip', mono ? UI.tipColor : UI.tipMono);
+    if (tipFor === toneBtn) { tipEl.textContent = toneBtn.getAttribute('data-tip'); placeTip(); }
     try { localStorage.setItem('afw-tone', mono ? 'mono' : 'warna'); } catch (e) {}
   }
   var savedTone = null;
   try { savedTone = localStorage.getItem('afw-tone'); } catch (e) {}
   setTone(savedTone !== 'warna'); // default mono
+  bindTip(toneBtn);
   toneBtn.addEventListener('click', function () { setTone(!proPanel.classList.contains('mono')); });
 
   // warna aksen acak (hue bebas: merah, hijau, oranye, biru, ...) dengan kontras setara biru awal #1D4ED8:
@@ -329,6 +373,7 @@
       var r = o.el.getBoundingClientRect();
       var vis = Math.min(r.bottom, vh) - Math.max(r.top, 0);
       state[o.key].seen = vis >= Math.min(vh * 0.4, r.height) - 1;
+      if (state[o.key].seen) introTip(o.key);
     });
   };
   var onSeen = function () { if (!vTick) { vTick = true; requestAnimationFrame(checkSeen); } };
