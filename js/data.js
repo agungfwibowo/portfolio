@@ -60,7 +60,7 @@ window.SITE.id = {
     badge: 'Desain + Kode',
     photo: { src: 'foto-agung.webp', alt: 'Agung Fitrah Wibowo duduk di kursi kerja', width: 600, height: 1094 },
     // stiker di sekitar foto: [lingkaran hitam (2 baris)]
-    stickers: [['Siap', 'kerja']],
+    stickers: [['Terima', 'freelance']],
     // style: 'dark' | 'light' | 'ai'; icon = kunci di js/icons.js (boleh dikosongkan); marquee: true = jadi slider berjalan
     groups: [
       { label: 'Mahir', style: 'dark', marquee: true, items: [
@@ -140,7 +140,7 @@ window.SITE.en = {
     title: ['Skills & tools', 'I work with:'],
     badge: 'Design + Code',
     photo: { alt: 'Agung Fitrah Wibowo sitting in an office chair' },
-    stickers: [['Open to', 'work']],
+    stickers: [['Open to', 'freelance']],
     groups: [
       { label: 'Advanced' },
       { label: 'Intermediate' },
