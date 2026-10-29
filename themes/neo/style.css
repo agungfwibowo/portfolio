@@ -145,7 +145,10 @@ a{color:var(--fg)}a:hover{color:var(--accent)}
 .half{flex:1 1 360px;display:flex;flex-direction:column;gap:22px}
 .half .h2{font-weight:600}
 .edu{font-family:var(--mono);font-size:14px;line-height:1.65}
-.edu p{margin:0 0 6px}.edu p+p{margin:0;color:var(--soft)}
+/* pendidikan: periode kecil di atas, nama kampus sebagai judul tebal (h4) di bawahnya, lalu gelar */
+.edu p{margin:0}.edu-period{font-weight:600}
+.edu-school{margin:6px 0 4px;font-family:var(--display);font-size:20px;font-weight:600;line-height:1.25;letter-spacing:-.01em}
+.edu-degree{color:var(--soft)}
 .mail{align-self:flex-start;max-width:100%;padding:14px 22px;border:1.5px solid var(--fg);border-radius:999px;background:var(--card);box-shadow:5px 5px 0 var(--fg);font-family:var(--mono);font-size:13px;font-weight:600;text-decoration:none;white-space:nowrap}
 .contact p{margin:0;font-family:var(--mono);font-size:13px;line-height:1.7}
 .contact .tel{text-decoration:none}
@@ -488,92 +491,180 @@ a{color:var(--fg)}a:hover{color:var(--accent)}
   .tagline p{flex:0 1 auto}
 }
 
-/* ===== layout "Glass" (themes/registry.js: id glass, dir neo): tiap panel jadi kartu kaca buram ber-noise di atas cahaya hangat, CSS saja ===== */
-html[data-skin=glass]{--display:'Geist',system-ui,sans-serif;--gap:10px;--noise:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='.33 .33 .33 0 0 .33 .33 .33 0 0 .33 .33 .33 0 0 0 0 0 0 .16'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+/* ===== layout kartu "Glass" & "Flat" (themes/registry.js: dir neo), CSS saja. Tata letak kartunya sama; aturan di bawah memakai gaya kaca
+   (variabel --glass*, --noise, --glow), lalu blok "Flat" di akhir menimpa variabel & efeknya jadi datar ===== */
+html:is([data-skin=glass],[data-skin=flat]){--display:'Geist',system-ui,sans-serif;--gap:10px;--noise:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='.33 .33 .33 0 0 .33 .33 .33 0 0 .33 .33 .33 0 0 0 0 0 0 .16'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   --glass:rgba(255,255,255,.4);--glass-brd:rgba(255,255,255,.65);--glass-hi:rgba(255,255,255,.8);
-  --glow:radial-gradient(42% 38% at 16% 18%,rgba(255,170,90,.75),transparent 70%),radial-gradient(40% 46% at 86% 62%,rgba(236,90,110,.6),transparent 72%),
-    radial-gradient(34% 30% at 55% 105%,color-mix(in srgb,var(--ab) 45%,transparent),transparent 70%);--desk:#efe7dc}
-html[data-skin=glass][data-theme=dark]{--glass:rgba(24,22,28,.42);--glass-brd:rgba(255,255,255,.14);--glass-hi:rgba(255,255,255,.2);
-  --glow:radial-gradient(42% 38% at 16% 18%,rgba(240,140,60,.55),transparent 70%),radial-gradient(40% 46% at 86% 62%,rgba(220,70,95,.5),transparent 72%),
-    radial-gradient(34% 30% at 55% 105%,color-mix(in srgb,var(--ab) 40%,transparent),transparent 70%);--desk:#141217}
+  --glow:radial-gradient(42% 38% at 16% 18%,rgba(70,120,255,.6),transparent 70%),radial-gradient(40% 46% at 86% 62%,rgba(30,200,190,.5),transparent 72%),
+    radial-gradient(40% 34% at 50% 105%,rgba(150,90,240,.5),transparent 70%);--desk:#eceef4}
+html:is([data-skin=glass],[data-skin=flat])[data-theme=dark]{--glass:rgba(24,22,28,.42);--glass-brd:rgba(255,255,255,.14);--glass-hi:rgba(255,255,255,.2);
+  --glow:radial-gradient(42% 38% at 16% 18%,rgba(60,105,240,.55),transparent 70%),radial-gradient(40% 46% at 86% 62%,rgba(20,170,165,.45),transparent 72%),
+    radial-gradient(40% 34% at 50% 105%,rgba(140,80,230,.5),transparent 70%);--desk:#10121a}
 /* latar cahaya + noise di lapisan position:fixed tersendiri, bukan background-attachment:fixed: di browser HP yang terakhir itu
    bisa tergambar sebagai potongan persegi berbeda di balik kartu ber-backdrop-filter saat scroll / URL bar bergerak */
-html[data-skin=glass]{background:var(--desk)}
-html[data-skin=glass] body{background:none}
-html[data-skin=glass] body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:var(--noise),var(--glow),var(--desk)}
-/* warna cahaya berganti otomatis, lambat & selaras: hue hanya diayun bolak-balik dalam rentang hangat (amber ↔ merah muda ↔ ungu),
-   tidak memutar penuh ke hijau/biru; transisi ease-in-out jadi tidak ada lonjakan (dijalankan GPU). Hanya desktop: tiap perubahan latar memaksa blur kaca di
+html:is([data-skin=glass],[data-skin=flat]){background:var(--desk)}
+html:is([data-skin=glass],[data-skin=flat]) body{background:none}
+html:is([data-skin=glass],[data-skin=flat]) body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:var(--noise),var(--glow),var(--desk)}
+/* warna cahaya berganti otomatis, lambat & selaras: hue hanya diayun bolak-balik dalam rentang sejuk (biru ↔ tosca ↔ ungu),
+   tidak memutar penuh ke warna hangat; transisi ease-in-out jadi tidak ada lonjakan (dijalankan GPU). Hanya desktop: tiap perubahan latar memaksa blur kaca di
    semua kartu digambar ulang, terlalu berat untuk baterai HP. Berhenti sendiri saat tab tersembunyi */
-@keyframes glass-hue{from{filter:hue-rotate(-20deg)}to{filter:hue-rotate(40deg)}}
+@keyframes glass-hue{from{filter:hue-rotate(-15deg)}to{filter:hue-rotate(30deg)}}
 @media (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){html[data-skin=glass] body::before{animation:glass-hue 30s ease-in-out infinite alternate}}
-html[data-skin=glass] .frame{background:none;gap:var(--gap);padding:var(--gap) 0 0} /* tanpa padding bawah: CTA menempel ke dasar halaman seperti di neo */
+html:is([data-skin=glass],[data-skin=flat]) .frame{background:none;gap:var(--gap);padding:var(--gap) 0 0} /* tanpa padding bawah: CTA menempel ke dasar halaman seperti di neo */
 /* kartu kaca: buram + saturasi, tepi atas bercahaya, noise halus; isi yang tadinya berlatar kertas jadi tembus */
-html[data-skin=glass] .panel:not(.cta){--paper:transparent;background:var(--noise),var(--glass);border:1px solid var(--glass-brd);border-radius:24px;
-  box-shadow:inset 0 1px 0 var(--glass-hi),0 24px 50px -28px rgba(0,0,0,.45);-webkit-backdrop-filter:blur(26px) saturate(160%);backdrop-filter:blur(26px) saturate(160%);overflow:clip}
+html:is([data-skin=glass],[data-skin=flat]) .panel:not(.cta){--paper:transparent;background:var(--noise),var(--glass);border:1px solid var(--glass-brd);border-radius:24px;
+  box-shadow:inset 0 1px 0 var(--glass-hi),0 10px 24px -16px rgba(0,0,0,.28);-webkit-backdrop-filter:blur(26px) saturate(160%);backdrop-filter:blur(26px) saturate(160%);overflow:clip}
 /* tombol & pil: kaca tipis, tanpa bayangan keras khas neo */
-html[data-skin=glass] :is(.ctrl:not(.swatch):not(.theme),.pill,.mail,.years){--card:var(--glass);border:1px solid var(--glass-brd);box-shadow:inset 0 1px 0 var(--glass-hi);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+html:is([data-skin=glass],[data-skin=flat]) :is(.ctrl:not(.swatch):not(.theme),.pill,.mail,.years){--card:var(--glass);border:1px solid var(--glass-brd);box-shadow:inset 0 1px 0 var(--glass-hi);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
 /* tombol tema & aksen: cincin kaca terang + bayangan halus supaya lingkaran utuh di latar gelap; sisi gelap toggle abu tua, bukan hitam */
-html[data-skin=glass] .ctrl.swatch,html[data-skin=glass] .ctrl.theme{border:1px solid rgba(255,255,255,.6);
+html:is([data-skin=glass],[data-skin=flat]) .ctrl.swatch,html:is([data-skin=glass],[data-skin=flat]) .ctrl.theme{border:1px solid rgba(255,255,255,.6);
   box-shadow:0 0 0 .5px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.45),0 6px 14px -6px rgba(0,0,0,.45)}
-html[data-skin=glass] .ctrl.theme{background:linear-gradient(90deg,#F6F2E8 50%,#2b2c34 50%)}
+html:is([data-skin=glass],[data-skin=flat]) .ctrl.theme{background:linear-gradient(90deg,#F6F2E8 50%,#2b2c34 50%)}
 /* strip tab yang menempel di bawah layar (HP): tiap tab berlatar kaca supaya isi di belakangnya tidak menembus jelas */
-html[data-skin=glass] .tabs-wrap.stack .tab:not([aria-selected="true"]){background:var(--glass);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
+html:is([data-skin=glass],[data-skin=flat]) .tabs-wrap.stack .tab:not([aria-selected="true"]){background:var(--glass);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
 /* garis bingkai, takik sambungan, garis titik penghubung, dan bubble dekoratif tidak dipakai saat panel terpisah */
-html[data-skin=glass] .frame::before,html[data-skin=glass] .frame::after,html[data-skin=glass] .bubbles,html[data-skin=glass] .skills-head::before,
-html[data-skin=glass] .panel.id::after,html[data-skin=glass] .panel.title::after,html[data-skin=glass] #pengalaman::after,
-html[data-skin=glass] .panel.half:not(.contact)::before,html[data-skin=glass] .panel.half:not(.contact)::after,
-html[data-skin=glass] .tabs-wrap.side::before,html[data-skin=glass] .tabs-wrap.side .tablist::before,html[data-skin=glass] .tabs-wrap.side .tablist::after{display:none}
+html:is([data-skin=glass],[data-skin=flat]) .frame::before,html:is([data-skin=glass],[data-skin=flat]) .frame::after,html:is([data-skin=glass],[data-skin=flat]) .bubbles,html:is([data-skin=glass],[data-skin=flat]) .skills-head::before,
+html:is([data-skin=glass],[data-skin=flat]) .panel.id::after,html:is([data-skin=glass],[data-skin=flat]) .panel.title::after,html:is([data-skin=glass],[data-skin=flat]) #pengalaman::after,
+html:is([data-skin=glass],[data-skin=flat]) .panel.half:not(.contact)::before,html:is([data-skin=glass],[data-skin=flat]) .panel.half:not(.contact)::after,
+html:is([data-skin=glass],[data-skin=flat]) .tabs-wrap.side::before,html:is([data-skin=glass],[data-skin=flat]) .tabs-wrap.side .tablist::before,html:is([data-skin=glass],[data-skin=flat]) .tabs-wrap.side .tablist::after{display:none}
+/* kartu AFW versi HP/tablet: tanpa garis pemisah logo & takik SVG-nya */
+html:is([data-skin=glass],[data-skin=flat]) .id .mark{border-right:0}
+html:is([data-skin=glass],[data-skin=flat]) .id .mark::after{display:none}
 /* CTA: hitam sedikit tembus + buram, cahaya hangat di belakang tetap terasa */
-html[data-skin=glass] .cta{background:color-mix(in srgb,var(--ink) 78%,transparent);-webkit-backdrop-filter:blur(28px) saturate(150%);backdrop-filter:blur(28px) saturate(150%)}
+html:is([data-skin=glass],[data-skin=flat]) .cta{background:color-mix(in srgb,var(--ink) 78%,transparent);-webkit-backdrop-filter:blur(28px) saturate(150%);backdrop-filter:blur(28px) saturate(150%)}
 /* penutup tepi CTA tembus, jadi CTA langsung selebar layar */
-html[data-skin=glass] .cta-side{display:none}
+html:is([data-skin=glass],[data-skin=flat]) .cta-side{display:none}
 /* daftar tab (pengalaman & proyek): kaca membulat, tab aktif terang dengan garis aksen, bukan kotak hitam */
-html[data-skin=glass] .tablist{border:1px solid var(--glass-brd);border-radius:18px;overflow:clip;background:var(--glass);box-shadow:inset 0 1px 0 var(--glass-hi)}
-html[data-skin=glass] :is(.job,.pro){border-bottom-color:var(--glass-brd)}
-html[data-skin=glass] .tablist>:last-child{border-bottom:0}
-html[data-skin=glass] .tab[aria-selected="true"]{background:rgba(255,255,255,.7);color:var(--fg);box-shadow:inset 3px 0 0 var(--accent)}
-html[data-skin=glass][data-theme=dark] .tab[aria-selected="true"]{background:rgba(255,255,255,.1);color:var(--fg)}
-html[data-skin=glass] .pro[aria-selected="true"] .no{color:var(--accent)}
-html[data-skin=glass] :is(.pro[aria-selected="true"] .nm small,.job[aria-selected="true"] .period){color:var(--muted)}
+html:is([data-skin=glass],[data-skin=flat]) .tablist{border:1px solid var(--glass-brd);border-radius:18px;overflow:clip;background:var(--glass);box-shadow:inset 0 1px 0 var(--glass-hi)}
+html:is([data-skin=glass],[data-skin=flat]) :is(.job,.pro){border-bottom-color:var(--glass-brd)}
+html:is([data-skin=glass],[data-skin=flat]) .tablist>:last-child{border-bottom:0}
+html:is([data-skin=glass],[data-skin=flat]) .tab[aria-selected="true"]{background:rgba(255,255,255,.7);color:var(--fg);box-shadow:inset 3px 0 0 var(--accent)}
+html:is([data-skin=glass],[data-skin=flat])[data-theme=dark] .tab[aria-selected="true"]{background:rgba(255,255,255,.1);color:var(--fg)}
+html:is([data-skin=glass],[data-skin=flat]) .pro[aria-selected="true"] .no{color:var(--accent)}
+html:is([data-skin=glass],[data-skin=flat]) :is(.pro[aria-selected="true"] .nm small,.job[aria-selected="true"] .period){color:var(--muted)}
 /* versi HP (strip horizontal): tanpa kotak luar, tiap tab bergaris kaca */
-html[data-skin=glass] .tabs-wrap.stack .tablist{border:0;border-radius:0;background:none;box-shadow:none;overflow-x:auto}
-html[data-skin=glass] .tabs-wrap.stack .tab,html[data-skin=glass] .tabs-wrap.stack .tablist>:first-child{border-color:var(--glass-brd)}
-html[data-skin=glass] .tabs-wrap.stack .tab[aria-selected="true"]{box-shadow:inset 0 -3px 0 var(--accent)}
+html:is([data-skin=glass],[data-skin=flat]) .tabs-wrap.stack .tablist{border:0;border-radius:0;background:none;box-shadow:none;overflow-x:auto}
+html:is([data-skin=glass],[data-skin=flat]) .tabs-wrap.stack .tab,html:is([data-skin=glass],[data-skin=flat]) .tabs-wrap.stack .tablist>:first-child{border-color:var(--glass-brd)}
+html:is([data-skin=glass],[data-skin=flat]) .tabs-wrap.stack .tab[aria-selected="true"]{box-shadow:inset 0 -3px 0 var(--accent)}
 /* screenshot proyek & garis progres: sudut membulat, bayangan lembut */
-html[data-skin=glass] .shot{border:1px solid var(--glass-brd);border-radius:14px;background:var(--glass)}
-html[data-skin=glass] .shot.hero{box-shadow:0 20px 44px -22px rgba(0,0,0,.5)}
-html[data-skin=glass] .bar{background:var(--glass-brd)}
+html:is([data-skin=glass],[data-skin=flat]) .shot{border:1px solid var(--glass-brd);border-radius:14px;background:var(--glass)}
+html:is([data-skin=glass],[data-skin=flat]) .shot.hero{box-shadow:0 10px 24px -14px rgba(0,0,0,.35)}
+html:is([data-skin=glass],[data-skin=flat]) .bar{background:var(--glass-brd)}
+/* ujung bar progres: bintang neo diganti bentuk polos — bulat di glass, kotak di flat */
+html:is([data-skin=glass],[data-skin=flat]) .bar>i::after{-webkit-mask:none;mask:none;width:10px;height:10px;right:-5px;margin-top:-5px;border-radius:50%}
+html[data-skin=flat] .bar>i::after{border-radius:0}
+/* halo di bawah titik: halo gelap neo (mode gelap) bergeser & tampak kotor → diganti cahaya aksen tipis yang tepat di tengah titik */
+html:is([data-skin=glass],[data-skin=flat]) .bar>i::before{right:-11px;background:radial-gradient(circle,color-mix(in srgb,var(--accent) 45%,transparent),transparent 70%)}
+html[data-skin=flat] .bar>i::before{display:none}
+/* pemisah pita keahlian: bintang svg disembunyikan, svg-nya sendiri jadi titik (bulat glass / kotak flat) */
+html:is([data-skin=glass],[data-skin=flat]) .tape-plus{width:8px;height:8px;background:currentColor;border-radius:50%}
+html:is([data-skin=glass],[data-skin=flat]) .tape-plus path{display:none}
+html[data-skin=flat] .tape-plus{border-radius:0;color:#fff} /* pita pertama berlatar aksen → kotak putih */
+html[data-skin=flat] .tape-light .tape-plus{color:var(--accent)}
 /* keahlian: tanpa latar grid; pita & stiker jadi kaca (tembus + buram, bayangan lembut), bukan bayangan keras */
-html[data-skin=glass] .skills-wrap::before,html[data-skin=glass] .cta::before{display:none} /* latar grid di keahlian & CTA */
-html[data-skin=glass] .tape{background:color-mix(in srgb,var(--ink) 80%,transparent);box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 16px 30px -18px rgba(0,0,0,.55);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
-html[data-skin=glass] .tape-light .tape{background:var(--glass);border-block:1px solid var(--glass-brd);box-shadow:inset 0 1px 0 var(--glass-hi),0 16px 30px -18px rgba(0,0,0,.35)}
-html[data-skin=glass] .tape-ai .tape{background:color-mix(in srgb,var(--accent) 82%,transparent);box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 16px 30px -18px var(--accent)}
-html[data-skin=glass] .st{border:1px solid var(--glass-brd);box-shadow:inset 0 1px 0 var(--glass-hi),0 14px 30px -16px rgba(0,0,0,.5);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
-html[data-skin=glass] .st-pill{background:var(--glass)}
-html[data-skin=glass] .st-dark{background:color-mix(in srgb,var(--ink) 75%,transparent);border-color:rgba(255,255,255,.2)}
-html[data-skin=glass] :is(.st-blue,.st-in){background:color-mix(in srgb,var(--accent) 85%,transparent);border-color:rgba(255,255,255,.3)}
+html:is([data-skin=glass],[data-skin=flat]) .skills-wrap::before,html:is([data-skin=glass],[data-skin=flat]) .cta::before{display:none} /* latar grid di keahlian & CTA */
+html:is([data-skin=glass],[data-skin=flat]) .tape{background:color-mix(in srgb,var(--ink) 80%,transparent);box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 8px 18px -12px rgba(0,0,0,.4);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+html:is([data-skin=glass],[data-skin=flat]) .tape-light .tape{background:var(--glass);border-block:1px solid var(--glass-brd);box-shadow:inset 0 1px 0 var(--glass-hi),0 8px 18px -12px rgba(0,0,0,.25)}
+html:is([data-skin=glass],[data-skin=flat]) .tape-ai .tape{background:color-mix(in srgb,var(--accent) 82%,transparent);box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 8px 18px -12px var(--accent)}
+html:is([data-skin=glass],[data-skin=flat]) .st{border:1px solid var(--glass-brd);box-shadow:inset 0 1px 0 var(--glass-hi),0 8px 18px -12px rgba(0,0,0,.35);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+html:is([data-skin=glass],[data-skin=flat]) .st-pill{background:var(--glass)}
+html:is([data-skin=glass],[data-skin=flat]) .st-dark{background:color-mix(in srgb,var(--ink) 75%,transparent);border-color:rgba(255,255,255,.2)}
+html:is([data-skin=glass],[data-skin=flat]) :is(.st-blue,.st-in){background:color-mix(in srgb,var(--accent) 85%,transparent);border-color:rgba(255,255,255,.3)}
 /* tooltip: kaca gelap tanpa panah & bayangan keras */
-html[data-skin=glass] .tip{background:color-mix(in srgb,#111318 72%,transparent);color:#fff;border:1px solid rgba(255,255,255,.18);
+html:is([data-skin=glass],[data-skin=flat]) .tip{background:color-mix(in srgb,#111318 72%,transparent);color:#fff;border:1px solid rgba(255,255,255,.18);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 12px 28px -12px rgba(0,0,0,.45);-webkit-backdrop-filter:blur(16px) saturate(160%);backdrop-filter:blur(16px) saturate(160%)}
-html[data-skin=glass] .tip::after{display:none}
+html:is([data-skin=glass],[data-skin=flat]) .tip::after{display:none}
 /* kursor: lensa kaca, tengahnya bening (tanpa blur, teks di bawahnya tetap tajam), blur & kilau hanya di tepi lewat mask radial;
    tanpa blend difference yang menghitamkan. Label jadi pil kaca gelap */
-html[data-skin=glass] .cursor{mix-blend-mode:normal;border:1px solid rgba(255,255,255,.75);
+html:is([data-skin=glass],[data-skin=flat]) .cursor{mix-blend-mode:normal;border:1px solid rgba(255,255,255,.75);
   background:radial-gradient(closest-side,transparent 62%,rgba(255,255,255,.22) 100%);
   box-shadow:0 0 0 .5px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.6),0 6px 18px -8px rgba(0,0,0,.35)}
-html[data-skin=glass] .cursor::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+html:is([data-skin=glass],[data-skin=flat]) .cursor::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
   -webkit-backdrop-filter:blur(4px) saturate(170%) brightness(1.06);backdrop-filter:blur(4px) saturate(170%) brightness(1.06);
   -webkit-mask:radial-gradient(closest-side,transparent 58%,#000 92%);mask:radial-gradient(closest-side,transparent 58%,#000 92%)}
-html[data-skin=glass] .cursor.big{background:radial-gradient(closest-side,transparent 64%,rgba(255,255,255,.26) 100%)}
-html[data-skin=glass] .cursor.label::before{display:none}
-html[data-skin=glass] .cursor.label{background:color-mix(in srgb,#111318 72%,transparent);border-color:rgba(255,255,255,.2);box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 12px 28px -12px rgba(0,0,0,.45);
+html:is([data-skin=glass],[data-skin=flat]) .cursor.big{background:radial-gradient(closest-side,transparent 64%,rgba(255,255,255,.26) 100%)}
+html:is([data-skin=glass],[data-skin=flat]) .cursor.label::before{display:none}
+html:is([data-skin=glass],[data-skin=flat]) .cursor.label{background:color-mix(in srgb,#111318 72%,transparent);border-color:rgba(255,255,255,.2);box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 12px 28px -12px rgba(0,0,0,.45);
   -webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
 /* desktop: seperti neo, CTA mulai selebar kartu lain (sudut membulat, isi sedikit mengecil) lalu melebar penuh layar saat ~98% terlihat
    (JS neo menambah .wide). Tanpa penutup tepi karena latar berupa gradasi: lebar, margin & padding CTA yang dianimasikan */
 @media (min-width:840px){
-  html[data-skin=glass] .panel.cta{flex-basis:100%;width:100%;margin-left:0;padding:104px 32px 0;border-radius:24px;overflow:clip;
+  html:is([data-skin=glass],[data-skin=flat]) .panel.cta{flex-basis:100%;width:100%;margin-left:0;padding:104px 32px 0;border-radius:24px;overflow:clip;
     transition:flex-basis .7s cubic-bezier(.16,1,.3,1),width .7s cubic-bezier(.16,1,.3,1),margin-left .7s cubic-bezier(.16,1,.3,1),padding .7s cubic-bezier(.16,1,.3,1),border-radius .7s cubic-bezier(.16,1,.3,1)}
-  html[data-skin=glass] .panel.cta.wide{flex-basis:100vw;width:100vw;margin-left:calc(50% - 50vw);padding:104px max(32px,calc(50vw - 600px + 32px)) 0;border-radius:0}
+  html:is([data-skin=glass],[data-skin=flat]) .panel.cta.wide{flex-basis:100vw;width:100vw;margin-left:calc(50% - 50vw);padding:104px max(32px,calc(50vw - 600px + 32px)) 0;border-radius:0}
 }
-@media (min-width:840px) and (prefers-reduced-motion:reduce){html[data-skin=glass] .panel.cta{transition:none}}
-@media (max-width:599px){html[data-skin=glass]{--gap:8px}html[data-skin=glass] .panel:not(.cta){border-radius:20px}}
+@media (min-width:840px) and (prefers-reduced-motion:reduce){html:is([data-skin=glass],[data-skin=flat]) .panel.cta{transition:none}}
+@media (max-width:599px){html:is([data-skin=glass],[data-skin=flat]){--gap:8px}html:is([data-skin=glass],[data-skin=flat]) .panel:not(.cta){border-radius:20px}}
+
+/* ===== "Flat": tata letak sama dengan Glass, gaya datar bersih (ala toko modern): kartu abu sangat muda + border tipis,
+   tanpa bayangan/blur/noise/cahaya, pil putih; warna mengikuti aksen tema (bisa diacak), plus versi pastelnya (--lime) ===== */
+html[data-skin=flat]{--display:'Manrope',system-ui,sans-serif;--mono:'Manrope',system-ui,sans-serif;--lime:color-mix(in srgb,var(--accent) 13%,#fff);
+  --glass:#f5f5f2;--glass-brd:#e6e6e1;--glass-hi:transparent;--noise:none;--glow:none;--desk:#fff;--paper:#fff;--card:#fff}
+html[data-skin=flat][data-theme=dark]{--glass:#1a1c1b;--glass-brd:#2b2e2c;--desk:#0f1110;--paper:#0f1110;--card:#1f2221;--lime:color-mix(in srgb,var(--accent) 22%,#0f1110)}
+html[data-skin=flat] body::before{background:var(--desk)}
+html[data-skin=flat] .panel:not(.cta){--paper:transparent;border-color:transparent;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none} /* kartu tanpa border: dibedakan dari latar putih lewat warna abu muda saja */
+html[data-skin=flat] :is(.ctrl:not(.swatch):not(.theme),.pill,.mail,.years,.st-pill){--card:#fff;background:#fff;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
+html[data-skin=flat][data-theme=dark] :is(.ctrl:not(.swatch):not(.theme),.pill,.mail,.years,.st-pill){--card:#1f2221;background:#1f2221}
+html:is([data-skin=glass],[data-skin=flat]) .ctrl:not(.swatch):not(.theme)[aria-pressed="true"]{--card:var(--ab);background:var(--ab);border-color:var(--ab);color:#fff} /* tombol aktif (Mono): latar aksen, bukan putih-di-atas-putih */
+html[data-skin=flat] .ctrl.swatch,html[data-skin=flat] .ctrl.theme{border-color:var(--glass-brd);box-shadow:none}
+html[data-skin=flat] .tablist{background:none;box-shadow:none;border:0;gap:2px} /* tanpa border: tiap tab blok putih terpisah celah tipis */
+html[data-skin=flat] .tab:not([aria-selected="true"]){background:var(--card)}
+html[data-skin=flat] :is(.tab,.tabs-wrap.stack .tab,.tabs-wrap.stack .tablist>:first-child){border:0!important}
+html[data-skin=flat] .tab[aria-selected="true"],html[data-skin=flat][data-theme=dark] .tab[aria-selected="true"]{background:var(--lime);box-shadow:none}
+html[data-skin=flat] .tabs-wrap.stack .tab:not([aria-selected="true"]){background:var(--card);-webkit-backdrop-filter:none;backdrop-filter:none}
+html[data-skin=flat] .tabs-wrap.stack .tab[aria-selected="true"]{box-shadow:inset 0 -2px 0 var(--accent)}
+html[data-skin=flat] .shot.hero{box-shadow:none}
+html[data-skin=flat] .tape{background:var(--ab);box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
+html[data-skin=flat] .tape-light .tape{background:var(--card);box-shadow:none}
+html[data-skin=flat] .tape-ai .tape{background:var(--lime);color:var(--fg);box-shadow:none}
+html[data-skin=flat] .tape-ai .tape-plus{color:var(--accent)}
+html[data-skin=flat] .st{box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
+html[data-skin=flat] .st-dark{background:var(--ab);border-color:var(--ab)}
+html[data-skin=flat] :is(.st-blue,.st-in){background:var(--lime);color:var(--fg);border-color:var(--glass-brd)}
+/* CTA & pita gelap ikut warna aksen (terang maupun gelap); kotak aksen judul CTA dibuat lebih gelap supaya tetap kontras */
+html[data-skin=flat] .cta{--accent:color-mix(in srgb,var(--ab) 58%,#000);background:var(--ab);-webkit-backdrop-filter:none;backdrop-filter:none}
+/* pita "Skills & tools" (latar hitam neo) juga ikut aksen */
+html[data-skin=flat] .skills-head::after{background:var(--ab)}
+html[data-skin=flat] :is(.tip,.cursor.label){background:var(--ab);border-color:var(--ab);box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
+/* kursor: cincin tipis polos, tanpa efek lensa */
+html[data-skin=flat] .cursor{border-color:transparent;background:color-mix(in srgb,var(--ab) 22%,transparent);box-shadow:none} /* tanpa border: lingkaran isi aksen tipis */
+html[data-skin=flat][data-theme=dark] .cursor{background:color-mix(in srgb,var(--accent) 28%,transparent)}
+html[data-skin=flat] .cursor::before{display:none}
+html[data-skin=flat] .cursor.big{background:color-mix(in srgb,var(--ab) 14%,transparent)}
+html[data-skin=flat] .cursor.label{border:0;background:var(--ab);color:#fff} /* label kursor: aksen solid tanpa border (menang atas .big) */
+/* judul: bobot medium & rapat seperti referensi datar; sorotan "Front-End" jadi pil aksen pastel, bukan blok hitam */
+html[data-skin=flat] :is(.title h1,.h2,.skills-head span,.cta-title){font-weight:500;letter-spacing:-.035em}
+html[data-skin=flat] .tagline p{font-weight:400;letter-spacing:-.02em}
+html[data-skin=flat] .hl{background:var(--lime);color:var(--fg);border-radius:14px}
+/* Manrope lebih lebar dari Space Grotesk: judul CTA diperkecil & dirapatkan supaya "something great." tidak terpotong */
+html[data-skin=flat] .cta-title{font-size:clamp(40px,7.4vw,108px);letter-spacing:-.045em}
+/* tombol CTA (email, WhatsApp, LinkedIn): tanpa bayangan keras & geser khas neo, di Glass dan Flat */
+html:is([data-skin=glass],[data-skin=flat]) .cta-btn,html:is([data-skin=glass],[data-skin=flat]) .cta-btn:hover,html:is([data-skin=glass],[data-skin=flat]) .cta-btn.ghost,html:is([data-skin=glass],[data-skin=flat]) .cta-btn.ghost:hover{box-shadow:none;translate:none}
+html:is([data-skin=glass],[data-skin=flat]) .cta-btn.ghost{border-color:rgba(255,255,255,.45)}
+html:is([data-skin=glass],[data-skin=flat]) .cta-btn.ghost:hover{background:rgba(255,255,255,.1)}
+html:is([data-skin=glass],[data-skin=flat]) .cta-btn:not(.ghost):hover{background:#fff}
+html[data-skin=glass] .cta-btn{border:1px solid rgba(255,255,255,.5);box-shadow:inset 0 1px 0 rgba(255,255,255,.4);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+html[data-skin=glass] .cta-btn:not(.ghost){background:rgba(255,255,255,.88)}
+/* kotak aksen baris kedua judul CTA: latar inline mengikuti tinggi glyph font (Geist/Manrope lebih tinggi dari Space Grotesk)
+   sehingga menimpa baris pertama; inline-block membuat tingginya mengikuti tinggi baris */
+html:is([data-skin=glass],[data-skin=flat]) .cta-hl{display:inline-block;line-height:1.04;margin-top:.04em}
+/* Flat: tanpa sudut membulat — kartu, tab, tombol, pil, stiker & screenshot siku semua (kursor tetap bulat) */
+html[data-skin=flat] :is(.panel,.tablist,.tab,.shot,.ctrl,.mail,.cta-btn,.pill,.hl,.tip,.years,.st-pill,.st-dark,.st-blue,.st-in,.cursor.label){border-radius:0!important}
+/* Flat: kartu tagline jadi bidang aksen bergradasi + noise halus (pemanis satu-satunya di layout datar) */
+html[data-skin=flat] .panel.tagline{position:relative;isolation:isolate;
+  background:radial-gradient(80% 140% at 0% 0%,color-mix(in srgb,var(--ab) 45%,#fff) 0%,transparent 60%),linear-gradient(300deg,color-mix(in srgb,var(--ab) 80%,#000),var(--ab) 55%,color-mix(in srgb,var(--ab) 70%,#fff));color:#fff}
+/* noise = pola bintik mosaik yang sama dengan grain bubble neo (--bubble-dots dibuat JS neo), digelapkan tipis di atas gradasi */
+html[data-skin=flat] .panel.tagline::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;border-radius:inherit;
+  background-image:var(--bubble-dots);background-size:var(--bubble-dots-size,216px 216px);mix-blend-mode:multiply;opacity:.4;
+  /* hanya di bagian terang gradasi (sorotan kiri atas & sisi kiri), memudar ke nol di sisi gelap kanan */
+  -webkit-mask-image:radial-gradient(80% 140% at 0% 0%,#000 0%,transparent 70%),linear-gradient(300deg,transparent 40%,#000 100%);mask-image:radial-gradient(80% 140% at 0% 0%,#000 0%,transparent 70%),linear-gradient(300deg,transparent 40%,#000 100%)}
+html[data-skin=flat] .panel.tagline p{color:#fff}
+html[data-skin=flat] .panel.tagline{animation:none;background-origin:border-box} /* border transparan: gradasi mulai dari tepi luar, tidak berulang jadi garis di tepi */ /* animasi grid neo menggeser background-position: lapisan gradasi ikut bergeser */
+html[data-skin=flat] .panel.tagline .years{color:var(--fg)}
+/* pita "Skills & tools": langsung tampil penuh (tanpa animasi membuka dari garis 1px & teks yang muncul belakangan).
+   --sy/--so diisi JS neo lewat style inline, jadi dikunci dengan !important; efek sticky & tertimpa (clip-path) tetap jalan */
+html:is([data-skin=glass],[data-skin=flat]) .skills-head{--sy:1!important;--so:1!important}
+/* Flat: footer di dalam CTA beraksen pakai putih semi-transparan, bukan abu tetap (yang dirancang untuk CTA hitam) */
+html[data-skin=flat] .cta .foot{color:rgba(255,255,255,.78)}
+html[data-skin=flat] .cta .foot a{color:#fff}
+html[data-skin=flat] .cta .foot a:hover{color:rgba(255,255,255,.7)} /* hover bawaan berwarna aksen, tak terlihat di atas CTA beraksen */

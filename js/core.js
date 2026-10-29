@@ -169,7 +169,8 @@
       '.lp-btn svg{width:18px;height:18px}' +
       '.lp-panel{position:absolute;right:0;bottom:54px;width:min(380px,calc(100vw - 28px));padding:12px;border-radius:20px;display:none;grid-template-columns:1fr 1fr;gap:10px}' +
       '.lp.open .lp-panel{display:grid;animation:lp-in .22s cubic-bezier(.16,1,.3,1)}' +
-      '.lp-h{grid-column:1/-1;margin:2px 4px 2px;font-size:12px;font-weight:600;color:var(--lp-mut);letter-spacing:.04em;text-transform:uppercase}' +
+      '.lp-h{grid-column:1/-1;margin:4px 4px 0;font-size:15px;font-weight:600;letter-spacing:-.01em}' +
+      '.lp-s{grid-column:1/-1;margin:0 4px 4px;font-size:12.5px;font-weight:500;color:var(--lp-mut)}' +
       '.lp-card{display:flex;flex-direction:column;gap:8px;padding:6px 6px 10px;border:2px solid transparent;border-radius:14px;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer;transition:background .2s,border-color .2s}' +
       '.lp-card:hover{background:rgba(127,127,127,.12)}.lp-card[aria-current=true]{border-color:#2f6df6}' +
       '.lp-card img{width:100%;height:auto;aspect-ratio:16/10;object-fit:cover;object-position:top;border-radius:9px;display:block;border:1px solid var(--lp-brd);background:rgba(127,127,127,.15)}' +
@@ -186,10 +187,15 @@
     btn.setAttribute('aria-haspopup', 'true'); btn.setAttribute('aria-expanded', 'false');
     btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/></svg><span>Layout</span>';
     var panel = add('div', { className: 'lp-panel', role: 'dialog' }); panel.setAttribute('aria-label', 'Layout');
-    panel.appendChild(add('div', { className: 'lp-h', textContent: 'Layout · ' + T.length }));
+    // judul panel & thumbnail mengikuti bahasa dan mode terang/gelap yang sedang aktif
+    var TXT = { id: ['Pilih tampilan favoritmu', 'Isi sama, gaya beda. Coba saja.', 'Coba tampilan lain →'],
+                en: ['Pick a look you like', 'Same content, different style. Try one.', 'Try another layout →'] };
+    var head = add('div', { className: 'lp-h' }), sub = add('div', { className: 'lp-s' }), imgs = [];
+    panel.appendChild(head); panel.appendChild(sub);
     T.forEach(function (t) {
       var c = add('button', { type: 'button', className: 'lp-card' }); if (t === th) c.setAttribute('aria-current', 'true');
-      c.innerHTML = (t.thumb ? '<img src="' + t.thumb + '?v=' + t.v + '" alt="" loading="lazy" width="480" height="300">' : '') + '<span>' + t.name + '</span>';
+      c.innerHTML = (t.thumb ? '<img alt="" loading="lazy" width="480" height="300">' : '') + '<span>' + t.name + '</span>';
+      if (t.thumb) imgs.push({ el: c.querySelector('img'), t: t });
       c.onclick = function () {
         if (t === th) { close(); return; }
         try { localStorage.setItem('afw-skin', t.id); } catch (e) {}
@@ -198,8 +204,12 @@
       };
       panel.appendChild(c);
     });
-    var tip = add('div', { className: 'lp-tip', textContent: window.AFW.lang === 'id' ? 'Coba tampilan lain →' : 'Try another layout →' });
+    var tip = add('div', { className: 'lp-tip' });
     tip.setAttribute('aria-hidden', 'true');
+    function texts() { var x = TXT[AFW.lang] || TXT.en; head.textContent = x[0]; sub.textContent = x[1]; tip.textContent = x[2]; }
+    function thumbs() { imgs.forEach(function (o) { o.el.src = ((AFW.dark && o.t.thumbDark) || o.t.thumb) + '?v=' + o.t.v; }); }
+    texts(); thumbs();
+    window.addEventListener('afw:lang', texts); window.addEventListener('afw:theme', thumbs);
     root.appendChild(tip); root.appendChild(panel); root.appendChild(btn);
     function open() { root.classList.add('open'); btn.setAttribute('aria-expanded', 'true'); }
     function close() { root.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); }

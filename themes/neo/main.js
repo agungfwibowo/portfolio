@@ -578,16 +578,23 @@
     });
     if (liftDock) liftDock();
   };
-  // tombol Layout (inti) di HP diangkat hanya selama strip tab yang menempel di dasar layar (.stack) terlihat, supaya tidak menutupinya
+  // tombol Layout (inti) di HP diangkat hanya saat strip tab (.stack) benar-benar berada di dasar layar: bagian tab melintasi
+  // tepi bawah layar (strip sticky menempel di sana) atau ujung bagiannya, tempat strip berhenti, masih dekat dasar layar
   var liftDock = null;
-  if (AFW.dock && 'IntersectionObserver' in window) {
-    var wrapsOn = [];
-    liftDock = function () { AFW.dock(wrapsOn.some(function (w) { return w.classList.contains('stack'); })); };
-    var dockIO = new IntersectionObserver(function (en) {
-      en.forEach(function (e) { var i = wrapsOn.indexOf(e.target); if (e.isIntersecting) { if (i < 0) wrapsOn.push(e.target); } else if (i >= 0) wrapsOn.splice(i, 1); });
-      liftDock();
-    });
-    document.querySelectorAll('.tabs-wrap').forEach(function (w) { dockIO.observe(w); });
+  if (AFW.dock) {
+    var dockTick = false;
+    liftDock = function () {
+      dockTick = false;
+      var vh = window.innerHeight, on = false;
+      document.querySelectorAll('.tabs-wrap.stack').forEach(function (w) {
+        var r = w.getBoundingClientRect();
+        if (r.top < vh - 80 && r.bottom > vh - 72) on = true;
+      });
+      AFW.dock(on);
+    };
+    var onDock = function () { if (!dockTick) { dockTick = true; requestAnimationFrame(liftDock); } };
+    window.addEventListener('scroll', onDock, { passive: true });
+    window.addEventListener('resize', onDock);
   }
   // hanya saat LEBAR berubah: URL bar HP yang muncul-hilang memicu resize (tinggi saja), dan melepas/memasang .stack
   // di tengah scroll membuat strip tab sticky & tinggi panel berganti sehingga halaman loncat
