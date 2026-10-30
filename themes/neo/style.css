@@ -520,8 +520,9 @@ html:is([data-skin=glass],[data-skin=flat]) .ctrl.swatch,html:is([data-skin=glas
 html:is([data-skin=glass],[data-skin=flat]) .ctrl.theme{background:linear-gradient(90deg,#F6F2E8 50%,#2b2c34 50%)}
 /* tombol bahasa lebar tetap 44px → jarak ke tombol aksen 12px, sama dengan jarak aksen–tema (16+44+12 = right 72) */
 html:is([data-skin=glass],[data-skin=flat]) .ctrl.lang{width:44px;padding:0;justify-content:center}
-/* strip tab yang menempel di bawah layar (HP): tiap tab berlatar kaca supaya isi di belakangnya tidak menembus jelas */
-html:is([data-skin=glass],[data-skin=flat]) .tabs-wrap.stack .tab:not([aria-selected="true"]){background:var(--glass);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
+/* strip tab yang menempel di bawah layar (HP): tiap tab berlatar hampir pekat (lihat Glass di akhir file) tanpa backdrop-filter;
+   blur per tab di dalam strip yang digeser menyamping membuat tab di luar layar telat digambar (kosong sesaat saat discroll) */
+html:is([data-skin=glass],[data-skin=flat]) .tabs-wrap.stack .tab:not([aria-selected="true"]){background:var(--glass)}
 /* garis bingkai, takik sambungan, garis titik penghubung, dan bubble dekoratif tidak dipakai saat panel terpisah */
 html:is([data-skin=glass],[data-skin=flat]) .frame::before,html:is([data-skin=glass],[data-skin=flat]) .frame::after,html[data-skin=flat] .bubbles,html:is([data-skin=glass],[data-skin=flat]) .skills-head::before,
 html:is([data-skin=glass],[data-skin=flat]) .panel.id::after,html:is([data-skin=glass],[data-skin=flat]) .panel.title::after,html:is([data-skin=glass],[data-skin=flat]) #pengalaman::after,

@@ -7,12 +7,12 @@
 //   loader true bila tampilan punya layar loader (kelas `loading` dipasang di kunjungan pertama per tab);
 //          tampilan wajib memanggil `window.__rv = true` setelah siap, kalau tidak, konten ditampilkan paksa setelah 2,5 dtk
 window.THEMES = [
-  { id: 'neo', name: 'Neo-brutalist', v: 62, loader: true, thumb: 'assets/themes/neo.webp', thumbDark: 'assets/themes/neo-dark.webp',
+  { id: 'neo', name: 'Neo-brutalist', v: 63, loader: true, thumb: 'assets/themes/neo.webp', thumbDark: 'assets/themes/neo-dark.webp',
     fonts: 'https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&family=Geist+Mono:wght@400;500;600&family=Red+Hat+Mono:wght@600&display=swap' },
   // varian neo: tiap panel jadi kartu kaca (CSS saja, di themes/neo/style.css); v harus sama dengan neo karena berkasnya sama
-  { id: 'glass', name: 'Glass', dir: 'neo', v: 62, loader: true, thumb: 'assets/themes/glass.webp', thumbDark: 'assets/themes/glass-dark.webp',
+  { id: 'glass', name: 'Glass', dir: 'neo', v: 63, loader: true, thumb: 'assets/themes/glass.webp', thumbDark: 'assets/themes/glass-dark.webp',
     fonts: 'https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&family=Red+Hat+Mono:wght@600&display=swap' },
   // varian neo kedua: tata letak kartu sama dengan Glass, gaya datar (CSS saja, di themes/neo/style.css)
-  { id: 'flat', name: 'Flat', dir: 'neo', v: 62, loader: true, thumb: 'assets/themes/flat.webp', thumbDark: 'assets/themes/flat-dark.webp',
+  { id: 'flat', name: 'Flat', dir: 'neo', v: 63, loader: true, thumb: 'assets/themes/flat.webp', thumbDark: 'assets/themes/flat-dark.webp',
     fonts: 'https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Red+Hat+Mono:wght@600&display=swap' }
 ];
