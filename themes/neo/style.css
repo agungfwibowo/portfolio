@@ -530,7 +530,7 @@ html:is([data-skin=glass],[data-skin=flat]) .ctrl.lang{width:44px;padding:0;just
 html:is([data-skin=glass],[data-skin=flat]) .tabs-wrap.stack .tab:not([aria-selected="true"]){background:var(--glass)}
 /* garis bingkai, takik sambungan, garis titik penghubung, dan bubble dekoratif tidak dipakai saat panel terpisah */
 html:is([data-skin=glass],[data-skin=flat]) .frame::before,html:is([data-skin=glass],[data-skin=flat]) .frame::after,html:is([data-skin=glass],[data-skin=flat]) .bubbles,html:is([data-skin=glass],[data-skin=flat]) .skills-head::before,
-html:is([data-skin=glass],[data-skin=flat]) .panel.id::after,html:is([data-skin=glass],[data-skin=flat]) .panel.title::after,html:is([data-skin=glass],[data-skin=flat]) #pengalaman::after,
+html:is([data-skin=glass],[data-skin=flat]) .panel.id::after,html:is([data-skin=glass],[data-skin=flat]) .panel.title::after,html:is([data-skin=glass],[data-skin=flat]) #pengalaman::before,html:is([data-skin=glass],[data-skin=flat]) #pengalaman::after,
 html:is([data-skin=glass],[data-skin=flat]) .panel.half:not(.contact)::before,html:is([data-skin=glass],[data-skin=flat]) .panel.half:not(.contact)::after,
 html:is([data-skin=glass],[data-skin=flat]) .tabs-wrap.side::before,html:is([data-skin=glass],[data-skin=flat]) .tabs-wrap.side .tablist::before,html:is([data-skin=glass],[data-skin=flat]) .tabs-wrap.side .tablist::after{display:none}
 /* kartu AFW versi HP/tablet: tanpa garis pemisah logo & takik SVG-nya */
