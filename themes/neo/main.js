@@ -756,6 +756,7 @@
   if (!reduce && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
     var bwrap = document.querySelector('.bubbles');
     if (bwrap && document.documentElement.getAttribute('data-skin') === 'glass') {
+      if (bwrap.offsetWidth) { // bubble Glass bisa disembunyikan lewat CSS: kalau begitu tidak perlu digerakkan
       // Glass: bubble meluncur lurus dengan arah & kecepatan acak, memantul saat menyentuh pinggir layar,
       // sambil mengembang-mengempis pelan (diameter 15–40% sisi layar terpendek, tiap bubble beda irama)
       var gb = Array.prototype.slice.call(document.querySelectorAll('.bubble')).map(function (el) {
@@ -779,6 +780,7 @@
         requestAnimationFrame(glide);
       };
       requestAnimationFrame(glide);
+      }
     } else if (bwrap) {
       document.querySelectorAll('.bubble').forEach(function (el, i) {
         function next() {
@@ -813,6 +815,16 @@
         if (!running) { running = true; requestAnimationFrame(bubTick); }
       }, { passive: true });
     }
+  }
+  // Glass: latar angka biner (0/1 acak) memenuhi layar; digambar sekali ke kanvas (ubin 480px, resolusi 2x) lalu diulang sebagai ubin (--binary di style.css)
+  if (document.documentElement.getAttribute('data-skin') === 'glass') {
+    document.fonts.ready.then(function () {
+      var bc = document.createElement('canvas'), bx = bc.getContext('2d');
+      bc.width = bc.height = 960; bx.scale(2, 2); // resolusi 2x supaya tetap tajam saat diperbesar di CSS
+      bx.font = '500 12px "Geist Mono", monospace'; bx.fillStyle = 'rgba(128,128,128,.22)';
+      for (var by = 0; by < 30; by++) for (var bi = 0; bi < 60; bi++) bx.fillText(Math.random() < .5 ? '0' : '1', bi * 8, by * 16 + 12);
+      document.documentElement.style.setProperty('--binary', 'url(' + bc.toDataURL() + ')');
+    });
   }
   // panel debug sementara: buka halaman dengan ?dbg
   if (/[?&]dbg/.test(location.search)) { var dsc = document.createElement('script'); dsc.src = 'js/dbg.js?v=1'; document.body.appendChild(dsc); }
