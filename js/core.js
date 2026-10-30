@@ -154,7 +154,8 @@
   }).catch(function () { d.classList.remove('js', 'loading'); });
 
   // pemilih tampilan: tombol "Layout" + panel kartu berisi thumbnail tiap tampilan (dari registry); hanya bila ada lebih dari satu.
-  // Komponen inti, gayanya netral & mengikuti mode gelap, jadi sama di semua tampilan. Ajakan sekali per sesi di awal.
+  // Komponen inti dengan gaya dasar netral yang mengikuti mode gelap; tiap tampilan boleh menimpanya lewat html[data-skin=..] .lp*
+  // (lihat akhir themes/neo/style.css). Ajakan sekali per sesi di awal.
   // tampilan bisa minta tombol Layout diangkat (mis. saat ada strip sticky di dasar layar HP): AFW.dock(true/false)
   var lpRoot = null, lifted = false;
   AFW.dock = function (on) { lifted = !!on; if (lpRoot) lpRoot.classList.toggle('lift', lifted); };
@@ -172,6 +173,7 @@
       '.lp-h{grid-column:1/-1;margin:4px 4px 0;font-size:15px;font-weight:600;letter-spacing:-.01em}' +
       '.lp-s{grid-column:1/-1;margin:0 4px 4px;font-size:12.5px;font-weight:500;color:var(--lp-mut)}' +
       '.lp-card{display:flex;flex-direction:column;gap:8px;padding:6px 6px 10px;border:2px solid transparent;border-radius:14px;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer;transition:background .2s,border-color .2s}' +
+      '.lp-card{position:relative}.lp-card::after{content:"";position:absolute;inset:-7px}' + // area hover menutup celah antar kartu (gap 10px + border) agar sorotan tidak mati-nyala saat mouse melintas
       '.lp-card:hover{background:rgba(127,127,127,.12)}.lp-card[aria-current=true]{border-color:#2f6df6}' +
       '.lp-card img{width:100%;height:auto;aspect-ratio:16/10;object-fit:cover;object-position:top;border-radius:9px;display:block;border:1px solid var(--lp-brd);background:rgba(127,127,127,.15)}' +
       '.lp-card span{padding:0 4px}' +
@@ -188,8 +190,8 @@
     btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/></svg><span>Layout</span>';
     var panel = add('div', { className: 'lp-panel', role: 'dialog' }); panel.setAttribute('aria-label', 'Layout');
     // judul panel & thumbnail mengikuti bahasa dan mode terang/gelap yang sedang aktif
-    var TXT = { id: ['Pilih tampilan favoritmu', 'Isi sama, gaya beda. Coba saja.', 'Coba tampilan lain →'],
-                en: ['Pick a look you like', 'Same content, different style. Try one.', 'Try another layout →'] };
+    var TXT = { id: ['Pilih tampilan favoritmu', 'Isi sama, gaya beda. Coba saja.', 'Coba tampilan lain ↓'],
+                en: ['Pick a look you like', 'Same content, different style. Try one.', 'Try another layout ↓'] };
     var head = add('div', { className: 'lp-h' }), sub = add('div', { className: 'lp-s' }), imgs = [];
     panel.appendChild(head); panel.appendChild(sub);
     T.forEach(function (t) {

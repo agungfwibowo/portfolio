@@ -425,7 +425,11 @@
       cur.textContent = lab ? lab.getAttribute('data-cursor') : '';
       cur.classList.toggle('label', !!lab);
       cur.classList.toggle('big', !lab && !!e.target.closest('a, button, .tab'));
+      onAccent(e);
     });
+    // di atas area berlatar aksen (Flat): kursor jadi putih, lihat .cursor.on-accent di style.css; dicek ulang saat klik karena tab yang diklik jadi aktif di bawah kursor
+    var onAccent = function (e) { cur.classList.toggle('on-accent', !!e.target.closest('.cta, .tab[aria-selected="true"], .tape-ai, .lp-btn')); };
+    document.addEventListener('click', onAccent);
     document.documentElement.addEventListener('mouseleave', function () { cur.classList.remove('on'); });
   }
 
@@ -751,7 +755,31 @@
   }
   if (!reduce && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
     var bwrap = document.querySelector('.bubbles');
-    if (bwrap) {
+    if (bwrap && document.documentElement.getAttribute('data-skin') === 'glass') {
+      // Glass: bubble meluncur lurus dengan arah & kecepatan acak, memantul saat menyentuh pinggir layar,
+      // sambil mengembang-mengempis pelan (diameter 15–40% sisi layar terpendek, tiap bubble beda irama)
+      var gb = Array.prototype.slice.call(document.querySelectorAll('.bubble')).map(function (el) {
+        var a = Math.random() * Math.PI * 2, v = 0.04 + Math.random() * 0.04; // px per ms
+        el.style.transition = 'none';
+        return { el: el, cx: Math.random() * bwrap.clientWidth, cy: Math.random() * bwrap.clientHeight, vx: Math.cos(a) * v, vy: Math.sin(a) * v,
+          ph: Math.random() * Math.PI * 2, per: 12000 + Math.random() * 10000 };
+      });
+      var gLast = 0;
+      var glide = function (t) {
+        var dt = gLast ? Math.min(t - gLast, 50) : 16, W = bwrap.clientWidth, H = bwrap.clientHeight, m = Math.min(W, H);
+        gLast = t;
+        gb.forEach(function (b) {
+          var w = b.el.offsetWidth, size = m * (0.15 + 0.25 * (0.5 + 0.5 * Math.sin(t / b.per * Math.PI * 2 + b.ph))), r = size / 2;
+          b.cx += b.vx * dt; b.cy += b.vy * dt;
+          if (b.cx - r < 0) { b.cx = r; b.vx = Math.abs(b.vx); } else if (b.cx + r > W) { b.cx = W - r; b.vx = -Math.abs(b.vx); }
+          if (b.cy - r < 0) { b.cy = r; b.vy = Math.abs(b.vy); } else if (b.cy + r > H) { b.cy = H - r; b.vy = -Math.abs(b.vy); }
+          b.el.style.translate = (b.cx - b.el.offsetLeft - w / 2).toFixed(1) + 'px ' + (b.cy - b.el.offsetTop - w / 2).toFixed(1) + 'px';
+          b.el.style.scale = (size / w).toFixed(3);
+        });
+        requestAnimationFrame(glide);
+      };
+      requestAnimationFrame(glide);
+    } else if (bwrap) {
       document.querySelectorAll('.bubble').forEach(function (el, i) {
         function next() {
           var dur = 5000 + Math.random() * 6000;

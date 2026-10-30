@@ -197,7 +197,7 @@ a{color:var(--fg)}a:hover{color:var(--accent)}
 .tape-light .tape-track{animation-direction:reverse}
 .tape-light .tape-title{padding-bottom:26px}
 .tape-light .tape-plus{color:#A7ABB6}
-.tape-ai .tape-plus{color:#A7ABB6}
+.tape-ai .tape-plus{color:color-mix(in srgb,var(--ab) 55%,#fff)}
 .tape-ai .tape-title{color:var(--accent)}
 .tape-ai .tape{rotate:-1deg;background:var(--accent);box-shadow:0 5px 0 var(--fg)}
 @keyframes mq{to{transform:translateX(-50%)}}
@@ -488,24 +488,26 @@ a{color:var(--fg)}a:hover{color:var(--accent)}
 }
 
 /* ===== layout kartu "Glass" & "Flat" (themes/registry.js: dir neo), CSS saja. Tata letak kartunya sama; aturan di bawah memakai gaya kaca
-   (variabel --glass*, --noise, --glow), lalu blok "Flat" di akhir menimpa variabel & efeknya jadi datar ===== */
+   (variabel --glass*, --noise, warna bubble --b1..3), lalu blok "Flat" di akhir menimpa variabel & efeknya jadi datar ===== */
 html:is([data-skin=glass],[data-skin=flat]){--display:'Geist',system-ui,sans-serif;--gap:10px;--noise:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='.33 .33 .33 0 0 .33 .33 .33 0 0 .33 .33 .33 0 0 0 0 0 0 .16'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   --glass:rgba(255,255,255,.4);--glass-brd:rgba(255,255,255,.65);--glass-hi:rgba(255,255,255,.8);
-  --glow:radial-gradient(42% 38% at 16% 18%,rgba(70,120,255,.6),transparent 70%),radial-gradient(40% 46% at 86% 62%,rgba(30,200,190,.5),transparent 72%),
-    radial-gradient(40% 34% at 50% 105%,rgba(150,90,240,.5),transparent 70%);--desk:#eceef4}
+  --b1:rgba(70,120,255,.6);--b2:rgba(30,200,190,.5);--b3:rgba(150,90,240,.5);--desk:#eceef4}
 html:is([data-skin=glass],[data-skin=flat])[data-theme=dark]{--glass:rgba(24,22,28,.42);--glass-brd:rgba(255,255,255,.14);--glass-hi:rgba(255,255,255,.2);
-  --glow:radial-gradient(42% 38% at 16% 18%,rgba(60,105,240,.55),transparent 70%),radial-gradient(40% 46% at 86% 62%,rgba(20,170,165,.45),transparent 72%),
-    radial-gradient(40% 34% at 50% 105%,rgba(140,80,230,.5),transparent 70%);--desk:#10121a}
+  --b1:rgba(60,105,240,.55);--b2:rgba(20,170,165,.45);--b3:rgba(140,80,230,.5);--desk:#10121a}
 /* latar cahaya + noise di lapisan position:fixed tersendiri, bukan background-attachment:fixed: di browser HP yang terakhir itu
    bisa tergambar sebagai potongan persegi berbeda di balik kartu ber-backdrop-filter saat scroll / URL bar bergerak */
 html:is([data-skin=glass],[data-skin=flat]){background:var(--desk)}
 html:is([data-skin=glass],[data-skin=flat]) body{background:none}
-html:is([data-skin=glass],[data-skin=flat]) body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:var(--noise),var(--glow),var(--desk)}
-/* warna cahaya berganti otomatis, lambat & selaras: hue hanya diayun bolak-balik dalam rentang sejuk (biru ↔ tosca ↔ ungu),
-   tidak memutar penuh ke warna hangat; transisi ease-in-out jadi tidak ada lonjakan (dijalankan GPU). Hanya desktop: tiap perubahan latar memaksa blur kaca di
-   semua kartu digambar ulang, terlalu berat untuk baterai HP. Berhenti sendiri saat tab tersembunyi */
-@keyframes glass-hue{from{filter:hue-rotate(-15deg)}to{filter:hue-rotate(30deg)}}
-@media (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){html[data-skin=glass] body::before{animation:glass-hue 30s ease-in-out infinite alternate}}
+html:is([data-skin=glass],[data-skin=flat]) body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:var(--noise),var(--desk)}
+/* warna tiap bubble berganti pelan sendiri-sendiri (hue diayun bolak-balik, durasi berbeda). Hanya desktop: tiap perubahan latar memaksa blur kaca
+   di kartu digambar ulang, terlalu berat untuk baterai HP */
+@keyframes bubble-hue{from{filter:hue-rotate(-40deg)}to{filter:hue-rotate(60deg)}}
+@media (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){html[data-skin=glass] .bubble{animation:bubble-hue 14s ease-in-out infinite alternate}html[data-skin=glass] .bubble-2{animation-duration:19s;animation-delay:-6s}html[data-skin=glass] .bubble-3{animation-duration:23s;animation-delay:-11s}}
+/* bubble Glass: lingkaran bertepi tegas (tanpa blur, tanpa grain), meluncur & memantul di pinggir layar lewat skrip bubble di main.js; selebar layar, bukan selebar .frame */
+html[data-skin=glass] .bubbles{width:100%;max-width:none;mix-blend-mode:normal}
+html[data-skin=glass] .bubbles::after{display:none}
+html[data-skin=glass] .bubble{width:clamp(120px,24vmin,260px);height:clamp(120px,24vmin,260px);opacity:1;filter:none} /* ukuran HP (diam); di desktop ukurannya diatur skrip */
+html[data-skin=glass] .bubble-1{background:var(--b1)}html[data-skin=glass] .bubble-2{background:var(--b2)}html[data-skin=glass] .bubble-3{background:var(--b3)}
 html:is([data-skin=glass],[data-skin=flat]) .frame{background:none;gap:var(--gap);padding:var(--gap) 0 0} /* tanpa padding bawah: CTA menempel ke dasar halaman seperti di neo */
 /* kartu kaca: buram + saturasi, tepi atas bercahaya, noise halus; isi yang tadinya berlatar kertas jadi tembus */
 html:is([data-skin=glass],[data-skin=flat]) .panel:not(.cta){--paper:transparent;background:var(--noise),var(--glass);border:1px solid var(--glass-brd);border-radius:24px;
@@ -521,7 +523,7 @@ html:is([data-skin=glass],[data-skin=flat]) .ctrl.lang{width:44px;padding:0;just
 /* strip tab yang menempel di bawah layar (HP): tiap tab berlatar kaca supaya isi di belakangnya tidak menembus jelas */
 html:is([data-skin=glass],[data-skin=flat]) .tabs-wrap.stack .tab:not([aria-selected="true"]){background:var(--glass);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
 /* garis bingkai, takik sambungan, garis titik penghubung, dan bubble dekoratif tidak dipakai saat panel terpisah */
-html:is([data-skin=glass],[data-skin=flat]) .frame::before,html:is([data-skin=glass],[data-skin=flat]) .frame::after,html:is([data-skin=glass],[data-skin=flat]) .bubbles,html:is([data-skin=glass],[data-skin=flat]) .skills-head::before,
+html:is([data-skin=glass],[data-skin=flat]) .frame::before,html:is([data-skin=glass],[data-skin=flat]) .frame::after,html[data-skin=flat] .bubbles,html:is([data-skin=glass],[data-skin=flat]) .skills-head::before,
 html:is([data-skin=glass],[data-skin=flat]) .panel.id::after,html:is([data-skin=glass],[data-skin=flat]) .panel.title::after,html:is([data-skin=glass],[data-skin=flat]) #pengalaman::after,
 html:is([data-skin=glass],[data-skin=flat]) .panel.half:not(.contact)::before,html:is([data-skin=glass],[data-skin=flat]) .panel.half:not(.contact)::after,
 html:is([data-skin=glass],[data-skin=flat]) .tabs-wrap.side::before,html:is([data-skin=glass],[data-skin=flat]) .tabs-wrap.side .tablist::before,html:is([data-skin=glass],[data-skin=flat]) .tabs-wrap.side .tablist::after{display:none}
@@ -568,7 +570,7 @@ html[data-skin=flat] .bar>i::before{display:none}
 /* pemisah pita keahlian: bintang svg disembunyikan, svg-nya sendiri jadi titik (bulat glass / kotak flat) */
 html:is([data-skin=glass],[data-skin=flat]) .tape-plus{width:8px;height:8px;background:currentColor;border-radius:50%}
 html:is([data-skin=glass],[data-skin=flat]) .tape-plus path{display:none}
-html[data-skin=flat] .tape-plus{border-radius:0;color:#A7ABB6} /* kotak abu muda di semua pita, senada dengan bintang abu neo */
+html[data-skin=flat] .tape-plus{border-radius:0;color:#A7ABB6} /* kotak abu muda (pita biru: biru muda), senada dengan bintang abu neo */
 html[data-skin=flat] .tape-light .tape-plus{color:#A7ABB6}
 /* keahlian: tanpa latar grid; pita & stiker jadi kaca (tembus + buram, bayangan lembut), bukan bayangan keras */
 html:is([data-skin=glass],[data-skin=flat]) .skills-wrap::before,html:is([data-skin=glass],[data-skin=flat]) .cta::before{display:none} /* latar grid di keahlian & CTA */
@@ -607,7 +609,7 @@ html:is([data-skin=glass],[data-skin=flat]) .cursor.label{background:color-mix(i
 /* ===== "Flat": tata letak sama dengan Glass, gaya datar bersih (ala toko modern): kartu abu sangat muda + border tipis,
    tanpa bayangan/blur/noise/cahaya, pil putih; warna mengikuti aksen tema (bisa diacak), plus versi pastelnya (--lime) ===== */
 html[data-skin=flat]{--display:'Manrope',system-ui,sans-serif;--mono:'Manrope',system-ui,sans-serif;--lime:color-mix(in srgb,var(--accent) 13%,#fff);
-  --glass:#f5f5f2;--glass-brd:#e6e6e1;--glass-hi:transparent;--noise:none;--glow:none;--desk:#fff;--paper:#fff;--card:#fff}
+  --glass:#f5f5f2;--glass-brd:#e6e6e1;--glass-hi:transparent;--noise:none;--desk:#fff;--paper:#fff;--card:#fff}
 html[data-skin=flat][data-theme=dark]{--glass:#1a1c1b;--glass-brd:#2b2e2c;--desk:#0f1110;--paper:#0f1110;--card:#1f2221;--lime:color-mix(in srgb,var(--accent) 22%,#0f1110)}
 html[data-skin=flat] body::before{background:var(--desk)}
 html[data-skin=flat] .panel:not(.cta){--paper:transparent;border-color:transparent;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none} /* kartu tanpa border: dibedakan dari latar putih lewat warna abu muda saja */
@@ -618,14 +620,16 @@ html[data-skin=flat] .ctrl.swatch,html[data-skin=flat] .ctrl.theme{border-color:
 html[data-skin=flat] .tablist{background:none;box-shadow:none;border:0;gap:2px} /* tanpa border: tiap tab blok putih terpisah celah tipis */
 html[data-skin=flat] .tab:not([aria-selected="true"]){background:var(--card)}
 html[data-skin=flat] :is(.tab,.tabs-wrap.stack .tab,.tabs-wrap.stack .tablist>:first-child){border:0!important}
-html[data-skin=flat] .tab[aria-selected="true"],html[data-skin=flat][data-theme=dark] .tab[aria-selected="true"]{background:var(--lime);box-shadow:none}
+html[data-skin=flat] .tab[aria-selected="true"],html[data-skin=flat][data-theme=dark] .tab[aria-selected="true"]{background:var(--ab);color:#fff;box-shadow:none} /* tab aktif: biru utama, teks putih */
+html[data-skin=flat] :is(.pro[aria-selected="true"] .nm small,.job[aria-selected="true"] .period){color:rgba(255,255,255,.75);opacity:1}
+html[data-skin=flat] .pro[aria-selected="true"] .no{color:#fff}
 html[data-skin=flat] .tabs-wrap.stack .tab:not([aria-selected="true"]){background:var(--card);-webkit-backdrop-filter:none;backdrop-filter:none}
-html[data-skin=flat] .tabs-wrap.stack .tab[aria-selected="true"]{box-shadow:inset 0 -2px 0 var(--accent)}
+html[data-skin=flat] .tabs-wrap.stack .tab[aria-selected="true"]{box-shadow:none}
 html[data-skin=flat] .shot.hero{box-shadow:none}
 html[data-skin=flat] .tape{background:var(--lime);color:var(--fg);box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
 html[data-skin=flat] .tape-light .tape{background:var(--card);box-shadow:none}
 html[data-skin=flat] .tape-ai .tape{background:var(--ab);color:#fff;box-shadow:none} /* urutan warna seperti neo: pita biru di AI, pita pertama pastel */
-html[data-skin=flat] .tape-ai .tape-plus{color:#A7ABB6}
+html[data-skin=flat] .tape-ai .tape-plus{color:color-mix(in srgb,var(--ab) 55%,#fff)} /* pita biru: biru muda seperti bintang neo */
 html[data-skin=flat] .st{box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
 html[data-skin=flat] .st-dark{background:var(--ab);border-color:var(--ab)}
 html[data-skin=flat] .st-in{background:var(--lime);color:var(--fg);border-color:var(--glass-brd)}
@@ -635,10 +639,11 @@ html[data-skin=flat] .cta{--accent:color-mix(in srgb,var(--ab) 58%,#000);backgro
 html[data-skin=flat] .skills-head::after{background:var(--ab)}
 html[data-skin=flat] :is(.tip,.cursor.label){background:var(--ab);border-color:var(--ab);box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
 /* kursor: cincin tipis polos, tanpa efek lensa */
-html[data-skin=flat] .cursor{border-color:transparent;background:color-mix(in srgb,var(--ab) 22%,transparent);box-shadow:none} /* tanpa border: lingkaran isi aksen tipis */
+html[data-skin=flat] .cursor{border-color:transparent;background:color-mix(in srgb,var(--ab) 22%,transparent);box-shadow:0 0 0 1px rgba(255,255,255,.6)} /* lingkaran isi aksen tipis; garis luar putih (tak terlihat di latar putih) menjaga tepinya tetap tampak di perbatasan area biru */
 html[data-skin=flat][data-theme=dark] .cursor{background:color-mix(in srgb,var(--accent) 28%,transparent)}
 html[data-skin=flat] .cursor::before{display:none}
 html[data-skin=flat] .cursor.big{background:color-mix(in srgb,var(--ab) 14%,transparent)}
+html[data-skin=flat] .cursor.on-accent:not(.label){background:rgba(255,255,255,.3)}html[data-skin=flat] .cursor.on-accent.big{background:rgba(255,255,255,.2)} /* area berlatar aksen di Flat (CTA, tab aktif, pita biru, tombol Layout): bulatan putih supaya kursor tetap terlihat */
 html[data-skin=flat] .cursor.label{border:0;background:var(--ab);color:#fff} /* label kursor: aksen solid tanpa border (menang atas .big) */
 /* judul: bobot medium & rapat seperti referensi datar; sorotan "Front-End" jadi pil aksen pastel, bukan blok hitam */
 html[data-skin=flat] :is(.title h1,.h2,.skills-head span,.cta-title){font-weight:500;letter-spacing:-.035em}
@@ -657,8 +662,8 @@ html[data-skin=glass] .cta-btn:not(.ghost){background:rgba(255,255,255,.88)}
 html[data-skin=flat] :is(.ctrl:not(.swatch):not(.theme),.mail,.cta-btn),html[data-skin=flat] .ctrl:is(.swatch,.theme){border:0}
 html[data-skin=flat] .cta-btn:not(.ghost){background:#fff;color:#111318}
 html[data-skin=flat] .cta-btn:not(.ghost):hover{background:#e6e7eb;color:#111318}
-html[data-skin=flat] .cta-btn.ghost{background:#111318;color:#fff}
-html[data-skin=flat] .cta-btn.ghost:hover{background:#2b2e36;color:#fff}
+html[data-skin=flat] .cta-btn.ghost{background:var(--accent);color:#fff} /* aksen gelap milik CTA Flat (lihat .cta di atas) */
+html[data-skin=flat] .cta-btn.ghost:hover{background:color-mix(in srgb,var(--accent) 80%,#000);color:#fff}
 /* tombol tema Flat tanpa border: separuh terang/gelap dibuat kontras dengan latar agar bentuknya tetap terbaca */
 html[data-skin=flat] .ctrl.theme{background:linear-gradient(90deg,#d9dad4 50%,#2b2c34 50%)}
 html[data-skin=flat][data-theme=dark] .ctrl.theme{background:linear-gradient(90deg,#F6F2E8 50%,#4a4d57 50%)}
@@ -685,3 +690,38 @@ html:is([data-skin=glass],[data-skin=flat]) .skills-head{--sy:1!important;--so:1
 html[data-skin=flat] .cta .foot{color:rgba(255,255,255,.78)}
 html[data-skin=flat] .cta .foot a{color:#fff}
 html[data-skin=flat] .cta .foot a:hover{color:rgba(255,255,255,.7)} /* hover bawaan berwarna aksen, tak terlihat di atas CTA beraksen */
+
+/* ===== pemilih layout (tombol "Layout" & panel kartu dari js/core.js): gaya mengikuti layout aktif.
+   CSS inti disisipkan setelah stylesheet ini, jadi tiap aturan di sini diawali html[data-skin=..] supaya lebih spesifik ===== */
+/* Neo: kertas krem, garis tinta, bayangan keras, judul Space Grotesk & keterangan Geist Mono */
+html[data-skin=neo] .lp{font-family:'Space Grotesk',sans-serif;color:#111318;--lp-bg:#F6F2E8;--lp-brd:#111318;--lp-mut:#5A5F6B}
+html[data-skin=neo][data-theme=dark] .lp{color:var(--fg);--lp-bg:var(--card);--lp-brd:var(--fg);--lp-mut:var(--muted)}
+html[data-skin=neo] :is(.lp-btn,.lp-panel,.lp-tip){border:1.5px solid var(--lp-brd);box-shadow:4px 4px 0 var(--lp-brd);-webkit-backdrop-filter:none;backdrop-filter:none}
+html[data-skin=neo] .lp-btn{transition:translate .2s ease,box-shadow .2s ease}
+html[data-skin=neo] .lp-btn:hover{translate:-1px -1px;box-shadow:5px 5px 0 var(--lp-brd)}
+html[data-skin=neo] .lp-panel{border-radius:8px}
+html[data-skin=neo] .lp-tip{border-radius:8px}
+html[data-skin=neo] .lp-s{font-family:'Geist Mono',monospace;font-size:12px}
+html[data-skin=neo] .lp-card{border:1.5px solid transparent;border-radius:6px}
+html[data-skin=neo] .lp-card:hover{background:color-mix(in srgb,var(--lp-brd) 7%,transparent)}
+html[data-skin=neo] .lp-card[aria-current=true]{border-color:var(--lp-brd);box-shadow:4px 4px 0 var(--accent)}
+html[data-skin=neo] .lp-card img{border-radius:3px;border-color:var(--lp-brd)}
+/* Glass: kaca lebih bening & buram, sudut besar, kartu terpilih bergaris aksen tipis dengan cahaya lembut */
+html[data-skin=glass] .lp{font-family:'Geist',system-ui,sans-serif;--lp-bg:rgba(255,255,255,.5);--lp-brd:rgba(255,255,255,.75)}
+html[data-skin=glass][data-theme=dark] .lp{--lp-bg:rgba(24,22,28,.5);--lp-brd:rgba(255,255,255,.16)}
+html[data-skin=glass] :is(.lp-btn,.lp-panel,.lp-tip){box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 14px 34px -14px rgba(0,0,0,.4);-webkit-backdrop-filter:blur(26px) saturate(170%);backdrop-filter:blur(26px) saturate(170%)}
+html[data-skin=glass][data-theme=dark] :is(.lp-btn,.lp-panel,.lp-tip){box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 14px 34px -14px rgba(0,0,0,.6)}
+html[data-skin=glass] .lp-panel{border-radius:24px}
+html[data-skin=glass] .lp-card{border:1px solid transparent;border-radius:16px}
+html[data-skin=glass] .lp-card[aria-current=true]{border-color:color-mix(in srgb,var(--accent) 55%,transparent);background:rgba(255,255,255,.22);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 16%,transparent)}
+html[data-skin=glass] .lp-card img{border-radius:11px}
+/* Flat: solid tanpa bayangan & sudut siku; tombol Layout & ajakan berlatar aksen (latar halaman putih), panel putih dengan garis rambut */
+html[data-skin=flat] .lp{font-family:'Manrope',system-ui,sans-serif;--lp-bg:#fff;--lp-brd:#e6e6e1}
+html[data-skin=flat][data-theme=dark] .lp{--lp-bg:#1f2221;--lp-brd:#2b2e2c}
+html[data-skin=flat] :is(.lp-btn,.lp-panel,.lp-tip){border-radius:0;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
+html[data-skin=flat] :is(.lp-btn,.lp-tip){border:0;background:var(--ab);color:#fff}
+html[data-skin=flat] .lp-btn:hover{background:color-mix(in srgb,var(--ab) 85%,#000)}
+html[data-skin=flat] .lp-card{border:0;border-radius:0}
+html[data-skin=flat] .lp-card:hover{background:var(--glass)}
+html[data-skin=flat] .lp-card[aria-current=true]{background:var(--lime)}
+html[data-skin=flat] .lp-card img{border-radius:0;border:0}
