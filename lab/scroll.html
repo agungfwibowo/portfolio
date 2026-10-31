@@ -109,6 +109,24 @@ try {
   .wheel button[aria-current=true]{color:var(--fg)}
   .wheel button[aria-current=true]::after{content:'';display:block;height:2px;margin-top:6px;background:var(--accent)}
   .wheel button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+  /* pengalaman: satu langkah, pekerjaan berjajar horizontal (scroll-snap). Tiap pekerjaan membawa titik dan garis waktunya sendiri;
+     pekerjaan berikutnya mengintip di kanan dengan fade */
+  /* --peek: ruang di kiri kolom teks tempat pekerjaan sebelumnya mengintip (memudar) */
+  .card.exp{--peek:56px;width:calc(min(540px,calc(62vw - 40px)) + var(--peek));padding-left:var(--peek);padding-top:8px}
+  .jobs{display:flex;gap:20px;margin-left:calc(var(--peek) * -1);padding:8px 0 0 var(--peek);scroll-padding-left:var(--peek);overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain;outline-offset:4px;
+    -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 var(--peek),#000 calc(100% - var(--fr,72px)),transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 var(--peek),#000 calc(100% - var(--fr,72px)),transparent 100%)}
+  .jobs::-webkit-scrollbar{display:none}
+  .jobs::after{content:'';flex:0 0 16%}
+  .job{position:relative;flex:0 0 84%;padding-top:30px;scroll-snap-align:start;scroll-snap-stop:always;cursor:default}
+  .job:not(.active){cursor:pointer}
+  .job::before{content:'';position:absolute;left:6px;right:-20px;top:6px;height:2px;margin-top:-1px;background:var(--line)}
+  .job:last-of-type::before{display:none}
+  .job.past::before{background:var(--fg)}
+  .job::after{content:'';position:absolute;left:0;top:0;width:12px;height:12px;border-radius:50%;border:2px solid var(--fg);background:var(--bg);transform-origin:0 50%;transition:transform .35s,background .35s,border-color .35s}
+  .job.past::after{background:var(--fg)}
+  .job.active::after{transform:scale(1.5);background:var(--accent);border-color:var(--accent)}
+  .job-ctrl{margin-top:12px;display:flex;justify-content:flex-end}
+  .job-ctrl .sl-ctrl{position:static}
   .hint{position:absolute;z-index:5;left:50%;bottom:16px;translate:-50% 0;font:600 13px/1 var(--sans);color:var(--muted);transition:opacity .4s;pointer-events:none}
   .hint.off{opacity:0}
   /* intro: latar kaca menyapu masuk dari kiri ke kanan (shader), baru teks muncul */
@@ -127,6 +145,7 @@ try {
     .headline span.tc{top:70px}
     .headline span.center{white-space:normal;width:calc(100vw - 32px)}
     .wheel{display:block}
+    .card.exp{--peek:0px;width:auto}
     .card,.card.contact,.card.cols{left:16px;right:16px;width:auto;top:auto;bottom:80px;max-height:calc(100svh - 250px)}
     .card.intro{width:calc(100vw - 32px);top:calc(50% + var(--name) + 26px);bottom:auto}
     .card.wide{padding-top:150px;padding-bottom:90px}
@@ -168,10 +187,10 @@ const D = lang === 'id' ? window.SITE.id : merge(window.SITE.id, window.SITE.en)
 document.documentElement.lang = lang
 const T = {
   id: { hello: 'Halo', chapters: 'Bab', hint: 'Scroll untuk lanjut', dark: 'Gelap', light: 'Terang', toDark: 'Pakai tema gelap', toLight: 'Pakai tema terang',
-    zoom: 'Perbesar', zoomImg: 'Perbesar gambar', shrinkImg: 'Perkecil gambar', close: 'Tutup', closeImg: 'Tutup gambar', prev: 'Gambar sebelumnya', next: 'Gambar berikutnya',
+    zoom: 'Perbesar', zoomImg: 'Perbesar gambar', shrinkImg: 'Perkecil gambar', close: 'Tutup', closeImg: 'Tutup gambar', prev: 'Gambar sebelumnya', next: 'Gambar berikutnya', prevJob: 'Pekerjaan sebelumnya', nextJob: 'Pekerjaan berikutnya',
     alt: (n, k, m) => `${n}, gambar ${k} dari ${m}` },
   en: { hello: 'Hello', chapters: 'Chapters', hint: 'Scroll to continue', dark: 'Dark', light: 'Light', toDark: 'Switch to dark theme', toLight: 'Switch to light theme',
-    zoom: 'Enlarge', zoomImg: 'Enlarge image', shrinkImg: 'Shrink image', close: 'Close', closeImg: 'Close image', prev: 'Previous image', next: 'Next image',
+    zoom: 'Enlarge', zoomImg: 'Enlarge image', shrinkImg: 'Shrink image', close: 'Close', closeImg: 'Close image', prev: 'Previous image', next: 'Next image', prevJob: 'Previous job', nextJob: 'Next job',
     alt: (n, k, m) => `${n}, image ${k} of ${m}` },
 }[lang]
 const A = '../' + D.assets
@@ -182,7 +201,7 @@ const root = document.documentElement
 const p = D.profile
 const chapters = [
   { word: p.name, label: T.hello, pos: 'center', calmTop: false, calmLow: -0.9, mid: true, col: [0, 0], cls: 'intro' },
-  { word: D.ui.nav[0], label: D.ui.nav[0], pos: 'bl', calmLow: -0.22, col: [0, 0], cls: '' },
+  { word: D.ui.nav[0], label: D.ui.nav[0], pos: 'bl', calmLow: -0.22, col: [0, 0], cls: 'exp' },
   { word: D.ui.nav[1], label: D.ui.nav[1], pos: 'tc', calmTop: false, calmLow: -0.9, col: [window.innerWidth < 768 ? 1.4 : 0.54, 1], cls: 'wide' },
   { word: D.ui.nav[2], label: D.ui.nav[2], pos: 'bl', calmLow: -0.08, col: [0, 0], cls: 'cols' },
   { word: D.ui.nav[3], label: D.ui.nav[3], pos: 'tl', calmTop: true, calmLow: -0.3, col: [0, 0], cls: 'contact' },
@@ -192,10 +211,17 @@ const add = (ch, html) => steps.push({ ch, html })
 
 add(0, `<h2>${esc(p.headline.highlight)} ${esc(p.headline.rest)} ${esc(p.headline.line2)}</h2><p>${esc(p.tagline)}</p>`)
 
-D.jobs.forEach(j => add(1, `<h2><small>${esc(j.period)}</small>${esc(j.company)}</h2>
-  <p class="meta">${esc(j.role)}</p><p>${esc(j.desc)}</p>`))
+const jobsHtml = D.jobs.map(j => `<article class="job"><h2><small>${esc(j.period)}</small>${esc(j.company)}</h2>
+  <p class="meta">${esc(j.role)}</p><p>${esc(j.desc)}</p></article>`).join('')
 
 const chev = d => `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${d}"/></svg>`
+const jobN = D.jobs.length
+add(1, `<div class="jobs" tabindex="0" role="group" aria-label="${esc(chapters[1].label)}">${jobsHtml}</div>
+  <div class="job-ctrl"><div class="sl-ctrl">
+    <button class="sl prev" type="button" aria-label="${T.prevJob}" disabled>${chev('M9 2.5 4.5 7 9 11.5')}</button>
+    <span class="sl-count" aria-hidden="true">1 / ${jobN}</span>
+    <button class="sl next" type="button" aria-label="${T.nextJob}">${chev('M5 2.5 9.5 7 5 11.5')}</button></div></div>`)
+
 D.projects.forEach(pr => {
   const multi = pr.imgs.length > 1
   const imgs = pr.imgs.map((f, k) => `<div class="slide"><img src="${A}${esc(f)}" alt="${esc(T.alt(pr.name, k + 1, pr.imgs.length))}" width="800" height="500" loading="lazy"></div>`).join('')
@@ -273,8 +299,9 @@ nav.addEventListener('click', e => {
   goChapter(+b.dataset.ch)
 })
 
-function goChapter(ch) {
-  const target = chapterStart(ch), y = target * innerHeight
+function goChapter(ch) { goStep(chapterStart(ch)) }
+function goStep(target) {
+  const ch = steps[target].ch, y = target * innerHeight
   // bab jauh (lebih dari 2 langkah): loncat langsung, tanpa menggulir melewati bab-bab di antaranya
   const far = Math.abs(target - Math.round(pos)) > 2
   if (far) {
@@ -331,6 +358,8 @@ requestAnimationFrame(fitCards)
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitCards)
 // roda di atas gambar tinggi / kartu yang meluber: gulir isinya selama masih ada sisa; di ujungnya serahkan ke halaman (Lenis)
 stage.addEventListener('wheel', e => {
+  const jobs = e.target.closest && e.target.closest('.jobs')
+  if (jobs) { jobs.toggleAttribute('data-lenis-prevent', Math.abs(e.deltaX) > Math.abs(e.deltaY)); return } // gesek horizontal = geser pekerjaan
   const slide = e.target.closest && e.target.closest('.slide.tall, .card.scrollable'); if (!slide) return
   const max = slide.scrollHeight - slide.clientHeight
   const can = (e.deltaY > 0 && slide.scrollTop < max - 1) || (e.deltaY < 0 && slide.scrollTop > 1)
@@ -352,7 +381,7 @@ function slideTo(sl, i) {
 }
 stage.addEventListener('click', e => {
   const b = e.target.closest('.sl'); if (!b) return
-  const sl = b.closest('.slider')
+  const sl = b.closest('.slider'); if (!sl) return // tombol slider pekerjaan ditangani sendiri
   slideTo(sl, +sl.dataset.i + (b.classList.contains('next') ? 1 : -1))
 })
 let swipeX = null, swipeY = 0
@@ -665,6 +694,28 @@ function moveTitle(ch, dir = 1) {
 const IDLE_MS = 2000
 let lastAct = performance.now(), drift = 0, idleAmp = 0, tFrame = performance.now(), frameN = 0, lastMain = ''
 ;['wheel', 'pointermove', 'pointerdown', 'keydown', 'touchstart', 'scroll'].forEach(ev => addEventListener(ev, () => { lastAct = performance.now() }, { passive: true }))
+/* ---------- pengalaman: slider horizontal (scroll-snap); titik/garis waktu ada di tiap pekerjaan ---------- */
+const jobsEl = stage.querySelector('.jobs'), jobsCard = jobsEl.closest('.card'), jobEls = [...jobsEl.querySelectorAll('.job')]
+const jPrev = jobsCard.querySelector('.sl.prev'), jNext = jobsCard.querySelector('.sl.next'), jCount = jobsCard.querySelector('.sl-count')
+const JOB_GAP = 20
+const jobW = () => jobEls[0].offsetWidth + JOB_GAP
+const jobAt = () => Math.max(0, Math.min(jobN - 1, Math.round(jobsEl.scrollLeft / jobW())))
+function jobsSync() {
+  const a = jobAt()
+  jobEls.forEach((el, i) => { el.classList.toggle('active', i === a); el.classList.toggle('past', i < a) })
+  jPrev.disabled = a === 0; jNext.disabled = a === jobN - 1
+  jCount.textContent = `${a + 1} / ${jobN}`
+  jobsEl.style.setProperty('--fr', a === jobN - 1 ? '0px' : '72px') // fade kanan hanya selama masih ada pekerjaan berikutnya
+}
+const jobTo = i => jobsEl.scrollTo({ left: Math.max(0, Math.min(jobN - 1, i)) * jobW(), behavior: still ? 'auto' : 'smooth' })
+jobsEl.addEventListener('scroll', jobsSync, { passive: true })
+jobsCard.addEventListener('click', e => {
+  const b = e.target.closest('.sl'); if (b) { jobTo(jobAt() + (b.classList.contains('next') ? 1 : -1)); return }
+  const j = e.target.closest('.job'); if (j) { const i = jobEls.indexOf(j); if (i !== jobAt()) jobTo(i) } // ketuk pekerjaan yang mengintip
+})
+addEventListener('resize', () => jobTo(jobAt()))
+jobsSync()
+
 /* ---------- menu roda (HP) ---------- */
 const wheelEl = document.createElement('nav')
 wheelEl.className = 'wheel'
@@ -745,8 +796,8 @@ function frame() {
 
   const step = Math.round(pos)
   if (step !== activeStep) {
-    activeStep = step
     const dir = Math.sign(step - activeStep) || 1
+    activeStep = step
     steps.forEach((s, i) => { s.el.classList.toggle('on', i === step); s.el.classList.toggle('before', i < step); s.el.classList.toggle('after', i > step) })
     updateCardFade(steps[step].el)
     const ch = steps[step].ch
