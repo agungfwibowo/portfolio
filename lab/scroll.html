@@ -9,8 +9,11 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
 <script>
-// tema dari pilihan di situs utama (kunci yang sama), default terang; diterapkan sebelum render
-try { if (localStorage.getItem('afw-theme') === 'dark') document.documentElement.dataset.theme = 'dark' } catch (e) {}
+// tema: pilihan tersimpan (kunci sama dengan situs utama) menang; kalau belum ada, ikut pengaturan sistem. Diterapkan sebelum render.
+try {
+  const saved = localStorage.getItem('afw-theme')
+  if (saved === 'dark' || (!saved && matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.dataset.theme = 'dark'
+} catch (e) {}
 </script>
 <style>
   /* Palet dari situs utama (themes/neo/style.css): kertas krem, tinta, satu biru.
@@ -47,9 +50,15 @@ try { if (localStorage.getItem('afw-theme') === 'dark') document.documentElement
   .headline span small{position:absolute;left:0;right:0;bottom:100%;margin-bottom:10px;font:600 14px/1.4 var(--sans);letter-spacing:0;color:var(--muted)}
 
   .card{position:absolute;z-index:4;right:var(--pad);bottom:clamp(20px,5vh,48px);width:min(420px,calc(50vw - 40px));max-height:calc(100svh - 150px);overflow:auto;
-    opacity:0;translate:0 14px;pointer-events:none;transition:opacity .4s,translate .4s;scrollbar-width:none}
+    opacity:0;translate:0 var(--sy,28px);pointer-events:none;transition:opacity .45s,translate .55s cubic-bezier(.2,.7,.2,1);scrollbar-width:none}
+  /* arah: kartu sebelum langkah aktif menunggu di atas, yang sesudahnya di bawah; jadi scroll ke bawah = isi lama naik pergi, isi baru naik masuk (dan sebaliknya) */
+  .card.before{--sy:-28px}
+  .card.after{--sy:28px}
   .card.on{opacity:1;translate:0 0;pointer-events:auto}
-  .card.intro{left:50%;right:auto;top:calc(50% + var(--name) * .5 + 30px);bottom:auto;width:min(980px,calc(100vw - 2 * var(--pad)));text-align:center;translate:-50% 14px}
+  /* kartu yang isinya lebih panjang dari layar (mis. keahlian): bisa digulir, pinggir memudar selagi masih ada sisa */
+  .card:not(.wide){-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 var(--ft,0px),#000 calc(100% - var(--fb,0px)),transparent 100%);
+    mask-image:linear-gradient(to bottom,transparent 0,#000 var(--ft,0px),#000 calc(100% - var(--fb,0px)),transparent 100%)}
+  .card.intro{left:50%;right:auto;top:calc(50% + var(--name) * .5 + 30px);bottom:auto;width:min(980px,calc(100vw - 2 * var(--pad)));text-align:center;translate:-50% var(--sy,28px)}
   .card.intro.on{translate:-50% 0}
   .card.intro h2{font-size:clamp(18px,1.8vw,24px);margin:0 0 6px}
   .card.intro p{margin:0}
@@ -92,6 +101,14 @@ try { if (localStorage.getItem('afw-theme') === 'dark') document.documentElement
   .links{display:flex;flex-wrap:wrap;gap:22px;margin-top:4px}
   .links a{color:var(--fg);font-weight:600;font-size:15px;text-underline-offset:.2em}
 
+  /* menu roda (khusus HP): satu bab di tengah, bab tetangga mengintip di kiri-kanan, tersusun di busur lingkaran
+     yang tidak digambar; digeser untuk memutar, berputar tanpa ujung */
+  .wheel{display:none;position:absolute;z-index:6;left:0;right:0;bottom:0;height:calc(64px + env(safe-area-inset-bottom));overflow:hidden;touch-action:pan-y;user-select:none;-webkit-user-select:none;
+    -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 11%,#000 89%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 11%,#000 89%,transparent 100%)}
+  .wheel button{position:absolute;left:50%;bottom:calc(14px + env(safe-area-inset-bottom));white-space:nowrap;padding:8px 12px;font:700 16px/1 var(--sans);color:var(--muted);background:none;border:0;cursor:pointer;transform-origin:50% 100%;will-change:transform,opacity}
+  .wheel button[aria-current=true]{color:var(--fg)}
+  .wheel button[aria-current=true]::after{content:'';display:block;height:2px;margin-top:6px;background:var(--accent)}
+  .wheel button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
   .hint{position:absolute;z-index:5;left:50%;bottom:16px;translate:-50% 0;font:600 13px/1 var(--sans);color:var(--muted);transition:opacity .4s;pointer-events:none}
   .hint.off{opacity:0}
   /* intro: latar kaca menyapu masuk dari kiri ke kanan (shader), baru teks muncul */
@@ -109,9 +126,10 @@ try { if (localStorage.getItem('afw-theme') === 'dark') document.documentElement
     .headline span:not(.center):not(.tc){bottom:auto;top:84px;font-size:clamp(48px,16vw,96px)}
     .headline span.tc{top:70px}
     .headline span.center{white-space:normal;width:calc(100vw - 32px)}
-    .card,.card.contact,.card.cols{left:16px;right:16px;width:auto;top:auto;bottom:16px;max-height:calc(100svh - 190px)}
-    .card.intro{width:calc(100vw - 32px);top:calc(50% + var(--name) + 26px)}
-    .card.wide{padding-top:150px}
+    .wheel{display:block}
+    .card,.card.contact,.card.cols{left:16px;right:16px;width:auto;top:auto;bottom:80px;max-height:calc(100svh - 250px)}
+    .card.intro{width:calc(100vw - 32px);top:calc(50% + var(--name) + 26px);bottom:auto}
+    .card.wide{padding-top:150px;padding-bottom:90px}
     .skillcols{grid-template-columns:1fr;gap:14px}
     .hint{display:none}
   }
@@ -225,6 +243,16 @@ const themeBtn = $('theme')
 const isDark = () => root.dataset.theme === 'dark'
 const syncThemeLabel = () => { themeBtn.textContent = isDark() ? T.light : T.dark; themeBtn.setAttribute('aria-label', isDark() ? T.toLight : T.toDark) }
 syncThemeLabel()
+// belum pernah memilih sendiri: ikuti perubahan tema sistem secara langsung
+try {
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+    let saved = null
+    try { saved = localStorage.getItem('afw-theme') } catch (err) {}
+    if (saved) return
+    root.dataset.theme = e.matches ? 'dark' : 'light'
+    syncThemeLabel(); applyTheme()
+  })
+} catch (e) {}
 
 nav.addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return
@@ -242,7 +270,11 @@ nav.addEventListener('click', e => {
     syncThemeLabel(); applyTheme()
     return
   }
-  const ch = +b.dataset.ch, target = chapterStart(ch), y = target * innerHeight
+  goChapter(+b.dataset.ch)
+})
+
+function goChapter(ch) {
+  const target = chapterStart(ch), y = target * innerHeight
   // bab jauh (lebih dari 2 langkah): loncat langsung, tanpa menggulir melewati bab-bab di antaranya
   const far = Math.abs(target - Math.round(pos)) > 2
   if (far) {
@@ -254,7 +286,7 @@ nav.addEventListener('click', e => {
     navBusy = true
     lenis.scrollTo(y, { duration: 1.2, onComplete: () => { navBusy = false; curCh = steps[Math.min(last, Math.round(lenis.scroll / innerHeight))].ch; gate.locked = false } })
   } else scrollTo({ top: y, behavior: 'smooth' })
-})
+}
 
 /* ukuran slider proyek: sebesar mungkin di tengah layar sesuai rasio gambar;
    gambar yang terlalu tinggi dijaga lebarnya dan isinya digulir di dalam bingkai */
@@ -269,7 +301,7 @@ function fitSlider(sl) {
   const desktop = innerWidth >= 768
   // desktop: maksimum 1200 x 600 px; HP: hampir selebar layar
   const boxW = desktop ? Math.min(innerWidth * 0.94, 1200) : innerWidth * 0.94
-  const boxH = Math.max(160, desktop ? Math.min(innerHeight - 290, 600) : innerHeight - 340)
+  const boxH = Math.max(160, desktop ? Math.min(innerHeight - 290, 600) : innerHeight - 386)
   const tall = boxH * ar < Math.min(boxW, 900) * 0.55
   slides.forEach(el => el.classList.toggle('tall', el === slide && tall))
   slide.tabIndex = tall ? 0 : -1
@@ -284,9 +316,22 @@ sliders.forEach(sl => sl.querySelectorAll('img').forEach(im => { if (!im.complet
 stage.querySelectorAll('.slide').forEach(el => el.addEventListener('scroll', () => updateFade(el), { passive: true }))
 addEventListener('resize', fitAll)
 fitAll()
-// roda di atas gambar tinggi: gulir gambar selama masih ada sisa; di ujungnya serahkan ke halaman (Lenis)
+// kartu yang meluber: tandai, pasang fade, dan perbarui saat digulir / layar berubah
+const scrollCards = [...stage.querySelectorAll('.card:not(.wide)')]
+function updateCardFade(el) {
+  const max = el.scrollHeight - el.clientHeight, over = max > 2
+  el.classList.toggle('scrollable', over)
+  el.style.setProperty('--ft', over && el.scrollTop > 4 ? '40px' : '0px')
+  el.style.setProperty('--fb', over && el.scrollTop < max - 4 ? '40px' : '0px')
+}
+const fitCards = () => scrollCards.forEach(updateCardFade)
+scrollCards.forEach(el => el.addEventListener('scroll', () => updateCardFade(el), { passive: true }))
+addEventListener('resize', fitCards)
+requestAnimationFrame(fitCards)
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitCards)
+// roda di atas gambar tinggi / kartu yang meluber: gulir isinya selama masih ada sisa; di ujungnya serahkan ke halaman (Lenis)
 stage.addEventListener('wheel', e => {
-  const slide = e.target.closest && e.target.closest('.slide.tall'); if (!slide) return
+  const slide = e.target.closest && e.target.closest('.slide.tall, .card.scrollable'); if (!slide) return
   const max = slide.scrollHeight - slide.clientHeight
   const can = (e.deltaY > 0 && slide.scrollTop < max - 1) || (e.deltaY < 0 && slide.scrollTop > 1)
   slide.toggleAttribute('data-lenis-prevent', can)
@@ -516,7 +561,8 @@ if (renderer) {
         float calm = max(uCalm.x * (1.0 - smoothstep(uCalmLow, uCalmLow + 0.28, sy)), uCalm.y * smoothstep(0.05, 0.45, sy));
         calm = max(calm, uCol.y * (1.0 - smoothstep(uCol.x, uCol.x + 0.2, abs(mapped.x / uResolution.y))));   // kolom tengah (bab proyek)
         calm = max(calm, uMid * (1.0 - smoothstep(0.12, 0.34, abs(sy))));   // tengah layar tenang di bab pembuka
-        calm = max(calm, 0.85 * smoothstep(0.36, 0.45, sy));   // jalur menu di atas selalu tenang
+        calm = max(calm, 0.85 * smoothstep(0.36, 0.45, sy));
+        calm = max(calm, 0.85 * (1.0 - smoothstep(-0.5, -0.36, sy)));   // jalur bawah (menu roda di HP)   // jalur menu di atas selalu tenang
         vec3 color = blobs(uv, nuv, calm);
 
         color *= 1.0 - uEdge * (1.0 - smoothstep(0.0, 0.04, f));   // garis tepi alur
@@ -588,13 +634,20 @@ const navBtns = [...nav.querySelectorAll('button[data-ch]')], titleSpans = [...t
 /* judul bab berpindah dengan animasi: judul baru meluncur dari posisi & ukuran judul lama,
    judul lama meluncur ke posisi baru sambil memudar (FLIP via Web Animations) */
 let activeCh = -1
-function moveTitle(ch) {
+function moveTitle(ch, dir = 1) {
   if (ch === activeCh) return
   const next = titleSpans[ch], prev = titleSpans[activeCh]
   const a = prev ? prev.getBoundingClientRect() : null
   titleSpans.forEach((s, i) => s.classList.toggle('on', i === ch))
   if (a && textShown && !still) {
     const b = next.getBoundingClientRect(), sc = a.height / b.height
+    if (Math.abs(a.left - b.left) < 6 && Math.abs(a.top - b.top) < 6) {
+      // posisi sama (mis. Experience -> Skills): geser vertikal mengikuti arah scroll
+      next.animate([{ opacity: 0, transform: `translateY(${dir * 26}px)` }, { opacity: 1, transform: 'none' }], { duration: 600, easing: 'cubic-bezier(.2,.7,.2,1)' })
+      prev.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: `translateY(${-dir * 26}px)` }], { duration: 450, easing: 'ease-in' })
+      activeCh = ch
+      return
+    }
     const o = 'top left', ease = 'cubic-bezier(.2,.7,.2,1)'
     next.animate([
       { transformOrigin: o, transform: `translate(${a.left - b.left}px,${a.top - b.top}px) scale(${sc})`, opacity: 0 },
@@ -612,6 +665,73 @@ function moveTitle(ch) {
 const IDLE_MS = 2000
 let lastAct = performance.now(), drift = 0, idleAmp = 0, tFrame = performance.now(), frameN = 0, lastMain = ''
 ;['wheel', 'pointermove', 'pointerdown', 'keydown', 'touchstart', 'scroll'].forEach(ev => addEventListener(ev, () => { lastAct = performance.now() }, { passive: true }))
+/* ---------- menu roda (HP) ---------- */
+const wheelEl = document.createElement('nav')
+wheelEl.className = 'wheel'
+wheelEl.setAttribute('aria-label', T.chapters)
+wheelEl.innerHTML = chapters.map((ch, i) => `<button type="button" data-i="${i}">${esc(ch.label)}</button>`).join('')
+stage.appendChild(wheelEl)
+const wheelBtns = [...wheelEl.children]
+const N = chapters.length, W_R = 700, W_STEP = 0.22 // radius busur (px) dan sudut antar bab (rad, sekitar 13 derajat)
+let wheelPos = 0, wheelTarget = 0, wheelDrag = null, wheelRaf = 0, wheelNavSuppress = false
+const wrapD = d => ((d + N / 2) % N + N) % N - N / 2 // selisih terpendek dalam [-N/2, N/2)
+function layoutWheel() {
+  wheelBtns.forEach((btn, i) => {
+    const d = wrapD(i - wheelPos), th = d * W_STEP, ad = Math.abs(d)
+    if (ad > 2.2) { btn.style.visibility = 'hidden'; return }
+    btn.style.visibility = 'visible'
+    btn.style.transform = `translate(calc(-50% + ${(W_R * Math.sin(th)).toFixed(1)}px), ${(W_R * (1 - Math.cos(th))).toFixed(1)}px) rotate(${(th * 57.2958).toFixed(1)}deg) scale(${(1.08 - ad * 0.12).toFixed(3)})`
+    btn.style.opacity = Math.max(0, 1 - ad * 0.38).toFixed(2)
+    btn.style.pointerEvents = ad < 1.6 ? 'auto' : 'none'
+  })
+}
+function wheelTick() {
+  wheelRaf = 0
+  if (!wheelDrag) wheelPos += (wheelTarget - wheelPos) * 0.2
+  if (!wheelDrag && Math.abs(wheelTarget - wheelPos) < 0.002) wheelPos = wheelTarget
+  layoutWheel()
+  if (wheelDrag || wheelPos !== wheelTarget) wheelRaf = requestAnimationFrame(wheelTick)
+}
+const wheelKick = () => { if (!wheelRaf) wheelRaf = requestAnimationFrame(wheelTick) }
+const chOf = pos => ((Math.round(pos) % N) + N) % N
+// ikut bab aktif bila halaman digulir (tanpa memicu navigasi lagi)
+function wheelSync(ch) {
+  wheelBtns.forEach((b, i) => b.setAttribute('aria-current', i === ch ? 'true' : 'false'))
+  if (wheelDrag || chOf(wheelTarget) === ch) return
+  wheelTarget = Math.round(wheelPos) + wrapD(ch - Math.round(wheelPos))
+  wheelKick()
+}
+wheelEl.addEventListener('pointerdown', e => {
+  wheelDrag = { x: e.clientX, pos: wheelPos, lastX: e.clientX, lastT: e.timeStamp, v: 0, moved: false }
+  wheelEl.setPointerCapture(e.pointerId); wheelKick()
+})
+wheelEl.addEventListener('pointermove', e => {
+  if (!wheelDrag) return
+  const dx = e.clientX - wheelDrag.x
+  if (Math.abs(dx) > 6) wheelDrag.moved = true
+  wheelPos = wheelDrag.pos - dx / (W_R * W_STEP)
+  const dt = Math.max(1, e.timeStamp - wheelDrag.lastT)
+  wheelDrag.v = 0.8 * wheelDrag.v + 0.2 * ((e.clientX - wheelDrag.lastX) / dt)
+  wheelDrag.lastX = e.clientX; wheelDrag.lastT = e.timeStamp
+})
+const wheelEnd = e => {
+  if (!wheelDrag) return
+  const d = wheelDrag; wheelDrag = null
+  if (!d.moved) return // ketukan biasa ditangani oleh klik tombol
+  wheelNavSuppress = true; setTimeout(() => { wheelNavSuppress = false }, 50)
+  const inertia = Math.max(-1.5, Math.min(1.5, -d.v * 220 / (W_R * W_STEP)))
+  wheelTarget = Math.round(wheelPos + inertia)
+  goChapter(chOf(wheelTarget)); wheelKick()
+}
+wheelEl.addEventListener('pointerup', wheelEnd)
+wheelEl.addEventListener('pointercancel', wheelEnd)
+wheelEl.addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b || wheelNavSuppress) return
+  wheelTarget = Math.round(wheelPos) + wrapD(+b.dataset.i - Math.round(wheelPos))
+  goChapter(+b.dataset.i); wheelKick()
+})
+layoutWheel()
+
 let pos = 0, bgPos = 0, activeStep = -1
 const calmNow = new THREE.Vector2(1, mobile ? 1 : 0)
 let calmLowNow = -0.2, midNow = 1
@@ -626,10 +746,13 @@ function frame() {
   const step = Math.round(pos)
   if (step !== activeStep) {
     activeStep = step
-    steps.forEach((s, i) => s.el.classList.toggle('on', i === step))
+    const dir = Math.sign(step - activeStep) || 1
+    steps.forEach((s, i) => { s.el.classList.toggle('on', i === step); s.el.classList.toggle('before', i < step); s.el.classList.toggle('after', i > step) })
+    updateCardFade(steps[step].el)
     const ch = steps[step].ch
     navBtns.forEach((b, i) => b.setAttribute('aria-current', i === ch ? 'true' : 'false'))
-    moveTitle(ch)
+    moveTitle(ch, dir)
+    wheelSync(ch)
     hint.classList.toggle('off', step > 0)
   }
 
