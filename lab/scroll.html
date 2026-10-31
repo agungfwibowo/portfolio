@@ -25,6 +25,8 @@ try {
   *{box-sizing:border-box}
   html,body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans)}
   .track{position:relative}
+  .track i{position:absolute;left:0;width:1px;scroll-snap-align:start;scroll-snap-stop:always}
+  html.snap{scroll-snap-type:y mandatory}
   .stage{position:fixed;inset:0;overflow:hidden;background:var(--bg)}
   canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 
@@ -107,7 +109,7 @@ try {
     -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 11%,#000 89%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 11%,#000 89%,transparent 100%)}
   .wheel button{position:absolute;left:50%;bottom:calc(14px + env(safe-area-inset-bottom));white-space:nowrap;padding:8px 12px;font:700 16px/1 var(--sans);color:var(--muted);background:none;border:0;cursor:pointer;transform-origin:50% 100%;will-change:transform,opacity}
   .wheel button[aria-current=true]{color:var(--fg)}
-  .wheel button[aria-current=true]::after{content:'';display:block;height:2px;margin-top:6px;background:var(--accent)}
+  .wheel button[aria-current=true]::after{content:'';position:absolute;left:12px;right:12px;bottom:1px;height:2px;background:var(--accent)}
   .wheel button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
   /* pengalaman: satu langkah, pekerjaan berjajar horizontal (scroll-snap). Tiap pekerjaan membawa titik dan garis waktunya sendiri;
      pekerjaan berikutnya mengintip di kanan dengan fade */
@@ -305,7 +307,7 @@ nav.addEventListener('click', e => {
 
 function goChapter(ch) { goStep(chapterStart(ch)) }
 function goStep(target) {
-  const ch = steps[target].ch, y = target * innerHeight
+  const ch = steps[target].ch, y = target * stepPx()
   // bab jauh (lebih dari 2 langkah): loncat langsung, tanpa menggulir melewati bab-bab di antaranya
   const far = Math.abs(target - Math.round(pos)) > 2
   if (far) {
@@ -315,7 +317,7 @@ function goStep(target) {
     pos = target; curCh = ch; gate.locked = false
   } else if (lenis) {
     navBusy = true
-    lenis.scrollTo(y, { duration: 1.2, onComplete: () => { navBusy = false; curCh = steps[Math.min(last, Math.round(lenis.scroll / innerHeight))].ch; gate.locked = false } })
+    lenis.scrollTo(y, { duration: 1.2, onComplete: () => { navBusy = false; curCh = steps[Math.min(last, Math.round(lenis.scroll / stepPx()))].ch; gate.locked = false } })
   } else scrollTo({ top: y, behavior: 'smooth' })
 }
 
@@ -405,7 +407,7 @@ let curCh = 0, navBusy = false
 const gate = { locked: false, dir: 0, t: 0 }
 function gateStep() {
   if (!lenis || navBusy) return
-  const vh = innerHeight, sc = lenis.scroll
+  const vh = stepPx(), sc = lenis.scroll
   const hi = curCh < chapters.length - 1 ? chapterStart(curCh + 1) * vh : Infinity
   const lo = curCh > 0 ? chapterEnd(curCh - 1) * vh : -Infinity
   let dir = 0, y = 0
@@ -439,7 +441,7 @@ let lenis = null
 if (matchMedia('(hover:hover) and (pointer:fine)').matches && !matchMedia('(prefers-reduced-motion:reduce)').matches) {
   import('https://cdn.jsdelivr.net/npm/lenis@1.1.20/+esm').then(({ default: Lenis }) => {
     lenis = new Lenis({ lerp: 0.09, wheelMultiplier: 1 })
-    curCh = steps[Math.min(last, Math.round(lenis.scroll / innerHeight))].ch
+    curCh = steps[Math.min(last, Math.round(lenis.scroll / stepPx()))].ch
     if (!textShown) lenis.stop() // dikunci selama intro
   }).catch(() => {})
 }
@@ -455,7 +457,15 @@ if (matchMedia('(hover:hover) and (pointer:fine)').matches) {
     if ((scrollY <= 0 && e.deltaY < 0) || (scrollY >= max - 1 && e.deltaY > 0)) e.preventDefault()
   }, { passive: false })
 }
-const setTrack = () => { track.style.height = steps.length * innerHeight + 'px' }
+// HP: satu langkah = 42% tinggi layar dan tiap langkah jadi titik snap (satu kibasan tak bisa melompati langkah); desktop: satu layar penuh
+const stepPx = () => innerWidth < 768 ? Math.round(innerHeight * 0.42) : innerHeight
+const setTrack = () => {
+  const st = stepPx(), snap = innerWidth < 768
+  track.style.height = (steps.length - 1) * st + innerHeight + 'px'
+  document.documentElement.classList.toggle('snap', snap)
+  track.querySelectorAll(':scope > i').forEach(n => n.remove())
+  if (snap) track.append(...steps.map((_, i) => { const a = document.createElement('i'); a.style.top = i * st + 'px'; a.style.height = st + 'px'; return a }))
+}
 
 /* ---------- kaca beralur: satu quad penuh + dua shader ----------
    Teknik mengikuti artikel "Animate beautiful fractal glass gradients with Three.js" (Franky, Arkon Digital).
@@ -794,7 +804,7 @@ const colNow = new THREE.Vector2(0, 0)
 
 function frame() {
   if (lenis) { lenis.raf(performance.now()); gateStep() }
-  const raw = Math.max(0, Math.min(last, (lenis ? lenis.scroll : scrollY) / innerHeight))
+  const raw = Math.max(0, Math.min(last, (lenis ? lenis.scroll : scrollY) / stepPx()))
   pos += (raw - pos) * (lenis ? 0.25 : 0.1) // Lenis sudah menghaluskan; sisanya tipis
   if (Math.abs(raw - pos) < 0.0005) pos = raw
 
