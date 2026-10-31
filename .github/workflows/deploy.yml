@@ -28,6 +28,7 @@ jobs:
           mkdir -p _site/lab
           cp -r index.html themes js assets _site/
           cp lab/scroll.html lab/glass.html _site/lab/
+          cp -r lab/scroll _site/lab/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
