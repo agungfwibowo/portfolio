@@ -1,0 +1,683 @@
+<!doctype html>
+<html lang="id" class="loading">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lab: Scroll di Tempat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
+<script>
+// tema dari pilihan di situs utama (kunci yang sama), default terang; diterapkan sebelum render
+try { if (localStorage.getItem('afw-theme') === 'dark') document.documentElement.dataset.theme = 'dark' } catch (e) {}
+</script>
+<style>
+  /* Palet dari situs utama (themes/neo/style.css): kertas krem, tinta, satu biru.
+     Huruf: Instrument Serif untuk nama besar (suara editorial di atas kaca), Manrope untuk antarmuka,
+     sama dengan skin Flat di situs utama. */
+  :root{--name:clamp(44px,7.4vw,112px);--bg:#EAE4D5;--card:#F6F2E8;--fg:#111318;--muted:#5A5F6B;--line:rgba(17,19,24,.28);--accent:#1D4ED8;--pad:clamp(16px,3vw,40px);
+    --serif:'Instrument Serif',Georgia,serif;--sans:'Manrope',system-ui,sans-serif}
+  html[data-theme=dark]{color-scheme:dark;--bg:#0d0e11;--card:#15171c;--fg:#e6e9f0;--muted:#a1a6b3;--line:rgba(255,255,255,.24);--accent:#7C9BF2}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans)}
+  .track{position:relative}
+  .stage{position:fixed;inset:0;overflow:hidden;background:var(--bg)}
+  canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+
+  .bar{position:absolute;z-index:5;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;gap:20px;padding:22px var(--pad)}
+  .mark{font-weight:800;font-size:18px}
+  .nav{display:flex;gap:26px;align-items:center}
+  .nav button{font:600 14px/1 var(--sans);color:var(--muted);background:none;border:0;padding:6px 0;cursor:pointer;border-bottom:2px solid transparent}
+  .nav button:hover{color:var(--fg)}
+  .nav button[aria-current=true]{color:var(--fg);border-bottom-color:var(--accent)}
+  .nav .theme,.nav .lang{color:var(--fg)}
+  .nav .lang{margin-left:6px}
+  .nav button:focus-visible,.links a:focus-visible,.mail:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+
+  /* kata bab: satu elemen per bab, posisinya berbeda (tengah, kiri bawah, tengah atas, kiri atas);
+     perpindahan antar posisi dianimasikan lewat JS (moveTitle) */
+  .headline{position:absolute;z-index:3;inset:0;margin:0;pointer-events:none}
+  .headline span{position:absolute;left:var(--pad);bottom:clamp(20px,5vh,48px);opacity:0;white-space:nowrap;
+    font:400 clamp(56px,9.5vw,150px)/.92 var(--serif);letter-spacing:-.02em}
+  .headline span.on{opacity:1}
+  .headline span.tl{bottom:auto;top:92px}
+  .headline span.tc{bottom:auto;top:68px;left:50%;translate:-50% 0;font-size:clamp(30px,3.4vw,48px)}
+  .headline span.center{left:50%;top:50%;bottom:auto;translate:-50% -50%;text-align:center;font-size:var(--name);line-height:1}
+  .headline span small{position:absolute;left:0;right:0;bottom:100%;margin-bottom:10px;font:600 14px/1.4 var(--sans);letter-spacing:0;color:var(--muted)}
+
+  .card{position:absolute;z-index:4;right:var(--pad);bottom:clamp(20px,5vh,48px);width:min(420px,calc(50vw - 40px));max-height:calc(100svh - 150px);overflow:auto;
+    opacity:0;translate:0 14px;pointer-events:none;transition:opacity .4s,translate .4s;scrollbar-width:none}
+  .card.on{opacity:1;translate:0 0;pointer-events:auto}
+  .card.intro{left:50%;right:auto;top:calc(50% + var(--name) * .5 + 30px);bottom:auto;width:min(980px,calc(100vw - 2 * var(--pad)));text-align:center;translate:-50% 14px}
+  .card.intro.on{translate:-50% 0}
+  .card.intro h2{font-size:clamp(18px,1.8vw,24px);margin:0 0 6px}
+  .card.intro p{margin:0}
+  .card.cols{width:min(680px,calc(62vw - 40px))}
+  .card.contact{right:auto;left:var(--pad);width:min(820px,calc(100vw - 2 * var(--pad)))}
+  .card h2{margin:0 0 8px;font-size:20px;line-height:1.25;font-weight:800;letter-spacing:-.01em}
+  .card h2 small{display:block;font:600 13px/1.4 var(--sans);color:var(--muted);margin-bottom:6px}
+  .card p{margin:0 0 10px;font-size:15px;line-height:1.55}
+  .card .meta{font-size:14px;color:var(--muted);margin:0 0 4px}
+  .slider{position:relative;overflow:hidden;height:clamp(110px,27vh,270px);margin-bottom:12px;border:1px solid var(--line);border-radius:4px;touch-action:pan-y}
+  .slides{display:flex;height:100%;transition:translate .35s}
+  .slide{flex:0 0 100%;width:100%;height:100%;overflow:hidden}
+  .slide img{width:100%;height:100%;object-fit:cover;object-position:top;display:block}
+  /* kontrol slider: satu batang gabungan [ ‹ | 1 / 3 | › ] di pojok kanan bawah gambar */
+  .sl-ctrl{position:absolute;right:10px;bottom:10px;display:flex;align-items:stretch;height:34px;background:var(--card);border:1px solid var(--fg);border-radius:4px;overflow:hidden}
+  .sl{display:grid;place-items:center;width:36px;padding:0;color:var(--fg);background:none;border:0;cursor:pointer;transition:background .15s,color .15s}
+  .sl:hover:not(:disabled){background:var(--fg);color:var(--bg)}
+  .sl:active:not(:disabled){opacity:.8}
+  .sl:disabled{opacity:.3;cursor:default}
+  .sl:focus-visible{outline:2px solid var(--accent);outline-offset:-4px}
+  .sl-count{display:grid;place-items:center;padding:0 11px;border-inline:1px solid var(--fg);font:700 12px/1 var(--sans);font-variant-numeric:tabular-nums}
+  /* bab proyek: gambar besar di tengah sesuai rasio aslinya, keterangan di tengah bawah */
+  .card.wide{left:0;right:0;top:0;bottom:0;width:auto;max-height:none;overflow:visible;padding:128px var(--pad) 26px;
+    display:grid;grid-template-rows:minmax(0,1fr) auto;justify-items:center;align-items:center;gap:16px}
+  .card.wide .slider{max-width:94vw;margin:0}
+  .card.wide .slider.anim{transition:width .35s,height .35s}
+  .card.wide .slide img{object-fit:contain}
+  /* gambar tinggi: lebar dijaga, isi di-scroll di dalam bingkai; pinggir atas/bawah memudar selagi masih ada yang bisa di-scroll */
+  .card.wide .slide.tall{overflow-y:auto;scrollbar-width:none;
+    -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 var(--ft,0px),#000 calc(100% - var(--fb,0px)),transparent 100%);
+    mask-image:linear-gradient(to bottom,transparent 0,#000 var(--ft,0px),#000 calc(100% - var(--fb,0px)),transparent 100%)}
+  .card.wide .slide.tall::-webkit-scrollbar{display:none}
+  .card.wide .slide.tall img{height:auto;object-fit:fill}
+  .card.wide .info{text-align:center;max-width:640px}
+  .card.wide .info h2{font-size:clamp(20px,2vw,26px)}
+  .skillcols{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+  .grp{margin:0 0 8px;font:800 14px/1.2 var(--sans)}
+  .plain{margin:0;padding:0;list-style:none;font-size:15px;line-height:1.7}
+  .mail{display:inline-block;margin:0 0 12px;color:var(--fg);font:400 clamp(30px,5.4vw,72px)/1.05 var(--serif);letter-spacing:-.01em;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:.12em;text-decoration-color:var(--accent)}
+  .links{display:flex;flex-wrap:wrap;gap:22px;margin-top:4px}
+  .links a{color:var(--fg);font-weight:600;font-size:15px;text-underline-offset:.2em}
+
+  .hint{position:absolute;z-index:5;left:50%;bottom:16px;translate:-50% 0;font:600 13px/1 var(--sans);color:var(--muted);transition:opacity .4s;pointer-events:none}
+  .hint.off{opacity:0}
+  /* intro: latar kaca menyapu masuk dari kiri ke kanan (shader), baru teks muncul */
+  html.loading{overflow:hidden}
+  html.lenis,html.lenis body{height:auto}
+  .lenis.lenis-smooth{scroll-behavior:auto!important}
+  .lenis.lenis-stopped{overflow:hidden}
+  .stage:not(.ready) :is(.card,.headline span,.hint){opacity:0!important}
+  .stage.intro .card.on{transition-delay:.35s}
+  .lil-gui.autoPlace{top:64px!important;right:auto!important;left:16px}
+
+  @media (max-width:767px){
+    .nav button:not(.theme):not(.lang){display:none}
+    :root{--name:clamp(34px,10.5vw,64px)}
+    .headline span:not(.center):not(.tc){bottom:auto;top:84px;font-size:clamp(48px,16vw,96px)}
+    .headline span.tc{top:70px}
+    .headline span.center{white-space:normal;width:calc(100vw - 32px)}
+    .card,.card.contact,.card.cols{left:16px;right:16px;width:auto;top:auto;bottom:16px;max-height:calc(100svh - 190px)}
+    .card.intro{width:calc(100vw - 32px);top:calc(50% + var(--name) + 26px)}
+    .card.wide{padding-top:150px}
+    .skillcols{grid-template-columns:1fr;gap:14px}
+    .hint{display:none}
+  }
+</style>
+<script src="../js/data.js"></script>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js"}}
+</script>
+</head>
+<body>
+<div class="track" id="track">
+  <div class="stage" id="stage">
+    <div class="bar">
+      <div class="mark" id="mark"></div>
+      <nav class="nav" id="nav" aria-label="Bab"></nav>
+    </div>
+    <h1 class="headline" id="title"></h1>
+    <div class="hint" id="hint"></div>
+  </div>
+</div>
+
+<script type="module">
+import * as THREE from 'three'
+
+/* Bahasa: sama seperti situs utama (js/core.js). English default; ?lang=id atau pilihan tersimpan ('afw-lang') mengganti. */
+function merge(a, b) {
+  if (b === undefined) return a
+  if (Array.isArray(a)) return a.map((x, i) => merge(x, b[i]))
+  if (a && typeof a === 'object') { const o = {}; Object.keys(a).forEach(k => { o[k] = merge(a[k], b[k]) }); return o }
+  return b
+}
+let lang = ''
+try { lang = new URLSearchParams(location.search).get('lang') || localStorage.getItem('afw-lang') || '' } catch (e) {}
+if (lang !== 'id' && lang !== 'en') lang = 'en'
+const D = lang === 'id' ? window.SITE.id : merge(window.SITE.id, window.SITE.en)
+document.documentElement.lang = lang
+const T = {
+  id: { hello: 'Halo', chapters: 'Bab', hint: 'Scroll untuk lanjut', dark: 'Gelap', light: 'Terang', toDark: 'Pakai tema gelap', toLight: 'Pakai tema terang',
+    zoom: 'Perbesar', zoomImg: 'Perbesar gambar', shrinkImg: 'Perkecil gambar', close: 'Tutup', closeImg: 'Tutup gambar', prev: 'Gambar sebelumnya', next: 'Gambar berikutnya',
+    alt: (n, k, m) => `${n}, gambar ${k} dari ${m}` },
+  en: { hello: 'Hello', chapters: 'Chapters', hint: 'Scroll to continue', dark: 'Dark', light: 'Light', toDark: 'Switch to dark theme', toLight: 'Switch to light theme',
+    zoom: 'Enlarge', zoomImg: 'Enlarge image', shrinkImg: 'Shrink image', close: 'Close', closeImg: 'Close image', prev: 'Previous image', next: 'Next image',
+    alt: (n, k, m) => `${n}, image ${k} of ${m}` },
+}[lang]
+const A = '../' + D.assets
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]))
+const root = document.documentElement
+
+/* Satu langkah = satu tinggi layar scroll. Bab = kelompok langkah berurutan. */
+const p = D.profile
+const chapters = [
+  { word: p.name, label: T.hello, pos: 'center', calmTop: false, calmLow: -0.9, mid: true, col: [0, 0], cls: 'intro' },
+  { word: D.ui.nav[0], label: D.ui.nav[0], pos: 'bl', calmLow: -0.22, col: [0, 0], cls: '' },
+  { word: D.ui.nav[1], label: D.ui.nav[1], pos: 'tc', calmTop: false, calmLow: -0.9, col: [window.innerWidth < 768 ? 1.4 : 0.54, 1], cls: 'wide' },
+  { word: D.ui.nav[2], label: D.ui.nav[2], pos: 'bl', calmLow: -0.08, col: [0, 0], cls: 'cols' },
+  { word: D.ui.nav[3], label: D.ui.nav[3], pos: 'tl', calmTop: true, calmLow: -0.3, col: [0, 0], cls: 'contact' },
+]
+const steps = []
+const add = (ch, html) => steps.push({ ch, html })
+
+add(0, `<h2>${esc(p.headline.highlight)} ${esc(p.headline.rest)} ${esc(p.headline.line2)}</h2><p>${esc(p.tagline)}</p>`)
+
+D.jobs.forEach(j => add(1, `<h2><small>${esc(j.period)}</small>${esc(j.company)}</h2>
+  <p class="meta">${esc(j.role)}</p><p>${esc(j.desc)}</p>`))
+
+const chev = d => `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${d}"/></svg>`
+D.projects.forEach(pr => {
+  const multi = pr.imgs.length > 1
+  const imgs = pr.imgs.map((f, k) => `<div class="slide"><img src="${A}${esc(f)}" alt="${esc(T.alt(pr.name, k + 1, pr.imgs.length))}" width="800" height="500" loading="lazy"></div>`).join('')
+  add(2, `<div class="slider" data-i="0" data-n="${pr.imgs.length}"><div class="slides">${imgs}</div>${multi ? `<div class="sl-ctrl">
+    <button class="sl prev" type="button" aria-label="${T.prev}" disabled>${chev('M9 2.5 4.5 7 9 11.5')}</button>
+    <span class="sl-count" aria-hidden="true">1 / ${pr.imgs.length}</span>
+    <button class="sl next" type="button" aria-label="${T.next}">${chev('M5 2.5 9.5 7 5 11.5')}</button></div>` : ''}</div>
+  <div class="info"><h2><small>${esc(pr.cat)}</small>${esc(pr.name)}</h2>
+  <p class="meta">${esc(D.ui.client)}: ${esc(pr.client)}</p><p class="meta">${esc(pr.tools)}</p></div>`)
+})
+
+add(3, `<h2>${esc(D.skills.title.join(' '))}</h2><div class="skillcols">` +
+  D.skills.groups.map(g => `<div><p class="grp">${esc(g.label)}</p><ul class="plain">${g.items.map(it => `<li>${esc(it.name)}</li>`).join('')}</ul></div>`).join('') + '</div>')
+
+const c = D.contact
+const wa = 'https://wa.me/' + c.whatsapp.replace(/\D/g, '') + '?text=' + encodeURIComponent(D.ui.waText)
+add(4, `<a class="mail" href="mailto:${esc(c.email)}">${esc(c.email)}</a><p>${esc(D.ui.cta.text)}</p>
+  <div class="links"><a href="${esc(c.linkedin)}" target="_blank" rel="noopener">LinkedIn</a>
+  <a href="${esc(wa)}" target="_blank" rel="noopener">WhatsApp</a></div>`)
+
+const last = steps.length - 1
+const chapterStart = ch => steps.findIndex(s => s.ch === ch)
+const chapterEnd = ch => steps.map(s => s.ch).lastIndexOf(ch)
+const $ = id => document.getElementById(id)
+const stage = $('stage'), track = $('track')
+$('mark').textContent = p.mark
+const nav = $('nav'), titleEl = $('title'), hint = $('hint')
+hint.textContent = T.hint
+nav.setAttribute('aria-label', T.chapters)
+nav.innerHTML = chapters.map((ch, i) => `<button data-ch="${i}">${esc(ch.label)}</button>`).join('') + `<button class="lang" id="lang" aria-label="${esc(D.ui.langAria)}">${esc(D.ui.lang)}</button><button class="theme" id="theme"></button>`
+titleEl.innerHTML = chapters.map((ch, i) => {
+  const kicker = i === 0 ? `<small>${esc(p.location)} · ${esc(p.since)}</small>` : ''
+  return `<span class="${ch.pos === 'bl' ? '' : ch.pos}">${kicker}${esc(ch.word)}</span>`
+}).join('')
+steps.forEach(s => {
+  const el = document.createElement('section')
+  el.className = 'card ' + chapters[s.ch].cls
+  el.innerHTML = s.html
+  stage.appendChild(el)
+  s.el = el
+})
+
+/* tema: gelap/terang, kunci penyimpanan sama dengan situs utama */
+const themeBtn = $('theme')
+const isDark = () => root.dataset.theme === 'dark'
+const syncThemeLabel = () => { themeBtn.textContent = isDark() ? T.light : T.dark; themeBtn.setAttribute('aria-label', isDark() ? T.toLight : T.toDark) }
+syncThemeLabel()
+
+nav.addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return
+  if (b.id === 'lang') {
+    const next = lang === 'en' ? 'id' : 'en'
+    try { localStorage.setItem('afw-lang', next) } catch (err) {}
+    const u = new URL(location.href)
+    if (next === 'en') u.searchParams.delete('lang'); else u.searchParams.set('lang', next)
+    location.href = u.pathname + u.search + u.hash
+    return
+  }
+  if (b === themeBtn) {
+    root.dataset.theme = isDark() ? 'light' : 'dark'
+    try { localStorage.setItem('afw-theme', root.dataset.theme) } catch (err) {}
+    syncThemeLabel(); applyTheme()
+    return
+  }
+  const ch = +b.dataset.ch, target = chapterStart(ch), y = target * innerHeight
+  // bab jauh (lebih dari 2 langkah): loncat langsung, tanpa menggulir melewati bab-bab di antaranya
+  const far = Math.abs(target - Math.round(pos)) > 2
+  if (far) {
+    if (lenis) lenis.scrollTo(y, { immediate: true, force: true }); else scrollTo({ top: y, behavior: 'instant' })
+    // latar tidak menyapu seluruh jarak (itu yang membuatnya berputar cepat): mulai dari satu langkah di sebelum tujuan lalu mengendap pelan
+    bgPos = target - Math.sign(target - Math.round(pos))
+    pos = target; curCh = ch; gate.locked = false
+  } else if (lenis) {
+    navBusy = true
+    lenis.scrollTo(y, { duration: 1.2, onComplete: () => { navBusy = false; curCh = steps[Math.min(last, Math.round(lenis.scroll / innerHeight))].ch; gate.locked = false } })
+  } else scrollTo({ top: y, behavior: 'smooth' })
+})
+
+/* ukuran slider proyek: sebesar mungkin di tengah layar sesuai rasio gambar;
+   gambar yang terlalu tinggi dijaga lebarnya dan isinya digulir di dalam bingkai */
+function updateFade(slide) {
+  const max = slide.scrollHeight - slide.clientHeight
+  slide.style.setProperty('--ft', slide.scrollTop > 4 ? '56px' : '0px')
+  slide.style.setProperty('--fb', slide.scrollTop < max - 4 ? '56px' : '0px')
+}
+function fitSlider(sl) {
+  const slides = sl.querySelectorAll('.slide'), slide = slides[+sl.dataset.i], im = slide.querySelector('img')
+  const ar = (im.naturalWidth || 800) / (im.naturalHeight || 500)
+  const desktop = innerWidth >= 768
+  // desktop: maksimum 1200 x 600 px; HP: hampir selebar layar
+  const boxW = desktop ? Math.min(innerWidth * 0.94, 1200) : innerWidth * 0.94
+  const boxH = Math.max(160, desktop ? Math.min(innerHeight - 290, 600) : innerHeight - 340)
+  const tall = boxH * ar < Math.min(boxW, 900) * 0.55
+  slides.forEach(el => el.classList.toggle('tall', el === slide && tall))
+  slide.tabIndex = tall ? 0 : -1
+  if (tall) { sl.style.width = Math.min(boxW, 900) + 'px'; sl.style.height = boxH + 'px' }
+  else { const w = Math.min(boxW, boxH * ar); sl.style.width = w + 'px'; sl.style.height = w / ar + 'px' }
+  slide.scrollTop = 0
+  requestAnimationFrame(() => updateFade(slide))
+}
+const sliders = [...stage.querySelectorAll('.slider')]
+const fitAll = () => sliders.forEach(fitSlider)
+sliders.forEach(sl => sl.querySelectorAll('img').forEach(im => { if (!im.complete) im.addEventListener('load', () => fitSlider(sl), { once: true }) }))
+stage.querySelectorAll('.slide').forEach(el => el.addEventListener('scroll', () => updateFade(el), { passive: true }))
+addEventListener('resize', fitAll)
+fitAll()
+// roda di atas gambar tinggi: gulir gambar selama masih ada sisa; di ujungnya serahkan ke halaman (Lenis)
+stage.addEventListener('wheel', e => {
+  const slide = e.target.closest && e.target.closest('.slide.tall'); if (!slide) return
+  const max = slide.scrollHeight - slide.clientHeight
+  const can = (e.deltaY > 0 && slide.scrollTop < max - 1) || (e.deltaY < 0 && slide.scrollTop > 1)
+  slide.toggleAttribute('data-lenis-prevent', can)
+}, { capture: true, passive: true })
+
+/* slider gambar proyek: tombol chevron + geser jari */
+function slideTo(sl, i) {
+  const n = +sl.dataset.n
+  i = Math.max(0, Math.min(n - 1, i))
+  sl.dataset.i = i
+  sl.querySelector('.slides').style.translate = `${-i * 100}% 0`
+  const prev = sl.querySelector('.prev'), next = sl.querySelector('.next'), cnt = sl.querySelector('.sl-count')
+  if (prev) prev.disabled = i === 0
+  if (next) next.disabled = i === n - 1
+  if (cnt) cnt.textContent = `${i + 1} / ${n}`
+  sl.classList.add('anim'); fitSlider(sl)
+  setTimeout(() => sl.classList.remove('anim'), 420)
+}
+stage.addEventListener('click', e => {
+  const b = e.target.closest('.sl'); if (!b) return
+  const sl = b.closest('.slider')
+  slideTo(sl, +sl.dataset.i + (b.classList.contains('next') ? 1 : -1))
+})
+let swipeX = null, swipeY = 0
+stage.addEventListener('touchstart', e => { swipeX = e.target.closest('.slider') ? e.touches[0].clientX : null; swipeY = e.touches[0].clientY }, { passive: true })
+stage.addEventListener('touchend', e => {
+  const sl = e.target.closest('.slider')
+  if (swipeX === null || !sl) return
+  const dx = e.changedTouches[0].clientX - swipeX
+  const dy = e.changedTouches[0].clientY - swipeY
+  if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) slideTo(sl, +sl.dataset.i + (dx < 0 ? 1 : -1))
+  swipeX = null
+})
+/* Gerbang bab (desktop): scroll berhenti di pintu masuk bab. Masuk dari atas berhenti di langkah pertama bab,
+   masuk dari bawah berhenti di langkah terakhirnya. Satu kibasan tidak bisa menembus gerbang; untuk lanjut
+   perlu gestur scroll baru (jeda, atau kibasan yang menguat lagi), atau berbalik arah. */
+let curCh = 0, navBusy = false
+const gate = { locked: false, dir: 0, t: 0 }
+function gateStep() {
+  if (!lenis || navBusy) return
+  const vh = innerHeight, sc = lenis.scroll
+  const hi = curCh < chapters.length - 1 ? chapterStart(curCh + 1) * vh : Infinity
+  const lo = curCh > 0 ? chapterEnd(curCh - 1) * vh : -Infinity
+  let dir = 0, y = 0
+  if (sc >= hi - 0.5) { dir = 1; y = hi } else if (sc <= lo + 0.5) { dir = -1; y = lo }
+  if (!dir) return
+  curCh += dir
+  lenis.scrollTo(y, { immediate: true, force: true }) // buang sisa momentum, berhenti tepat di pintu
+  gate.locked = true; gate.dir = dir; gate.t = performance.now()
+}
+let lastWheelT = 0, lastWheelAbs = 0
+addEventListener('wheel', e => {
+  if (!lenis || e.ctrlKey || navBusy) return
+  if (e.target.closest && e.target.closest('[data-lenis-prevent]')) return // gulir di dalam gambar tinggi
+  const dy = e.deltaY, dir = Math.sign(dy), now = e.timeStamp
+  if (gate.locked) {
+    if (dir && dir !== gate.dir) gate.locked = false // berbalik arah: bebas
+    else {
+      const fresh = now - lastWheelT > 160 || (Math.abs(dy) > lastWheelAbs * 1.3 + 2 && performance.now() - gate.t > 300)
+      lastWheelT = now; lastWheelAbs = Math.abs(dy)
+      if (!fresh) { e.preventDefault(); e.stopImmediatePropagation(); return } // sisa kibasan yang sama: telan
+      gate.locked = false
+    }
+  }
+  lastWheelT = now; lastWheelAbs = Math.abs(dy)
+}, { capture: true, passive: false })
+
+/* Lenis: scroll mulus untuk mouse/trackpad. Layar sentuh dibiarkan native (tarik-untuk-refresh tetap jalan),
+   dan dimatikan bila perangkat meminta animasi dikurangi. Lenis menggerakkan scroll lewat JS sehingga
+   rubber band macOS tidak muncul; kalau CDN gagal, pengaman wheel di bawah yang bekerja. */
+let lenis = null
+if (matchMedia('(hover:hover) and (pointer:fine)').matches && !matchMedia('(prefers-reduced-motion:reduce)').matches) {
+  import('https://cdn.jsdelivr.net/npm/lenis@1.1.20/+esm').then(({ default: Lenis }) => {
+    lenis = new Lenis({ lerp: 0.09, wheelMultiplier: 1 })
+    curCh = steps[Math.min(last, Math.round(lenis.scroll / innerHeight))].ch
+    if (!textShown) lenis.stop() // dikunci selama intro
+  }).catch(() => {})
+}
+
+/* Matikan rubber band macOS lewat JS. Hanya untuk pointer halus (mouse/trackpad);
+   layar sentuh tidak disentuh, jadi tarik-untuk-refresh di HP tetap bekerja. */
+if (matchMedia('(hover:hover) and (pointer:fine)').matches) {
+  root.style.overscrollBehavior = 'none'
+  document.body.style.overscrollBehavior = 'none'
+  addEventListener('wheel', e => {
+    if (e.ctrlKey || lenis) return // cubit-zoom trackpad; Lenis sudah menangani wheel sendiri
+    const max = document.documentElement.scrollHeight - innerHeight
+    if ((scrollY <= 0 && e.deltaY < 0) || (scrollY >= max - 1 && e.deltaY > 0)) e.preventDefault()
+  }, { passive: false })
+}
+const setTrack = () => { track.style.height = steps.length * innerHeight + 'px' }
+
+/* ---------- kaca beralur: satu quad penuh + dua shader ----------
+   Teknik mengikuti artikel "Animate beautiful fractal glass gradients with Three.js" (Franky, Arkon Digital).
+   1. Peta noise simplex 256x256 dirender dulu ke render target kecil (jauh lebih murah daripada
+      menghitung noise di tiap piksel layar). Kanal r dan g = dua arah warp.
+   2. Koordinat piksel (satuan CSS px, titik nol di tengah) dibagi menjadi alur selebar uFluteWidth.
+      Di tiap alur, x digeser sebesar uFluteStrength * (fract - 0.5): sisi kiri melihat ke kiri,
+      sisi kanan ke kanan, jadi tiap alur menampilkan pandangan lebih lebar (efek zoom-out).
+   3. Warna = beberapa gumpalan Gaussian yang dicampur di atas warna dasar halaman (krem / gelap),
+      posisinya digerakkan oleh scroll dan kursor (bukan animasi otomatis), diwarp noise.
+      Area di belakang teks ditenangkan supaya teks tetap terbaca. Butiran halus ditambahkan terakhir. */
+const params = { fluteWidth: 70, bias: 1.3, warp: 0.2, grain: 0.08 }
+if (matchMedia('(max-width:767px)').matches) params.fluteWidth = 44
+const still = matchMedia('(prefers-reduced-motion:reduce)').matches
+const mobile = matchMedia('(max-width:767px)').matches
+
+const PALETTE = {
+  light: { base: '#EAE4D5', c1: '#1D4ED8', c2: '#111318', c3: '#9DB4F5', edge: 0.16, grain: 0.045 },
+  dark: { base: '#0d0e11', c1: '#2b5be6', c2: '#7C9BF2', c3: '#0a1a5c', edge: 0.35, grain: 0.1 },
+}
+const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16) / 255)
+
+let lastKey = '' // kunci keadaan frame terakhir yang digambar; kosongkan untuk memaksa gambar ulang
+let renderer = null
+try { renderer = new THREE.WebGLRenderer({ antialias: false }) } catch (e) { renderer = null }
+let mat, noiseMat, noiseRT, noiseScene, scene, cam
+function applyTheme() {
+  if (!renderer) return
+  const t = PALETTE[isDark() ? 'dark' : 'light'], u = mat.uniforms
+  u.uBase.value.set(...hex(t.base)); u.uC1.value.set(...hex(t.c1)); u.uC2.value.set(...hex(t.c2)); u.uC3.value.set(...hex(t.c3))
+  u.uEdge.value = t.edge; u.uGrainStrength.value = t.grain * (params.grain / 0.08)
+  lastKey = ''
+}
+if (renderer) {
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5))
+  stage.prepend(renderer.domElement)
+  cam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1) // tidak dipakai shader: vertex langsung jadi NDC
+  const vert = 'varying vec2 vUvA; void main(){ vUvA = uv; gl_Position = vec4(position, 1.0); }'
+
+  noiseRT = new THREE.WebGLRenderTarget(256, 256, { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, depthBuffer: false })
+  noiseMat = new THREE.ShaderMaterial({
+    uniforms: { uTime: { value: 0 }, uNoiseScaleX: { value: 1.6 }, uNoiseScaleY: { value: 1.0 }, uWarpSpeed: { value: 1 } },
+    vertexShader: vert,
+    fragmentShader: `
+      precision highp float;
+      uniform float uTime, uNoiseScaleX, uNoiseScaleY, uWarpSpeed;
+      varying vec2 vUvA;
+      vec3 mod289(vec3 x){ return x - floor(x * (1.0 / 289.0)) * 289.0; }
+      vec2 mod289(vec2 x){ return x - floor(x * (1.0 / 289.0)) * 289.0; }
+      vec3 permute(vec3 x){ return mod289(((x * 34.0) + 1.0) * x); }
+      float snoise(vec2 v){
+        const vec4 C = vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439);
+        vec2 i = floor(v + dot(v, C.yy)); vec2 x0 = v - i + dot(i, C.xx);
+        vec2 i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+        vec4 x12 = x0.xyxy + C.xxzz; x12.xy -= i1;
+        i = mod289(i);
+        vec3 p = permute(permute(i.y + vec3(0.0, i1.y, 1.0)) + i.x + vec3(0.0, i1.x, 1.0));
+        vec3 m = max(0.5 - vec3(dot(x0, x0), dot(x12.xy, x12.xy), dot(x12.zw, x12.zw)), 0.0);
+        m = m * m; m = m * m;
+        vec3 x = 2.0 * fract(p * C.www) - 1.0; vec3 h = abs(x) - 0.5; vec3 ox = floor(x + 0.5); vec3 a0 = x - ox;
+        m *= 1.79284291400159 - 0.85373472095314 * (a0 * a0 + h * h);
+        vec3 g; g.x = a0.x * x0.x + h.x * x0.y; g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+        return 130.0 * dot(m, g);
+      }
+      void main(){
+        float t = uTime * uWarpSpeed;
+        float nx = snoise(vUvA * vec2(uNoiseScaleX, uNoiseScaleY) + t * 0.5);
+        float ny = snoise(vUvA * vec2(uNoiseScaleX, uNoiseScaleY) * 0.93 - t * 0.3);
+        gl_FragColor = vec4(nx * 0.5 + 0.5, ny * 0.5 + 0.5, 0.0, 1.0);
+      }`,
+  })
+  noiseScene = new THREE.Scene()
+  noiseScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), noiseMat))
+
+  // butiran: tekstur acak kecil yang diulang (dibuat di kode, tanpa file gambar)
+  const gsize = 256, gdata = new Uint8Array(gsize * gsize * 4)
+  for (let k = 0; k < gdata.length; k += 4) { const v = Math.random() * 255; gdata[k] = gdata[k + 1] = gdata[k + 2] = v; gdata[k + 3] = 255 }
+  const grainTex = new THREE.DataTexture(gdata, gsize, gsize)
+  grainTex.wrapS = grainTex.wrapT = THREE.RepeatWrapping
+  grainTex.needsUpdate = true
+
+  mat = new THREE.ShaderMaterial({
+    uniforms: {
+      uResolution: { value: new THREE.Vector2(1, 1) }, uPixelRatio: { value: 1 },
+      uMouse: { value: new THREE.Vector2() }, uPos: { value: 0 }, uTime: { value: 0 }, uReveal: { value: 0 },
+      uCalm: { value: new THREE.Vector2(1, mobile ? 1 : 0) }, uCalmLow: { value: -0.2 }, uMid: { value: 1 }, uCol: { value: new THREE.Vector2(0, 0) },
+      uFluteWidth: { value: params.fluteWidth }, uFluteStrength: { value: params.fluteWidth * params.bias },
+      uWarpStrength: { value: params.warp }, uEdge: { value: 0.16 }, uGrainStrength: { value: 0.07 },
+      uNoiseMap: { value: noiseRT.texture }, uGrainTexture: { value: grainTex },
+      uBase: { value: new THREE.Vector3() }, uC1: { value: new THREE.Vector3() }, uC2: { value: new THREE.Vector3() }, uC3: { value: new THREE.Vector3() },
+    },
+    vertexShader: vert,
+    fragmentShader: `
+      precision highp float;
+      uniform vec2 uResolution, uMouse, uCalm; uniform vec2 uCol; uniform float uCalmLow, uMid, uReveal, uPixelRatio, uPos, uTime, uFluteWidth, uFluteStrength, uWarpStrength, uEdge, uGrainStrength;
+      uniform sampler2D uNoiseMap, uGrainTexture;
+      uniform vec3 uBase, uC1, uC2, uC3;
+      varying vec2 vUvA;
+
+      vec3 blobs(vec2 uv, vec2 nuv, float calm){
+        float t = uTime * 0.6 + 3.5;
+        vec2 p1 = vec2(-0.55 + sin(t * 0.7 + 0.5) * 0.15, 0.10 + cos(t * 0.5) * 0.12) + uMouse * 0.04;
+        vec2 p2 = vec2(-0.15 + sin(t * 0.55 + 2.0) * 0.18, -0.15 + cos(t * 0.65 + 1.0) * 0.14);
+        vec2 p3 = vec2( 0.25 + sin(t * 0.6 + 4.0) * 0.16, 0.18 + cos(t * 0.45 + 2.5) * 0.13);
+        vec2 p4 = vec2( 0.55 + sin(t * 0.5 + 1.2) * 0.14, -0.10 + cos(t * 0.7 + 3.1) * 0.15);
+        vec2 p5 = vec2( 0.00 + sin(t * 0.4 + 5.0) * 0.25, 0.30 + cos(t * 0.6 + 0.3) * 0.10);
+
+        vec2 warpNoise = texture2D(uNoiseMap, nuv).rg * 2.0 - 1.0;
+        vec2 w = uv + warpNoise * uWarpStrength;
+        float k = 1.0 - 0.92 * calm;     // area teks: warna gumpalan nyaris hilang
+        vec3 col = uBase;
+        col = mix(col, uC3, clamp(exp(-dot(w - p2, w - p2) * 7.0) * 0.9 * k, 0.0, 1.0));
+        col = mix(col, uC1, clamp(exp(-dot(w - p1, w - p1) * 12.0) * 1.1 * k, 0.0, 1.0));
+        col = mix(col, uC1, clamp(exp(-dot(w - p4, w - p4) * 12.0) * 1.0 * k, 0.0, 1.0));
+        col = mix(col, uC2, clamp(exp(-dot(w - p3, w - p3) * 13.0) * 0.85 * k, 0.0, 1.0));
+        col = mix(col, uC2, clamp(exp(-dot(w - p5, w - p5) * 15.0) * 0.7 * k, 0.0, 1.0));
+        return col;
+      }
+
+      void main(){
+        // piksel CSS, titik nol di tengah layar
+        vec2 mapped = gl_FragCoord.xy / uPixelRatio - uResolution * 0.5;
+        vec2 scaled = mapped / vec2(uFluteWidth);
+        float f = fract(scaled.x);
+        float flutedX = uFluteStrength * (f - 0.5);
+        vec2 fluted = vec2(mapped.x + flutedX, mapped.y);
+        // intro: tiap alur masuk berurutan dari kiri ke kanan, isinya naik sambil muncul
+        float count = uResolution.x / uFluteWidth;
+        float norm = (floor(scaled.x) + count * 0.5) / count;
+        float rv = smoothstep(norm * 0.55, norm * 0.55 + 0.45, uReveal);
+        fluted.y -= (1.0 - rv) * uResolution.y * 0.35;
+
+        vec2 uv = fluted / uResolution.y;               // y: -0.5..0.5, x menyesuaikan aspek
+        vec2 nuv = fluted / uResolution + 0.5;          // 0..1 untuk membaca peta noise
+        float sy = mapped.y / uResolution.y;            // posisi vertikal layar sebenarnya
+        float calm = max(uCalm.x * (1.0 - smoothstep(uCalmLow, uCalmLow + 0.28, sy)), uCalm.y * smoothstep(0.05, 0.45, sy));
+        calm = max(calm, uCol.y * (1.0 - smoothstep(uCol.x, uCol.x + 0.2, abs(mapped.x / uResolution.y))));   // kolom tengah (bab proyek)
+        calm = max(calm, uMid * (1.0 - smoothstep(0.12, 0.34, abs(sy))));   // tengah layar tenang di bab pembuka
+        calm = max(calm, 0.85 * smoothstep(0.36, 0.45, sy));   // jalur menu di atas selalu tenang
+        vec3 color = blobs(uv, nuv, calm);
+
+        color *= 1.0 - uEdge * (1.0 - smoothstep(0.0, 0.04, f));   // garis tepi alur
+        color = mix(uBase, color, rv);
+
+        float grain = texture2D(uGrainTexture, gl_FragCoord.xy / 256.0).r * 2.0 - 1.0;
+        color += grain * uGrainStrength * max(color.r, max(color.g, color.b));
+        gl_FragColor = vec4(clamp(color, 0.0, 1.0), 1.0);
+      }`,
+  })
+  scene = new THREE.Scene()
+  scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), mat))
+  applyTheme()
+
+  // panel penyetel hanya muncul dengan ?tune di URL; tidak dimuat untuk pengunjung biasa
+  if (location.search.includes('tune')) {
+    import('https://cdn.jsdelivr.net/npm/lil-gui@0.19.2/+esm').then(({ default: GUI }) => {
+      const gui = new GUI({ title: 'kaca' })
+      gui.add(params, 'fluteWidth', 20, 160, 1).name('lebar alur').onChange(v => { mat.uniforms.uFluteWidth.value = v; mat.uniforms.uFluteStrength.value = v * params.bias })
+      gui.add(params, 'bias', 0, 3, 0.01).name('bias').onChange(v => mat.uniforms.uFluteStrength.value = v * params.fluteWidth)
+      gui.add(params, 'warp', 0, 0.6, 0.01).name('warp').onChange(v => mat.uniforms.uWarpStrength.value = v)
+      gui.add(params, 'grain', 0, 0.3, 0.005).name('butiran').onChange(applyTheme)
+    })
+  }
+}
+
+const mouse = new THREE.Vector2(), mouseS = new THREE.Vector2()
+// kursor di atas kartu/menu/tombol tidak menggeser latar, jadi hover tombol tidak memicu gambar ulang WebGL
+addEventListener('pointermove', e => { if (e.target.closest && e.target.closest('.card, .bar')) return; mouse.set((e.clientX / innerWidth) * 2 - 1, -((e.clientY / innerHeight) * 2 - 1)) })
+
+function resize() {
+  setTrack()
+  if (!renderer) return
+  renderer.setSize(innerWidth, innerHeight)
+  mat.uniforms.uResolution.value.set(innerWidth, innerHeight)
+  mat.uniforms.uPixelRatio.value = renderer.getPixelRatio()
+  lastKey = ''
+}
+addEventListener('resize', resize)
+resize()
+
+/* ---------- intro: tunggu font + frame pertama, lalu latar menyapu masuk, lalu teks ---------- */
+const ready = { font: false, frame: false }
+const fontOk = () => { ready.font = true }
+Promise.race([
+  Promise.all([document.fonts.load("400 20px 'Instrument Serif'"), document.fonts.load("600 14px 'Manrope'")]),
+  new Promise(res => setTimeout(res, 4000)), // font lambat tidak boleh menahan halaman
+]).then(fontOk, fontOk)
+stage.classList.add('intro')
+let introStart = null, textShown = false
+const REVEAL_MS = 1800
+const easeOut = x => 1 - Math.pow(1 - x, 3)
+function introStep(now) {
+  if (introStart === null && ready.font && ready.frame) introStart = still ? now - REVEAL_MS * 2 : now
+  if (introStart === null) return 0
+  const el = now - introStart
+  if (!textShown && el > REVEAL_MS * 0.55) {
+    textShown = true
+    stage.classList.add('ready')
+    if (titleSpans[activeCh] && !still) titleSpans[activeCh].animate([{ opacity: 0, transform: 'translateY(18px)' }, { opacity: 1, transform: 'none' }], { duration: 550, easing: 'ease-out' })
+    root.classList.remove('loading')
+    setTimeout(() => stage.classList.remove('intro'), 1600)
+    if (lenis) lenis.start()
+  }
+  return easeOut(Math.min(1, el / REVEAL_MS))
+}
+
+const navBtns = [...nav.querySelectorAll('button[data-ch]')], titleSpans = [...titleEl.children]
+/* judul bab berpindah dengan animasi: judul baru meluncur dari posisi & ukuran judul lama,
+   judul lama meluncur ke posisi baru sambil memudar (FLIP via Web Animations) */
+let activeCh = -1
+function moveTitle(ch) {
+  if (ch === activeCh) return
+  const next = titleSpans[ch], prev = titleSpans[activeCh]
+  const a = prev ? prev.getBoundingClientRect() : null
+  titleSpans.forEach((s, i) => s.classList.toggle('on', i === ch))
+  if (a && textShown && !still) {
+    const b = next.getBoundingClientRect(), sc = a.height / b.height
+    const o = 'top left', ease = 'cubic-bezier(.2,.7,.2,1)'
+    next.animate([
+      { transformOrigin: o, transform: `translate(${a.left - b.left}px,${a.top - b.top}px) scale(${sc})`, opacity: 0 },
+      { transformOrigin: o, transform: `translate(${(a.left - b.left) * .5}px,${(a.top - b.top) * .5}px) scale(${(sc + 1) / 2})`, opacity: 1, offset: .4 },
+      { transformOrigin: o, transform: 'none', opacity: 1 }], { duration: 750, easing: ease })
+    prev.animate([
+      { transformOrigin: o, transform: 'none', opacity: 1 },
+      { transformOrigin: o, transform: `translate(${(b.left - a.left) * .6}px,${(b.top - a.top) * .6}px) scale(${(1 / sc + 1) / 2})`, opacity: 0, offset: .6 },
+      { transformOrigin: o, transform: `translate(${b.left - a.left}px,${b.top - a.top}px) scale(${1 / sc})`, opacity: 0 }], { duration: 750, easing: ease })
+  }
+  activeCh = ch
+}
+/* Gerak latar saat diam: 2 detik tanpa aktivitas (scroll, kursor, sentuh, keyboard), gumpalan mulai melayang pelan
+   (halus masuk dan halus keluar). Dimatikan bila perangkat meminta animasi dikurangi. */
+const IDLE_MS = 2000
+let lastAct = performance.now(), drift = 0, idleAmp = 0, tFrame = performance.now(), frameN = 0, lastMain = ''
+;['wheel', 'pointermove', 'pointerdown', 'keydown', 'touchstart', 'scroll'].forEach(ev => addEventListener(ev, () => { lastAct = performance.now() }, { passive: true }))
+let pos = 0, bgPos = 0, activeStep = -1
+const calmNow = new THREE.Vector2(1, mobile ? 1 : 0)
+let calmLowNow = -0.2, midNow = 1
+const colNow = new THREE.Vector2(0, 0)
+
+function frame() {
+  if (lenis) { lenis.raf(performance.now()); gateStep() }
+  const raw = Math.max(0, Math.min(last, (lenis ? lenis.scroll : scrollY) / innerHeight))
+  pos += (raw - pos) * (lenis ? 0.25 : 0.1) // Lenis sudah menghaluskan; sisanya tipis
+  if (Math.abs(raw - pos) < 0.0005) pos = raw
+
+  const step = Math.round(pos)
+  if (step !== activeStep) {
+    activeStep = step
+    steps.forEach((s, i) => s.el.classList.toggle('on', i === step))
+    const ch = steps[step].ch
+    navBtns.forEach((b, i) => b.setAttribute('aria-current', i === ch ? 'true' : 'false'))
+    moveTitle(ch)
+    hint.classList.toggle('off', step > 0)
+  }
+
+  if (renderer) {
+    const u = mat.uniforms
+    // gerak hanya mengikuti scroll dan kursor, tanpa animasi otomatis
+    // isi (kartu, judul) berpindah langsung saat loncat; latar menyusul dengan mulus
+    // kecepatan latar dibatasi (maks 0,05 langkah per frame) supaya tidak berputar kencang saat jarak jauh
+    bgPos += Math.max(-0.05, Math.min(0.05, (pos - bgPos) * 0.1))
+    if (Math.abs(pos - bgPos) < 0.001) bgPos = pos
+    const now = performance.now(), dt = now - tFrame; tFrame = now; frameN++
+    const idleTarget = !still && textShown && now - lastAct > IDLE_MS ? 1 : 0
+    idleAmp += (idleTarget - idleAmp) * Math.min(1, dt / 1000)
+    if (idleTarget === 0 && idleAmp < 0.02) idleAmp = 0
+    drift += dt / 1000 * 0.22 * idleAmp
+    u.uPos.value = bgPos
+    u.uTime.value = bgPos * 0.9 + drift
+    noiseMat.uniforms.uTime.value = bgPos * 0.7 + drift * 0.7
+    u.uReveal.value = introStep(performance.now())
+    mouseS.lerp(mouse, 0.06)
+    if (mouseS.distanceTo(mouse) < 0.002) mouseS.copy(mouse)
+    u.uMouse.value.copy(mouseS)
+    // zona tenang di belakang teks: bawah selalu; atas hanya bila judul bab di atas
+    const cur = chapters[steps[step].ch]
+    const topTarget = (mobile && !cur.mid) || cur.calmTop ? 1 : 0
+    calmNow.y += (topTarget - calmNow.y) * 0.12
+    u.uCalm.value.copy(calmNow)
+    calmLowNow += ((mobile && !cur.mid ? 0.05 : cur.calmLow) - calmLowNow) * 0.12
+    midNow += ((cur.mid ? 1 : 0) - midNow) * 0.12
+    u.uMid.value = midNow
+    colNow.x += (cur.col[0] - colNow.x) * 0.12; colNow.y += (cur.col[1] - colNow.y) * 0.12
+    u.uCol.value.copy(colNow)
+    u.uCalmLow.value = calmLowNow
+    // gambar ulang hanya bila ada yang berubah; layar diam = GPU diam, jadi hover tombol tidak ikut tersendat/berkedip
+    const main = [bgPos.toFixed(4), mouseS.x.toFixed(3), mouseS.y.toFixed(3), calmNow.y.toFixed(3), calmLowNow.toFixed(3), midNow.toFixed(3), colNow.x.toFixed(3), colNow.y.toFixed(3), u.uReveal.value.toFixed(4)].join()
+    // saat melayang pelan cukup 30 fps (hemat daya); selain itu gambar ulang hanya bila ada perubahan
+    const key = main + (idleAmp > 0 ? drift.toFixed(3) : '')
+    if (key !== lastKey && (main !== lastMain || idleAmp === 0 || frameN % 2 === 0)) {
+      lastKey = key; lastMain = main
+      renderer.setRenderTarget(noiseRT); renderer.render(noiseScene, cam); renderer.setRenderTarget(null)
+      renderer.render(scene, cam)
+    }
+  }
+  ready.frame = true
+  if (!renderer) introStep(performance.now())
+  requestAnimationFrame(frame)
+}
+frame()
+</script>
+</body>
+</html>

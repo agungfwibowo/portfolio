@@ -25,8 +25,9 @@ jobs:
       - uses: actions/configure-pages@v5
       - name: Siapkan file situs
         run: |
-          mkdir _site
+          mkdir -p _site/lab
           cp -r index.html themes js assets _site/
+          cp lab/scroll.html _site/lab/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site

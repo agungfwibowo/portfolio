@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lab: Glass Transmission</title>
+<style>
+  html,body{margin:0;height:100%;background:#000;overflow:hidden}
+  canvas{display:block}
+</style>
+<script type="importmap">
+{"imports":{
+  "three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+}}
+</script>
+</head>
+<body>
+<script type="module">
+import * as THREE from 'three'
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js'
+import GUI from 'https://cdn.jsdelivr.net/npm/lil-gui@0.19.2/+esm'
+
+/* Cara kerja kaca di three.js:
+   1. Teks digambar ke canvas 2D, dijadikan tekstur pada plane datar di belakang.
+   2. Bola memakai MeshPhysicalMaterial dengan `transmission` > 0. Saat render, three.js
+      lebih dulu merender semua objek buram ke render target, lalu bola membaca target itu
+      dan membelokkannya lewat `ior` + `thickness` (efek lensa).
+   3. `dispersion` memisahkan kanal R/G/B saat dibiaskan (chromatic aberration).
+   4. `envMap` memberi sesuatu untuk dipantulkan; tanpa itu kaca tampak mati. */
+
+const renderer = new THREE.WebGLRenderer({ antialias: true })
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2))
+renderer.toneMapping = THREE.ACESFilmicToneMapping
+document.body.appendChild(renderer.domElement)
+
+const scene = new THREE.Scene()
+scene.background = new THREE.Color(0x000000)
+const pmrem = new THREE.PMREMGenerator(renderer)
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture
+
+const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 100)
+camera.position.z = 10
+
+/* teks sebagai tekstur */
+const TEXT = 'hello world!'
+function makeTextTexture() {
+  const c = document.createElement('canvas')
+  c.width = 2048; c.height = 512
+  const g = c.getContext('2d')
+  g.fillStyle = '#000'; g.fillRect(0, 0, c.width, c.height)
+  g.fillStyle = '#bdbdbd'
+  g.font = '800 340px Helvetica, Arial, sans-serif'
+  g.textAlign = 'center'; g.textBaseline = 'middle'
+  g.fillText(TEXT, c.width / 2, c.height / 2 + 10)
+  const t = new THREE.CanvasTexture(c)
+  t.colorSpace = THREE.SRGBColorSpace
+  t.anisotropy = 8
+  return t
+}
+const textPlane = new THREE.Mesh(
+  new THREE.PlaneGeometry(8, 2),
+  new THREE.MeshBasicMaterial({ map: makeTextTexture(), toneMapped: false })
+)
+textPlane.position.z = -1
+scene.add(textPlane)
+
+/* bola kaca */
+const params = {
+  thickness: 0.2,
+  roughness: 0,
+  transmission: 1,
+  ior: 1.2,
+  chromaticAberration: 0.02,
+  backside: false,
+}
+const glass = new THREE.MeshPhysicalMaterial({
+  color: 0xffffff,
+  metalness: 0,
+  transmission: 1,
+  side: THREE.FrontSide,
+})
+const ball = new THREE.Mesh(new THREE.SphereGeometry(1, 96, 96), glass)
+scene.add(ball)
+
+function apply() {
+  glass.thickness = params.thickness * 10 // skala three.js: satuan dunia, bukan 0–1 seperti drei
+  glass.roughness = params.roughness
+  glass.transmission = params.transmission
+  glass.ior = params.ior
+  glass.dispersion = params.chromaticAberration * 100 // dispersion three.js berskala 0–10
+  glass.side = params.backside ? THREE.DoubleSide : THREE.FrontSide
+  glass.needsUpdate = true
+}
+apply()
+
+const gui = new GUI({ title: 'material' })
+gui.add(params, 'thickness', 0, 1, 0.01).onChange(apply)
+gui.add(params, 'roughness', 0, 1, 0.01).onChange(apply)
+gui.add(params, 'transmission', 0, 1, 0.01).onChange(apply)
+gui.add(params, 'ior', 1, 2.3, 0.01).onChange(apply)
+gui.add(params, 'chromaticAberration', 0, 0.1, 0.001).name('chromaticAb…').onChange(apply)
+gui.add(params, 'backside').onChange(apply)
+
+/* bola mengikuti kursor / sentuhan */
+const target = new THREE.Vector2()
+addEventListener('pointermove', e => {
+  target.set((e.clientX / innerWidth) * 2 - 1, -((e.clientY / innerHeight) * 2 - 1))
+})
+
+function resize() {
+  renderer.setSize(innerWidth, innerHeight)
+  camera.aspect = innerWidth / innerHeight
+  // jaga teks tetap muat di layar sempit
+  const fitW = 8.6 / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * (camera.position.z + 1) * camera.aspect)
+  camera.position.z = Math.max(10, 10 * fitW)
+  camera.updateProjectionMatrix()
+}
+addEventListener('resize', resize)
+resize()
+
+renderer.setAnimationLoop(() => {
+  const halfH = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.position.z
+  ball.position.x += (target.x * halfH * camera.aspect * 0.8 - ball.position.x) * 0.06
+  ball.position.y += (target.y * halfH * 0.8 - ball.position.y) * 0.06
+  renderer.render(scene, camera)
+})
+</script>
+</body>
+</html>
