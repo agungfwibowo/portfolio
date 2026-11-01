@@ -27,6 +27,8 @@ try {
   .track{position:relative}
   .track i{position:absolute;left:0;width:1px;scroll-snap-align:start;scroll-snap-stop:always}
   html.snap{scroll-snap-type:y mandatory}
+  .sbar{display:none;position:absolute;z-index:7;left:0;top:0;bottom:0;width:2px;pointer-events:none}
+  .sbar b{position:absolute;left:0;top:0;width:100%;border-radius:0 2px 2px 0;background:var(--accent);will-change:transform}
   .stage{position:fixed;inset:0;overflow:hidden;background:var(--bg)}
   canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 
@@ -147,6 +149,9 @@ try {
     .headline span.tc{top:70px}
     .headline span.center{white-space:normal;width:calc(100vw - 32px)}
     .wheel{display:block}
+    html{scrollbar-width:none}
+    html::-webkit-scrollbar{display:none}
+    .sbar{display:block}
     .card,.card.contact,.card.cols{left:16px;right:16px;width:auto;top:auto;bottom:80px;max-height:calc(100svh - 250px)}
     .card.intro{width:calc(100vw - 32px);top:calc(50% + var(--name) * .5 + 14px);bottom:auto}
     .card.exp{--peek:16px;left:0;right:0;width:auto}
@@ -466,6 +471,20 @@ const setTrack = () => {
   track.querySelectorAll(':scope > i').forEach(n => n.remove())
   if (snap) track.append(...steps.map((_, i) => { const a = document.createElement('i'); a.style.top = i * st + 'px'; a.style.height = st + 'px'; return a }))
 }
+
+// scrollbar buatan di sisi kiri (HP): tinggi jempol mengikuti proporsi layar terhadap seluruh halaman
+const sbar = document.createElement('div'); sbar.className = 'sbar'; sbar.innerHTML = '<b></b>'; sbar.setAttribute('aria-hidden', 'true')
+stage.append(sbar)
+const sthumb = sbar.firstChild
+function sbarSync() {
+  const total = document.documentElement.scrollHeight, max = total - innerHeight
+  if (max <= 0) return
+  const th = Math.max(36, innerHeight * innerHeight / total)
+  sthumb.style.height = th + 'px'
+  sthumb.style.transform = `translateY(${Math.max(0, Math.min(1, scrollY / max)) * (innerHeight - th)}px)`
+}
+addEventListener('scroll', sbarSync, { passive: true }); addEventListener('resize', sbarSync)
+sbarSync()
 
 /* ---------- kaca beralur: satu quad penuh + dua shader ----------
    Teknik mengikuti artikel "Animate beautiful fractal glass gradients with Three.js" (Franky, Arkon Digital).
