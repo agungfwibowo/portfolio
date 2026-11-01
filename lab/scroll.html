@@ -161,7 +161,7 @@ try {
     .card.exp .job-ctrl{padding-right:16px}
     .card.wide{padding-top:110px;padding-bottom:90px;grid-template-rows:auto auto;align-content:center;gap:14px}
     .card.wide .slider{overflow:visible;clip-path:inset(0 0 -48px 0);margin-bottom:44px}
-    .card.wide .sl-ctrl{bottom:-44px;right:0}
+    .card.wide .sl-ctrl{bottom:-44px;right:auto;left:50%;transform:translateX(-50%)}
     .skillcols{grid-template-columns:1fr 1fr;gap:14px 18px}
     .hint{display:none}
   }
@@ -340,7 +340,7 @@ function fitSlider(sl) {
   const ar = (im.naturalWidth || 800) / (im.naturalHeight || 500)
   const desktop = innerWidth >= 768
   // desktop: maksimum 1200 x 600 px; HP: hampir selebar layar
-  const boxW = desktop ? Math.min(innerWidth * 0.94, 1200) : innerWidth * 0.94
+  const boxW = desktop ? Math.min(innerWidth * 0.94, 1200) : innerWidth - 32
   const boxH = Math.max(160, desktop ? Math.min(innerHeight - 290, 600) : innerHeight - 400)
   const tall = boxH * ar < Math.min(boxW, 900) * 0.55
   slides.forEach(el => el.classList.toggle('tall', el === slide && tall))
