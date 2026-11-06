@@ -82,7 +82,7 @@ html.spread .leaf.on-right .curl.pv,html.spread .leaf.on-left .curl.nx{display:n
 
 /* mode buku (JS + gerak tidak dikurangi): panggung tetap, halaman diposisikan JS, posisi scroll dipetakan ke baca/balik lembar */
 /* perspektif diatur JS: buku terbuka di desktop, satu halaman di HP */
-html.book .stage{position:fixed;inset:0;overflow:hidden}
+html.book .stage{position:fixed;inset:0;overflow:hidden;touch-action:pan-y}
 html.book .leaf{position:absolute;top:0;left:0;margin:0;will-change:transform}
 html.book .curl{display:block}
 /* lembar yang sedang dibalik: 5 potongan bersambung yang masing-masing menekuk sedikit, jadi kertas tampak melengkung */
@@ -691,6 +691,7 @@ html.lenis{scroll-behavior:auto}
   // REST: jarak gulir "diam" setelah isi selesai dibaca, sebelum lembar mulai berputar; supaya gulir kecil tidak langsung membalik halaman
   var L = [], V = 0, GAP = 0, TURN = 0, REST = 0, PW = 0, SX = 0, step = 0, off = 0, jump = null
   var ease = function (t) { return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2 }
+  var easeInv = function (e) { return e < 0.5 ? Math.sqrt(e / 2) : 1 - Math.sqrt((1 - e) / 2) }
   function layout() {
     var W = innerWidth
     V = innerHeight
@@ -905,18 +906,24 @@ html.lenis{scroll-behavior:auto}
   // Tiap halaman difoto jadi tekstur (html-to-image, dari salinan di luar layar). Saat membalik, lembar digambar di WebGL
   // sebagai bidang yang benar-benar melengkung (silinder) dengan cahaya mengikuti lengkungannya. Saat diam yang tampil tetap HTML asli.
   // Kalau WebGL/three gagal dimuat atau foto halaman belum siap, lembar CSS di atas yang dipakai.
+  var TILT = 1
   var GL = { ok: false, tex: {}, fail: {}, gen: 0, busy: false, font: null }
   var THREE_URL = 'https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.min.js'
   var VERT = [
-    'uniform float uT0; uniform float uK;',
+    'uniform float uT0; uniform float uBend; uniform float uTilt; uniform float uFW; uniform float uH;',
     'varying vec2 vUv; varying vec3 vN;',
     'void main(){',
     '  vUv = uv;',
     '  float u = position.x;',
-    '  float th = uT0 + uK * u;',
-    // posisi titik di sepanjang busur: sudut berubah linear dari punggung (uT0) ke tepi luar (uT0 + uK*lebar)
-    '  vec3 p = abs(uK) < 1e-6 ? vec3(u * cos(uT0), position.y, u * sin(uT0))',
-    '                          : vec3((sin(th) - sin(uT0)) / uK, position.y, (cos(uT0) - cos(th)) / uK);',
+    // w: 0 di tepi atas, 1 di tepi bawah. Kemiringan: baris di sisi jari berputar lebih jauh dari baris di seberangnya,
+    // jadi garis lipatnya miring seperti kertas yang ditarik dari sudut
+    '  float w = clamp(-position.y / uH, 0.0, 1.0);',
+    '  float f = uTilt >= 0.0 ? w : 1.0 - w;',
+    '  float t0 = clamp(uT0 + abs(uTilt) * (f - 0.5) * 2.0, 0.0, 3.14159265);',
+    '  float k = min(uBend, 3.14159265 - t0) / uFW;',
+    '  float th = t0 + k * u;',
+    '  vec3 p = abs(k) < 1e-7 ? vec3(u * cos(t0), position.y, u * sin(t0))',
+    '                         : vec3((sin(th) - sin(t0)) / k, position.y, (cos(t0) - cos(th)) / k);',
     '  vN = vec3(-sin(th), 0.0, cos(th));',
     '  gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);',
     '}'].join('\n')
@@ -950,7 +957,7 @@ html.lenis{scroll-behavior:auto}
       GL.cam = new THREE.PerspectiveCamera()
       GL.mat = new THREE.ShaderMaterial({
         vertexShader: VERT, fragmentShader: FRAG, side: THREE.DoubleSide,
-        uniforms: { uT0: { value: 0 }, uK: { value: 0 }, uFront: { value: null }, uBack: { value: null }, uHasBack: { value: 0 }, uBlank: { value: new THREE.Color(0xE3A6C2) } }
+        uniforms: { uT0: { value: 0 }, uBend: { value: 0 }, uTilt: { value: 0 }, uFW: { value: 1 }, uH: { value: 1 }, uFront: { value: null }, uBack: { value: null }, uHasBack: { value: 0 }, uBlank: { value: new THREE.Color(0xE3A6C2) } }
       })
       GL.mesh = new THREE.Mesh(new THREE.BufferGeometry(), GL.mat)
       GL.scene.add(GL.mesh)
@@ -1033,14 +1040,17 @@ html.lenis{scroll-behavior:auto}
     var F = GL.tex[front], FW = pwOf(front), key = FW + 'x' + F.h
     if (GL.geo !== key) {
       GL.mesh.geometry.dispose()
-      GL.mesh.geometry = new GL.T.PlaneGeometry(FW, F.h, 128, 1).translate(FW / 2, -F.h / 2, 0)
+      GL.mesh.geometry = new GL.T.PlaneGeometry(FW, F.h, 96, 32).translate(FW / 2, -F.h / 2, 0)
       GL.geo = key
     }
     var u = GL.mat.uniforms, e = ease(tt)
     // pangkal berputar 0..180 derajat di punggung; tepi luar mendahului (lengkung terbesar di tengah putaran), tidak pernah lewat 180
-    var bend = Math.min(1.15 * Math.sin(Math.PI * e), Math.PI * (1 - e))
     u.uT0.value = Math.PI * e
-    u.uK.value = bend / FW
+    u.uBend.value = 1.15 * Math.sin(Math.PI * e)
+    // TILT: +1 = sisi bawah terangkat dulu (bawaan, dan saat jari di separuh bawah), -1 = sisi atas
+    u.uTilt.value = TILT * 0.55 * Math.sin(Math.PI * e)
+    u.uFW.value = FW
+    u.uH.value = F.h
     u.uFront.value = F.t
     u.uHasBack.value = back >= 0 ? 1 : 0
     u.uBack.value = back >= 0 ? GL.tex[back].t : F.t
@@ -1072,6 +1082,7 @@ html.lenis{scroll-behavior:auto}
     var from = jump ? jump.to : step, fromOff = jump ? 0 : off
     if (jump) { cancelAnimationFrame(jump.raf); jump = null }
     if (instant || s === from) { scrollNow(L[s].start); draw(); return }
+    TILT = 1
     jump = { from: from, to: s, off: fromOff, t0: performance.now(), dur: 1150 }
     scrollNow(L[s].start)
     step = s; syncBar(); setHash()
@@ -1081,13 +1092,23 @@ html.lenis{scroll-behavior:auto}
     $('hint').classList.remove('on')
     var j = jump
     if (!j) return
-    var t = Math.min(1, (now - j.t0) / j.dur), a = j.from, b = j.to
+    var k = Math.min(1, (now - j.t0) / j.dur)
+    var t = j.p0 == null ? k : j.p0 + (j.p1 - j.p0) * (1 - Math.pow(1 - k, 3))
+    jumpScene(j, t)
+    if (k < 1) { j.raf = requestAnimationFrame(tickJump); return }
+    jump = null
+    clearTurn()
+    // lembar yang ditarik jari: kalau jadi dibalik, baru pindah langkah di sini
+    if (j.drag && j.p1 === 1) { scrollNow(L[j.to].start); step = j.to; syncBar(); setHash() }
+    draw()
+  }
+  // satu bingkai perpindahan dari langkah j.from ke j.to pada progres t (0 = belum dibalik, 1 = selesai)
+  function jumpScene(j, t) {
+    var a = j.from, b = j.to
     var oa = spread && a === 0 ? 0 : 1, ob = spread && b === 0 ? 0 : 1
     var open = oa + (ob - oa) * ease(t)
     if (b > a) turnScene(ST[a][0], ST[b][1], ST[a][1], ST[b][0], t, -j.off * (1 - ease(t)), open)
     else turnScene(ST[b][0], ST[a][1], ST[b][1], ST[a][0], 1 - t, -j.off * (1 - ease(t)), open)
-    if (t < 1) j.raf = requestAnimationFrame(tickJump)
-    else { jump = null; clearTurn(); draw() }
   }
   function base() { return jump ? jump.to : step }
 
@@ -1147,13 +1168,63 @@ html.lenis{scroll-behavior:auto}
     if (e.key === 'ArrowRight') { e.preventDefault(); goStep(base() + 1) }
     else if (e.key === 'ArrowLeft') { e.preventDefault(); goStep(base() - 1) }
   })
-  // geser kiri/kanan di layar sentuh; geser vertikal tetap scroll biasa
-  var sx = 0, sy = 0
-  addEventListener('touchstart', function (e) { sx = e.touches[0].clientX; sy = e.touches[0].clientY }, { passive: true })
-  addEventListener('touchend', function (e) {
-    var dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy
-    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) goStep(base() + (dx < 0 ? 1 : -1))
+  // geser kiri/kanan di layar sentuh: lembar mengikuti jari selama digeser, lalu menyelesaikan putaran (atau kembali) saat dilepas.
+  // Gestur tegak tetap gulir biasa (touch-action: pan-y di panggung). Tanpa buku (gerak dikurangi): pindah halaman saat dilepas.
+  var sx = 0, sy = 0, lx = 0, lt = 0, vx = 0, drag = null, axis = null
+  addEventListener('touchstart', function (e) {
+    if (e.touches.length > 1) return
+    sx = lx = e.touches[0].clientX; sy = e.touches[0].clientY; lt = performance.now(); vx = 0; axis = null
   }, { passive: true })
+  addEventListener('touchmove', function (e) {
+    if (!book || e.touches.length > 1 || e.target.closest('.bar')) return
+    var x = e.touches[0].clientX, dx = x - sx, dy = e.touches[0].clientY - sy
+    if (!axis) {
+      if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return
+      axis = Math.abs(dx) > Math.abs(dy) * 1.2 ? 'x' : 'y'
+      if (axis === 'x') {
+        var dir = dx < 0 ? 1 : -1, from = base(), to = from + dir
+        if (to < 0 || to >= ST.length) { axis = 'none'; return }
+        if (jump) { cancelAnimationFrame(jump.raf); jump = null; clearTurn() }
+        // sisi tempat jari menyentuh yang terangkat lebih dulu
+        TILT = sy > innerHeight / 2 ? 1 : -1
+        drag = jump = { from: from, to: to, off: 0, drag: true, dir: dir, p: 0 }
+      }
+    }
+    if (axis !== 'x' || !drag) return
+    var now = performance.now()
+    vx = (x - lx) / Math.max(1, now - lt); lx = x; lt = now
+    // ujung lembar mengikuti jari: posisi jari dipetakan ke sudut putar lembar (sx = titik awal sentuhan, sp = punggung)
+    var sp = spread ? SX : sxOf(pagesOf(drag.from)[0]), xr, a
+    if (drag.dir > 0) {
+      xr = (x - sp) / Math.max(60, sx - sp)
+      a = Math.acos(Math.max(-1, Math.min(1, xr))) / Math.PI
+      drag.p = easeInv(a)
+    } else {
+      xr = -1 + 2 * (x - sx) / Math.max(60, innerWidth - sx)
+      a = 1 - Math.acos(Math.max(-1, Math.min(1, xr))) / Math.PI
+      drag.p = 1 - easeInv(1 - a)
+    }
+    drag.a = a
+    jumpScene(drag, drag.p)
+  }, { passive: true })
+  function release(e) {
+    if (!book) {
+      var dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy
+      if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) goStep(base() + (dx < 0 ? 1 : -1))
+      return
+    }
+    if (!drag) return
+    var d = drag, fling = -vx * d.dir
+    drag = null
+    // jadi dibalik kalau sudah lewat sepertiga, atau dijentik cukup cepat ke arah yang sama
+    var go = e.type === 'touchend' && (fling > 0.35 || ((d.a || 0) > 0.28 && fling > -0.25))
+    d.p0 = d.p; d.p1 = go ? 1 : 0
+    d.t0 = performance.now()
+    d.dur = 260 + 520 * Math.abs(d.p1 - d.p0)
+    d.raf = requestAnimationFrame(tickJump)
+  }
+  addEventListener('touchend', release, { passive: true })
+  addEventListener('touchcancel', release, { passive: true })
   // Tab ke elemen di halaman yang tidak tampil: bawa langkah itu ke layar (tanpa animasi, supaya fokus tidak tertinggal)
   document.addEventListener('focusin', function (e) {
     if (!book || progFocus) return
