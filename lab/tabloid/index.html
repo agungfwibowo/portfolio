@@ -1,0 +1,1239 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#13213F">
+<title>Tabloid · Agung Fitrah Wibowo</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23F3C3D9'/%3E%3Ctext x='16' y='22' font-family='Arial' font-weight='700' font-size='13' fill='%2313213F' text-anchor='middle'%3EAFW%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=IBM+Plex+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet" crossorigin="anonymous">
+<link rel="preload" as="image" href="../../assets/foto-agung.webp" fetchpriority="high">
+<script>document.documentElement.classList.add('js')</script>
+<style>
+/* Arah visual: edisi tabloid, diturunkan dari referensi Pink Pages tapi dipangkas.
+   - kertas pink koran yang diredam + tinta navy + kuning sebagai satu-satunya aksen (ungu referensi dibuang: warna ke-4 dan gagal kontras di atas pink)
+   - Bagel Fat One: judul gemuk bergaya 70-an seperti judul referensi, gratis
+   - Newsreader: serif yang dirancang untuk teks berita, dipakai untuk paragraf panjang (huruf biasa, bukan kapital)
+   - IBM Plex Mono: label, teks berjalan, nomor halaman; nuansa mesin ketik redaksi, hanya untuk teks pendek
+   - tiap section = satu lembar; berpindah lembar dengan dibalik dari punggung kiri, pojok bawah tertekuk = tombol halaman */
+:root{
+  --paper:#F3C3D9;--paper-back:#E3A6C2;--ink:#13213F;--ink-2:#3A4566;--hl:#FFEE4A;--desk:#13213F;
+  --display:'Bagel Fat One','Arial Black',sans-serif;
+  --serif:'Newsreader',Georgia,serif;
+  --mono:'IBM Plex Mono',ui-monospace,monospace;
+  --pad:clamp(18px,3vw,48px);
+  --gap:20px;
+  --noise:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+@media (max-width:760px){:root{--gap:8px}}
+/* ukuran tekukan pojok dianimasikan, jadi didaftarkan sebagai panjang */
+@property --cr{syntax:'<length>';inherits:true;initial-value:0px}
+@property --cl{syntax:'<length>';inherits:true;initial-value:0px}
+*{box-sizing:border-box}
+html{background:var(--desk)}
+body{margin:0;background:var(--desk);color:var(--ink);font:400 17px/1.55 var(--serif);-webkit-font-smoothing:antialiased}
+img{display:block;max-width:100%}
+a,button{cursor:pointer;color:inherit;font:inherit}
+button:disabled{cursor:not-allowed;opacity:.4}
+:focus-visible{outline:3px solid var(--hl);outline-offset:3px;box-shadow:0 0 0 6px var(--ink)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.skip{position:fixed;left:16px;top:-80px;z-index:80;background:var(--hl);color:var(--ink);padding:12px 16px;font:600 14px var(--mono);text-decoration:none}
+.skip:focus{top:16px}
+h1,h2,h3{margin:0;font-weight:400}
+
+/* ---------- lembar ---------- */
+.stage{position:relative}
+/* tiap halaman = container: tata letak isi mengikuti lebar halaman (setengah buku di desktop, penuh di HP), bukan lebar layar */
+.leaf{position:relative;margin:var(--gap);container:page/inline-size;--cr:42px;--cl:42px;transition:--cr .45s cubic-bezier(.3,.7,.2,1),--cl .45s cubic-bezier(.3,.7,.2,1)}
+.paper{position:relative;min-height:calc(100vh - var(--gap) * 2);min-height:calc(100svh - var(--gap) * 2);padding:clamp(18px,2.4vw,32px) var(--pad) 104px;background:var(--paper);overflow:hidden;
+  clip-path:polygon(0 0,100% 0,100% calc(100% - var(--cr)),calc(100% - var(--cr)) 100%,var(--cl) 100%,0 calc(100% - var(--cl)))}
+/* serat kertas koran + bayangan punggung di tepi kiri: lembar terbaca sebagai kertas yang dijilid, bukan kartu */
+.paper::before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(19,33,63,.16),rgba(19,33,63,0) 22px),var(--noise);background-size:auto,200px;opacity:.38;mix-blend-mode:multiply;z-index:0}
+.paper>*{position:relative;z-index:1}
+/* halaman kiri buku: punggung ada di tepi kanan */
+html.spread .leaf.on-left .paper::before{background:linear-gradient(270deg,rgba(19,33,63,.16),rgba(19,33,63,0) 22px),var(--noise);background-size:auto,200px}
+/* bayangan yang dijatuhkan lembar yang sedang dibalik ke halaman di bawahnya: --sh dari punggung kiri, --shr dari punggung kanan; diisi JS */
+.paper::after{content:"";position:absolute;inset:0;z-index:5;pointer-events:none;
+  background:linear-gradient(90deg,rgba(9,15,30,calc(var(--sh,0) * .5)),rgba(9,15,30,0) 45%),linear-gradient(270deg,rgba(9,15,30,calc(var(--shr,0) * .5)),rgba(9,15,30,0) 45%)}
+.leaf:has(.curl.nx:hover),.leaf:has(.curl.nx:focus-visible){--cr:84px}
+.leaf:has(.curl.pv:hover),.leaf:has(.curl.pv:focus-visible){--cl:84px}
+/* sampul tidak punya halaman sebelumnya: sudut kirinya utuh */
+.leaf:first-of-type{--cl:0px}
+/* di buku terbuka, sudut yang menghadap punggung tetap utuh: halaman kanan hanya punya pojok berikutnya, halaman kiri hanya pojok sebelumnya */
+html.spread .leaf.on-right{--cl:0px}
+html.spread .leaf.on-left{--cr:0px}
+html.spread .leaf.on-right .curl.pv,html.spread .leaf.on-left .curl.nx{display:none !important}
+
+/* pojok tertekuk = tombol halaman. Area klik 72px; segitiga = sisi belakang kertas yang terlipat ke atas */
+.curl{display:none;position:absolute;bottom:0;z-index:6;width:84px;height:84px;padding:0;border:0;background:none;filter:drop-shadow(-3px -3px 4px rgba(9,15,30,.28))}
+.curl.nx{right:0}
+.curl.pv{left:0;filter:drop-shadow(3px -3px 4px rgba(9,15,30,.28))}
+.curl::before{content:"";position:absolute;bottom:0;width:var(--cr);height:var(--cr);background:linear-gradient(135deg,var(--paper-back) 35%,#f6d3e3)}
+.curl.nx::before{right:0;clip-path:polygon(0 0,100% 0,0 100%)}
+.curl.pv::before{left:0;width:var(--cl);height:var(--cl);clip-path:polygon(0 0,100% 0,100% 100%);background:linear-gradient(225deg,var(--paper-back) 35%,#f6d3e3)}
+.curl .lb{position:absolute;bottom:calc(100% + 8px);white-space:nowrap;padding:5px 9px;background:var(--ink);color:var(--paper);font:500 12px var(--mono);text-transform:uppercase;opacity:0;translate:0 6px;transition:opacity .3s,translate .3s;pointer-events:none}
+.curl.nx .lb{right:6px}
+.curl.pv .lb{left:6px}
+.curl:hover .lb,.curl:focus-visible .lb{opacity:1;translate:0 0}
+.curl:focus-visible{outline-offset:-6px}
+
+/* mode buku (JS + gerak tidak dikurangi): panggung tetap, halaman diposisikan JS, posisi scroll dipetakan ke baca/balik lembar */
+/* perspektif diatur JS: buku terbuka di desktop, satu halaman di HP */
+html.book .stage{position:fixed;inset:0;overflow:hidden}
+html.book .leaf{position:absolute;top:0;left:0;margin:0;will-change:transform}
+html.book .curl{display:block}
+/* lembar yang sedang dibalik: 5 potongan bersambung yang masing-masing menekuk sedikit, jadi kertas tampak melengkung */
+.turn{position:absolute;top:0;left:0;z-index:20;transform-style:preserve-3d;pointer-events:none}
+.seg{position:absolute;top:0;height:100%;transform-style:preserve-3d;transform-origin:0 50%}
+.face{position:absolute;top:0;bottom:0;left:0;right:-1px;overflow:hidden;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.face.b{transform:rotateY(180deg)}
+.face>.leaf{position:absolute;top:0;margin:0}
+.face.blank{background:linear-gradient(270deg,#d896b5,var(--paper-back) 40%)}
+.face .shd{position:absolute;inset:0;background:#0a1020;opacity:0}
+/* lipatan punggung buku di tengah (desktop) */
+.gutter{display:none;position:absolute;top:0;bottom:0;z-index:10;width:90px;margin-left:-45px;pointer-events:none;background:linear-gradient(90deg,rgba(9,15,30,0),rgba(9,15,30,.22) 44%,rgba(9,15,30,.34) 50%,rgba(9,15,30,.12) 56%,rgba(9,15,30,0))}
+html.book.spread .gutter{display:block}
+/* kanvas WebGL lembar yang dibalik: hanya tampil selama lembar berputar */
+.gl{position:absolute;inset:0;z-index:20;width:100%;height:100%;display:none;pointer-events:none}
+/* isi yang dipangkas supaya halaman muat satu layar (diatur JS, lihat fitPages) */
+[data-drop].cut{display:none !important}
+.spacer{display:none}
+html.book .spacer{display:block}
+
+/* ---------- bilah halaman (tetap di bawah tengah) ---------- */
+.bar{position:fixed;left:50%;bottom:calc(var(--gap) + 10px);z-index:40;translate:-50% 0;display:flex;align-items:stretch;background:var(--ink);color:var(--paper);font:500 13px var(--mono);text-transform:uppercase;box-shadow:0 0 0 2px var(--paper)}
+.bar button{min-width:44px;min-height:44px;border:0;background:none;color:inherit;font:600 18px var(--mono);transition:background-color .3s,color .3s}
+.bar button:not(:disabled):hover{background:var(--hl);color:var(--ink)}
+.bar button:active{translate:0 1px}
+.bar .fo{display:flex;align-items:center;gap:8px;padding:0 12px;white-space:nowrap;font:500 13px var(--mono);text-transform:uppercase}
+.hint{position:fixed;left:50%;bottom:calc(var(--gap) + 70px);z-index:39;translate:-50% 8px;display:grid;gap:6px;justify-items:center;padding:8px 14px 10px;background:var(--hl);color:var(--ink);box-shadow:0 0 0 2px var(--ink);font:600 12px var(--mono);text-transform:uppercase;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .3s,translate .3s}
+.hint.on{opacity:1;translate:-50% 0}
+.hint i{display:block;width:100%;min-width:180px;height:4px;background:rgba(19,33,63,.2)}
+.hint b{display:block;height:100%;background:var(--ink);transform-origin:0 50%;transform:scaleX(0)}
+.bar .fo .car{font-size:11px;transition:rotate .3s}
+.bar .fo[aria-expanded="true"]{background:var(--hl);color:var(--ink)}
+.bar .fo[aria-expanded="true"] .car{rotate:180deg}
+/* daftar isi: muncul di atas bilah halaman, satu baris per halaman */
+.toc{position:absolute;left:50%;bottom:calc(100% + 10px);translate:-50% 0;width:min(320px,calc(100vw - 32px));padding:6px 0 8px;background:var(--paper);color:var(--ink);box-shadow:0 0 0 2px var(--ink),8px 8px 0 var(--ink);text-transform:none}
+.toc-h{margin:0;padding:8px 16px 10px;border-bottom:2px solid var(--ink);font:600 12px var(--mono);text-transform:uppercase}
+.toc ol{list-style:none;margin:0;padding:0}
+.toc button{display:flex;align-items:baseline;gap:14px;width:100%;min-height:44px;padding:8px 16px;border:0;border-bottom:1px solid rgba(19,33,63,.25);background:none;color:var(--ink);text-align:left;font:400 22px/1 var(--display);text-transform:uppercase;transition:background-color .3s}
+.toc li:last-child button{border-bottom:0}
+.toc button small{flex:none;width:22px;font:500 12px var(--mono)}
+.toc button:hover{background:var(--hl)}
+.toc button[aria-current="page"]{background:var(--ink);color:var(--paper)}
+.bar .lang{font-size:13px;border-left:1px solid rgba(243,195,217,.3)}
+@media (max-width:420px){.bar .fo .nm-pg{display:none}}
+
+/* ---------- unsur tabloid bersama ---------- */
+.mono{font-family:var(--mono);text-transform:uppercase;letter-spacing:.02em}
+.folio{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 16px;padding-bottom:10px;border-bottom:2px solid var(--ink);font:500 12px/1.4 var(--mono);text-transform:uppercase}
+.logo{font:400 13px var(--mono);text-transform:uppercase;letter-spacing:.02em;text-decoration:none}
+.logo b{font-weight:600}
+.kick{display:block;font:600 13px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.02em}
+.hl-box{display:inline-block;padding:.5em .8em;background:var(--hl);font:600 15px/1.3 var(--mono);text-transform:uppercase;box-shadow:6px 6px 0 var(--ink)}
+.rule{border:0;border-top:2px solid var(--ink);margin:0}
+.fit{display:block;white-space:nowrap;line-height:.95;font-family:var(--display);text-transform:uppercase}
+.fit .t{display:inline-block}
+.hd{font:400 clamp(34px,4.6vw,72px)/.95 var(--display);text-transform:uppercase}
+.lead{font-size:clamp(19px,1.6vw,23px);line-height:1.4}
+.dl{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:0;font:400 14px/1.45 var(--mono)}
+.dl dt{text-transform:uppercase;font-weight:600}
+.dl dd{margin:0}
+/* foto dicetak di kertas: putihnya ikut warna kertas (multiply) + titik raster halus */
+.print{position:relative;margin:0;background:var(--paper)}
+.print img{width:100%;height:100%;object-fit:cover;object-position:top;mix-blend-mode:multiply}
+.print::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle,rgba(19,33,63,.12) .8px,transparent 1.2px);background-size:4px 4px;mix-blend-mode:multiply}
+.cap{margin-top:8px;font:400 12px/1.4 var(--mono);text-transform:uppercase}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 20px;border:2px solid var(--ink);text-decoration:none;font:600 14px var(--mono);text-transform:uppercase;transition:background-color .3s,color .3s,translate .3s,box-shadow .3s}
+.btn.y{background:var(--hl);box-shadow:5px 5px 0 var(--ink)}
+.btn.y:hover{background:var(--ink);color:var(--hl)}
+.btn.o:hover{background:var(--ink);color:var(--paper)}
+.btn:active{translate:2px 2px;box-shadow:3px 3px 0 var(--ink)}
+.lnk{text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1.5px;transition:color .3s,background-color .3s}
+.lnk:hover{background:var(--ink);color:var(--paper)}
+
+/* ---------- 1. sampul ---------- */
+.mast{display:flex;flex-wrap:wrap;align-items:center;gap:10px 28px;padding-bottom:18px}
+.mast .logo{font-size:clamp(18px,1.8vw,24px);margin-right:auto;padding:8px 0}
+.mast nav{display:flex;flex-wrap:wrap;gap:4px 26px}
+.mast nav a{display:inline-flex;align-items:center;min-height:44px;font:400 14px var(--mono);text-transform:uppercase;text-decoration:none;border-bottom:2px solid transparent;transition:border-color .3s}
+.mast nav a:hover{border-color:var(--ink)}
+.tick{display:flex;align-items:center;border-top:2px solid var(--ink);border-bottom:2px solid var(--ink)}
+.tick .vp{flex:1;overflow:hidden;white-space:nowrap;padding:12px 0;font:400 14px var(--mono);text-transform:uppercase}
+.tick .tr{display:inline-block;animation:tick 60s linear infinite}
+.tick.paused .tr,.tick:hover .tr{animation-play-state:paused}
+@keyframes tick{to{transform:translateX(-50%)}}
+.tick button{flex:none;min-width:44px;min-height:44px;border:0;border-left:2px solid var(--ink);background:none;font:600 13px var(--mono);transition:background-color .3s}
+.tick button:hover{background:var(--hl)}
+.cv-name{margin:clamp(14px,2vw,28px) 0 clamp(12px,1.6vw,22px)}
+.cv-name .w{display:inline}
+/* nama dipecah 2 atau 3 baris sesuai lebar halaman (diatur JS lewat data-lines) */
+.cv-name [data-lines="2"] .w:nth-child(3),.cv-name [data-lines="3"] .w{display:block}
+.cv-body{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(260px,.9fr);gap:28px clamp(28px,5vw,96px);margin-top:clamp(18px,2.4vw,34px);align-items:start}
+.cv-body .kick::before{content:"✱ "}
+.cv-body .hl-box{margin:16px 0 22px}
+.cv-body p{margin:0;max-width:58ch}
+/* bingkai foto dengan teks keliling, seperti referensi; teksnya dekoratif (aria-hidden) */
+.frame{position:relative;justify-self:end;width:min(100%,340px);aspect-ratio:1;padding:32px;background:var(--hl);box-shadow:12px 12px 0 var(--ink)}
+.frame .in{height:100%;padding:14px;background:var(--ink)}
+.frame .print{height:100%}
+.frame .print img{filter:grayscale(1) contrast(1.05);object-position:50% 12%}
+.frame .ft{position:absolute;font:500 13px/32px var(--mono);text-transform:uppercase;white-space:nowrap;overflow:hidden}
+.frame .ft.t{top:0;left:32px;right:32px}
+.frame .ft.r{top:32px;right:0;bottom:32px;writing-mode:vertical-rl}
+.frame .ft.b{bottom:0;left:32px;right:32px;rotate:180deg}
+.frame .ft.l{top:32px;left:0;bottom:32px;writing-mode:vertical-rl;rotate:180deg}
+
+/* ---------- 2. profil ---------- */
+.pf{display:grid;grid-template-columns:minmax(0,2.2fr) minmax(240px,1fr);gap:28px clamp(28px,4vw,64px);margin-top:clamp(20px,3vw,40px)}
+.pf .hd{margin:10px 0 18px}
+.cols{column-count:2;column-gap:32px;column-rule:1px solid var(--ink)}
+.cols p{margin:0 0 .9em}
+.cols p:first-child::first-letter{float:left;margin:.06em .08em 0 0;font:400 3.6em/.8 var(--display)}
+.quote{margin:18px 0 0;padding:16px 0;border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);font:italic 400 clamp(22px,2vw,30px)/1.25 var(--serif)}
+.quote span{background:var(--hl);box-decoration-break:clone;-webkit-box-decoration-break:clone;padding:0 .15em}
+.side{border-left:2px solid var(--ink);padding-left:clamp(18px,2vw,28px)}
+.side h3{font:600 13px var(--mono);text-transform:uppercase;padding:8px 0;border-bottom:1px solid var(--ink);margin-bottom:10px}
+.side ul{list-style:none;margin:0 0 22px;padding:0;font:400 14px/1.7 var(--mono)}
+.side p{margin:0 0 4px;font-size:15px;line-height:1.45}
+
+/* ---------- 3. proyek utama: gambar besar + kolom fakta ---------- */
+.f1{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(250px,1fr);gap:24px clamp(28px,4vw,64px);margin-top:clamp(20px,3vw,40px)}
+.f1 .hd{margin:10px 0 16px}
+.f1 .main-img{aspect-ratio:1100/619}
+.f1 .thumbs{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.f1 .thumbs .print{aspect-ratio:16/9}
+.f1 .lead{margin:0 0 16px}
+.f1 p{margin:0 0 16px}
+.f1 .dl{padding-top:14px;border-top:2px solid var(--ink)}
+
+/* ---------- 4. dua proyek berdampingan, dipisah garis kolom ---------- */
+.f2{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:24px 0;margin-top:clamp(20px,3vw,40px)}
+.f2 article{padding:0 clamp(20px,3vw,44px)}
+.f2 article:first-child{padding-left:0;border-right:2px solid var(--ink)}
+.f2 article:last-child{padding-right:0}
+.f2 .hd{margin:10px 0 14px;font-size:clamp(30px,3.6vw,56px)}
+.f2 .print{margin-bottom:14px}
+.f2 .s1{aspect-ratio:1100/504}
+.f2 .s2{aspect-ratio:4/3}
+.f2 p{margin:0 0 14px}
+
+/* ---------- 5. indeks proyek lain: kotak iklan baris ---------- */
+.ix-h{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:12px 28px;margin:clamp(20px,3vw,40px) 0 20px}
+.ix{list-style:none;margin:0;padding:0;display:grid;grid-auto-rows:1fr;grid-template-columns:repeat(4,minmax(0,1fr));border-top:2px solid var(--ink);border-left:2px solid var(--ink)}
+.ix li{padding:14px 16px 16px;border-right:2px solid var(--ink);border-bottom:2px solid var(--ink)}
+.ix h3{font:400 clamp(20px,1.7vw,26px)/1 var(--display);text-transform:uppercase;margin:6px 0 8px}
+.ix .m{font:400 12px/1.45 var(--mono);text-transform:uppercase}
+.ix p{margin:0 0 8px;font-size:15px;line-height:1.4}
+.ix li:nth-child(3n+1){background:rgba(255,238,74,.0)}
+.ix li:first-child{background:var(--hl)}
+
+/* ---------- 6. pengalaman: garis waktu mendatar ---------- */
+.xp{list-style:none;margin:clamp(20px,3vw,36px) 0 0;padding:0;display:grid;align-content:stretch;grid-template-columns:repeat(4,minmax(0,1fr))}
+.xp li{padding:0 clamp(14px,1.6vw,24px);border-left:2px solid var(--ink)}
+.xp li:first-child{padding-left:0;border-left:0}
+.xp .per{display:inline-block;margin-bottom:12px;padding:3px 8px;background:var(--ink);color:var(--paper);font:500 12px var(--mono);text-transform:uppercase}
+.xp h3{font:400 clamp(22px,2vw,32px)/1 var(--display);text-transform:uppercase;margin-bottom:10px}
+.xp .role{display:block;margin-bottom:8px;font:600 13px/1.4 var(--mono);text-transform:uppercase}
+.xp p{margin:0;font-size:16px;line-height:1.5}
+.edu{display:flex;flex-wrap:wrap;gap:6px 24px;margin-top:clamp(22px,3vw,40px);padding:14px 0;border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);font:400 14px var(--mono);text-transform:uppercase}
+.edu b{font-weight:600}
+
+/* ---------- 7. kontak ---------- */
+.ct-name{margin:clamp(16px,2vw,28px) 0 clamp(14px,1.6vw,22px)}
+.ct{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px clamp(28px,5vw,96px);align-items:start}
+.ct p{margin:0;max-width:44ch}
+.ct .btns{display:grid;gap:14px}
+.ct .btn{justify-content:space-between;gap:12px;min-height:56px}
+.ct .btn small{font:400 13px var(--mono);text-transform:none}
+/* pengaman terakhir: sisa ruang yang tidak bisa diisi elemen elastis dibagi rata di antara blok, bukan menumpuk di bawah */
+.paper.even{display:flex;flex-direction:column;justify-content:space-between}
+.end{display:flex;flex-wrap:wrap;gap:6px 24px;align-items:center;margin-top:clamp(18px,2vw,28px);padding-top:12px;border-top:2px solid var(--ink);font:400 13px var(--mono);text-transform:uppercase}
+.end span{margin-right:auto}
+.end a{display:inline-flex;align-items:center;min-height:44px}
+
+/* selama halaman bergulir (termasuk luncuran Lenis), kontrol yang lewat di bawah kursor tidak ikut menyala */
+.is-scrolling .paper a,.is-scrolling .curl{pointer-events:none}
+
+/* ---------- HP / layar sempit ---------- */
+/* halaman sempit: diukur dari lebar halaman */
+@container page (max-width:640px){
+  .mast nav{display:none}
+  .cv-body{grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:20px}
+  .frame{padding:26px}
+  .frame .ft{line-height:26px;font-size:12px}
+  .frame .ft.t,.frame .ft.b{left:26px;right:26px}
+  .frame .ft.r,.frame .ft.l{top:26px;bottom:26px}
+}
+@container page (max-width:480px){
+  .cv-body{grid-template-columns:minmax(0,1fr)}
+  .frame{justify-self:start;width:min(100%,300px)}
+}
+@container page (max-width:860px){
+  .pf,.f1,.ct{grid-template-columns:minmax(0,1fr)}
+  .cols{column-count:1}
+  .side{border-left:0;padding-left:0;border-top:2px solid var(--ink);padding-top:8px}
+  .f2{grid-template-columns:minmax(0,1fr)}
+  .f2 article{padding:0 !important;border-right:0 !important}
+  .f2 article+article{margin-top:24px;padding-top:24px !important;border-top:2px solid var(--ink)}
+  .ix{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .xp{grid-template-columns:repeat(2,minmax(0,1fr));gap:28px 0}
+  .xp li:nth-child(3){padding-left:0;border-left:0}
+}
+@container page (max-width:520px){
+  .paper{padding-bottom:96px}
+  .ix{grid-template-columns:minmax(0,1fr)}
+  .xp{grid-template-columns:minmax(0,1fr)}
+  .xp li{padding:0 0 22px !important;border-left:0 !important;border-bottom:2px solid var(--ink)}
+}
+@media (max-width:560px){
+  .curl{width:60px;height:60px}
+  .leaf{--cr:34px;--cl:34px}
+  .leaf:has(.curl.nx:hover){--cr:60px}
+  .leaf:has(.curl.pv:hover){--cl:60px}
+  .frame{padding:26px}
+  .frame .ft{line-height:26px;font-size:12px}
+  .frame .ft.t,.frame .ft.b{left:26px;right:26px}
+  .frame .ft.r,.frame .ft.l{top:26px;bottom:26px}
+}
+@media (prefers-reduced-motion:reduce){
+  .tick .tr{animation:none}
+  .leaf,.curl .lb,.btn,.bar button,.lnk,.tick button,.mast nav a{transition:none}
+}
+/* Lenis (smooth scroll), dari dist/lenis.css 1.3.27, sama seperti lab lain */
+html.lenis,html.lenis body{height:auto}
+html.lenis{scroll-behavior:auto}
+.lenis:not(.lenis-autoToggle).lenis-stopped{overflow:clip}
+.lenis [data-lenis-prevent]{overscroll-behavior:contain}
+.lenis.lenis-smooth iframe{pointer-events:none}
+.leaf:focus{outline:none}
+</style>
+</head>
+<body>
+<a class="skip" href="#profil" data-go="1" data-t="skip">Skip to profile</a>
+
+<main class="stage" id="stage">
+
+  <!-- 1. sampul -->
+  <section class="leaf" id="sampul" tabindex="-1" aria-labelledby="cv-h">
+    <div class="paper">
+      <header class="mast">
+        <a class="logo" href="../" data-lab data-t-aria="labAria"><b>AFW</b>✱TABLOID</a>
+        <nav data-t-aria="navAria">
+          <a href="#profil" data-go="1" data-t="navProfile"></a>
+          <a href="#proyek" data-go="2" data-t="navWork"></a>
+          <a href="#pengalaman" data-go="5" data-t="navXp"></a>
+        </nav>
+        <a class="btn y" href="#kontak" data-go="6" data-t="navContact"></a>
+      </header>
+      <div class="tick" id="tick" data-drop="3">
+        <div class="vp" aria-hidden="true"><span class="tr" id="tick-tr"></span></div>
+        <p class="sr" id="tick-sr"></p>
+        <button type="button" id="tick-btn"></button>
+      </div>
+      <h1 class="cv-name" id="cv-h"><span class="fit" data-fit="name"><span class="t"><span class="w">Agung </span><span class="w">Fitrah </span><span class="w">Wibowo</span></span></span></h1>
+      <hr class="rule">
+      <div class="cv-body">
+        <div>
+          <span class="kick" data-t="spot"></span>
+          <span class="hl-box">Front-End Developer &amp; UI/UX Designer</span>
+          <p class="lead" data-t="intro" data-drop="2"></p>
+        </div>
+        <figure class="frame" style="margin:0" data-drop="1" data-grow="h">
+          <div class="in"><div class="print"><img src="../../assets/foto-agung.webp" width="600" height="1095" fetchpriority="high" alt="Agung Fitrah Wibowo"></div></div>
+          <span class="ft t" aria-hidden="true" data-frame></span>
+          <span class="ft r" aria-hidden="true" data-frame></span>
+          <span class="ft b" aria-hidden="true" data-frame></span>
+          <span class="ft l" aria-hidden="true" data-frame></span>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. profil -->
+  <section class="leaf" id="profil" tabindex="-1" aria-labelledby="pf-h">
+    <div class="paper">
+      <div class="folio" data-folio></div>
+      <div class="pf">
+        <div>
+          <span class="kick" data-t="pfKick"></span>
+          <h2 class="hd" id="pf-h" data-t="pfH"></h2>
+          <div class="cols">
+            <p data-t="bio1"></p>
+            <p data-t="bio2" data-drop="1"></p>
+            <p data-t="bio3" data-drop="4"></p>
+          </div>
+          <p class="quote" data-drop="2" data-grow="fs"><span data-t="bio4"></span></p>
+        </div>
+        <aside class="side" data-t-aria="sideAria" data-drop="3">
+          <h3 data-t="skAdv"></h3>
+          <ul><li>HTML</li><li>CSS</li><li>Tailwind CSS</li><li>Bootstrap</li><li>Figma</li></ul>
+          <h3 data-t="skMid"></h3>
+          <ul><li>JavaScript</li><li>Svelte · React · Vue.js</li><li>PHP · Yii2 · Laravel</li><li>SCSS / Sass</li><li>WordPress (Divi)</li><li>Git</li></ul>
+          <h3 data-t="skAi" data-drop="5"></h3>
+          <ul data-drop="5"><li>Claude · ChatGPT</li><li data-t="skAgent"></li></ul>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. proyek 01 -->
+  <section class="leaf" id="proyek" tabindex="-1" aria-labelledby="f1-h">
+    <div class="paper">
+      <div class="folio" data-folio></div>
+      <div class="f1">
+        <div>
+          <figure class="print main-img" data-grow="h"><img src="../../assets/faria-managebac.webp" width="1100" height="619" loading="lazy" alt="ManageBac website"></figure>
+          <div class="thumbs" data-drop="3">
+            <figure style="margin:0"><div class="print"><img src="../../assets/faria-schoolsbuddy.webp" width="1100" height="619" loading="lazy" alt="SchoolsBuddy website"></div><figcaption class="cap">SchoolsBuddy</figcaption></figure>
+            <figure style="margin:0"><div class="print"><img src="../../assets/faria-openapply.webp" width="1100" height="619" loading="lazy" alt="OpenApply website"></div><figcaption class="cap">OpenApply</figcaption></figure>
+          </div>
+        </div>
+        <div>
+          <span class="kick" data-t="f1Kick"></span>
+          <h2 class="hd" id="f1-h">Faria Education Group</h2>
+          <p class="lead" data-t="p1role"></p>
+          <p data-t="j2d" data-drop="2"></p>
+          <dl class="dl" data-drop="1"><dt data-t="lClient"></dt><dd>Faria Education Group</dd><dt data-t="lPeriod"></dt><dd data-t="j2p"></dd><dt data-t="lTools"></dt><dd>Svelte · Tailwind CSS · JavaScript</dd></dl>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. proyek 02 + 03 -->
+  <section class="leaf" id="proyek-2" tabindex="-1" aria-labelledby="f2-h">
+    <div class="paper">
+      <div class="folio" data-folio></div>
+      <h2 class="sr" id="f2-h" data-t="f2Sr"></h2>
+      <div class="f2">
+        <article>
+          <span class="kick" data-t="f2aKick"></span>
+          <h3 class="hd">STARS Mandiri</h3>
+          <figure class="print s1" data-drop="2" data-grow="h"><img src="../../assets/stars-1.webp" width="1100" height="504" loading="lazy" data-t-alt="alt2" alt=""></figure>
+          <p data-t="p2role" data-drop="5"></p>
+          <dl class="dl" data-drop="4"><dt data-t="lClient"></dt><dd>RSUP H. Adam Malik Medan</dd><dt data-t="lTools"></dt><dd>UI Design · Layout Print · Yii2</dd></dl>
+        </article>
+        <article data-drop="1">
+          <span class="kick" data-t="f2bKick"></span>
+          <h3 class="hd">Kimy Kuky</h3>
+          <figure class="print s2" data-drop="3" data-grow="h"><img src="../../assets/kimy-1.webp" width="1100" height="837" loading="lazy" data-t-alt="alt3" alt=""></figure>
+          <p data-t="p3role" data-drop="5"></p>
+          <dl class="dl" data-drop="4"><dt data-t="lClient"></dt><dd>Kimy Kuky Cookies</dd><dt data-t="lTools"></dt><dd>UI Design · WordPress · Divi Builder</dd></dl>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. indeks proyek lain -->
+  <section class="leaf" id="proyek-lain" tabindex="-1" aria-labelledby="ix-h">
+    <div class="paper">
+      <div class="folio" data-folio></div>
+      <div class="ix-h">
+        <div><span class="kick" data-t="ixKick"></span><h2 class="hd" id="ix-h" data-t="ixH"></h2></div>
+        <a class="lnk mono" href="../../#proyek" data-main style="font-size:13px" data-t="ixAll"></a>
+      </div>
+      <ul class="ix" id="ix" data-grow="hn"></ul>
+    </div>
+  </section>
+
+  <!-- 6. pengalaman -->
+  <section class="leaf" id="pengalaman" tabindex="-1" aria-labelledby="xp-h">
+    <div class="paper">
+      <div class="folio" data-folio></div>
+      <span class="kick" style="margin-top:clamp(20px,3vw,40px)" data-t="xpKick"></span>
+      <h2 class="hd" id="xp-h" style="margin-top:10px" data-t="xpH" data-grow="fs"></h2>
+      <ol class="xp" data-grow="hn">
+        <li><span class="per" data-t="j1p"></span><h3>RSUP H. Adam Malik</h3><span class="role" data-t="j1r"></span><p data-t="j1d" data-drop="4"></p></li>
+        <li><span class="per" data-t="j2p"></span><h3>Faria Edu</h3><span class="role" data-t="j2r"></span><p data-t="j2d2" data-drop="5"></p></li>
+        <li data-drop="2"><span class="per" data-t="j3p"></span><h3>Freelancer</h3><span class="role">Web Front-End Developer / UI/UX Designer</span><p data-t="j3d" data-drop="6"></p></li>
+        <li data-drop="3"><span class="per" data-t="j4p"></span><h3>Xtend Indonesia</h3><span class="role">Web Front-End Developer / UI/UX Designer</span><p data-t="j4d" data-drop="7"></p></li>
+      </ol>
+      <p class="edu" data-drop="8"><b data-t="edu"></b><span>Universitas Potensi Utama, Medan</span><span data-t="eduDeg"></span><span data-t="eduPer"></span></p>
+    </div>
+  </section>
+
+  <!-- 7. kontak -->
+  <section class="leaf" id="kontak" tabindex="-1" aria-labelledby="ct-h">
+    <div class="paper">
+      <div class="folio" data-folio></div>
+      <h2 class="ct-name" id="ct-h">
+        <span class="fit" data-fit data-grow="fs"><span class="t" data-t="c1"></span></span>
+        <span class="fit" data-fit data-grow="fs"><span class="t" data-t="c2"></span></span>
+      </h2>
+      <div class="ct">
+        <p class="lead" data-t="cText" data-drop="1"></p>
+        <div class="btns">
+          <a class="btn y" href="mailto:agungf.wibowo@gmail.com" data-mail><span>Email</span><small>agungf.wibowo@gmail.com</small></a>
+          <a class="btn o" href="https://wa.me/6281370419424" data-wa target="_blank" rel="noopener"><span>WhatsApp <span aria-hidden="true">↗</span></span><small>+62 813 7041 9424</small></a>
+          <a class="btn o" href="https://www.linkedin.com/in/agungfwibowo/" target="_blank" rel="noopener"><span>LinkedIn <span aria-hidden="true">↗</span></span><small>agungfwibowo</small></a>
+        </div>
+      </div>
+      <footer class="end">
+        <span>© 2026 Agung Fitrah Wibowo</span>
+        <a class="lnk" href="../" data-lab data-t="fLab"></a>
+        <a class="lnk" href="../../" data-main data-t="fMain"></a>
+      </footer>
+    </div>
+  </section>
+  <div class="gutter" id="gutter" aria-hidden="true"></div>
+</main>
+<div class="spacer" id="spacer" aria-hidden="true"></div>
+
+<!-- petunjuk di zona jeda: isi sudah habis dibaca, gulir lagi untuk membalik; bar terisi sampai lembar mulai berputar -->
+<div class="hint" id="hint" aria-hidden="true"><span id="hint-t"></span><i><b id="hint-p"></b></i></div>
+<nav class="bar" data-t-aria="barAria">
+  <button type="button" id="pv" aria-label="Previous page">‹</button>
+  <button type="button" class="fo" id="toc-btn" aria-expanded="false" aria-controls="toc"><span id="fo-n"></span><span class="nm-pg" id="fo-name"></span><span class="car" aria-hidden="true">▾</span></button>
+  <div class="toc" id="toc" hidden>
+    <p class="toc-h" data-t="tocH"></p>
+    <ol id="toc-list"></ol>
+  </div>
+  <button type="button" id="nx" aria-label="Next page">›</button>
+  <button type="button" class="lang" id="lang-btn"></button>
+</nav>
+
+<script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js" integrity="sha384-UbfRVKN3/elS1r7JcK2FhmPP+KlJ4CvYwbyYD7tH+uTkbT9bNJr9eJeQ0FoFbAgz" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.3.27/dist/lenis.min.js" integrity="sha384-R18XzqnxvVLEF+BYfhpmDx30v7eP83fAckyfoRzK7/Uf6nGqufcmsk0eAKo7S3RU" crossorigin="anonymous"></script>
+<script>
+(function () {
+  var T = {
+    en: {
+      skip: 'Skip to profile', labAria: 'AFW Tabloid, back to the lab list', navAria: 'Sections', barAria: 'Pages',
+      navProfile: 'Profile', navWork: 'Work', navXp: 'Experience', navContact: 'Contact me',
+      lang: 'ID', langAria: 'Ganti ke Bahasa Indonesia', page: 'Page', edition: 'November 2026 edition',
+      pages: ['Cover', 'Profile', 'Work', 'Work', 'More work', 'Experience', 'Contact'],
+      hint: 'Keep scrolling to turn the page', tocH: 'Contents', tocOpen: ', open the contents',
+      toc: ['Cover', 'Profile', 'Faria Education', 'STARS & Kimy Kuky', 'More work', 'Experience', 'Contact'],
+      next: 'Next page: ', prev: 'Previous page: ', first: 'This is the first page', last: 'This is the last page', toCover: 'Back to the cover',
+      tick: ['Front-end developer & UI/UX designer since 2019', 'Now: programmer, SIMRS unit, RSUP H. Adam Malik Medan', '2022 to 2024: Faria Education Group sites moved from WordPress to Svelte', '11 projects in the archive', 'Open to freelance'],
+      tickLabel: 'Ticker: ', tickPause: 'Pause', tickPlay: 'Play', tickPauseA: 'Pause the ticker', tickPlayA: 'Play the ticker',
+      spot: 'Spotlight / November 2026',
+      intro: 'I design interfaces in Figma and write the code for them myself: hospital information system modules at RSUP H. Adam Malik Medan, product sites for Faria Education Group, and websites for clients in retail, interior, gaming, and education.',
+      frame: '/Front-end ✱ UI/UX ✱ since 2019 *** ',
+      pfKick: 'Profile', pfH: 'From Figma to tidy code',
+      bio1: 'Since May 2021 I have been a programmer in the SIMRS unit at RSUP H. Adam Malik Medan: designing module UI, building the front-end, writing the Yii2 backend, and laying out printed forms and reports.',
+      bio2: 'From 2022 to 2024 I worked remotely for Faria Education Group, slicing designs and writing animation logic while their product sites moved from WordPress + Divi to Svelte + Tailwind CSS.',
+      bio3: 'Before that, as a freelancer, I designed and built 9 websites and web apps for clients in retail, interior, gaming, industry, education, energy, and health.',
+      bio4: 'Need one person who draws the screen and writes its code?',
+      sideAria: 'Skills', skAdv: 'Advanced', skMid: 'Intermediate', skAi: 'AI-assisted development', skAgent: 'Claude Code (AI agent)',
+      f1Kick: 'Work 01 · Product websites', lClient: 'Client', lTools: 'Tools', lPeriod: 'Period',
+      p1role: 'These sites were built with WordPress + Divi Builder, then migrated to Svelte + Tailwind CSS. Design slicing and animation logic for ManageBac, SchoolsBuddy, OpenApply, and more.',
+      j2d: 'I worked full-time and remotely as a WordPress developer, then carried the same pages across to the new Svelte + Tailwind CSS stack.',
+      f2Sr: 'Work 02 and 03', f2aKick: 'Work 02 · Information system', f2bKick: 'Work 03 · E-commerce website',
+      p2role: 'Print layouts, the patient bed information display, and the backend in Yii2.',
+      p3role: 'Designed the website UI and built it with WordPress + Divi Builder.',
+      alt2: 'STARS Mandiri screen', alt3: 'Kimy Kuky Cookies home page',
+      ixKick: 'Work 04 to 11', ixH: 'More from the archive', ixAll: 'Screenshots of every project are on the main site',
+      xpKick: 'Career', xpH: 'Experience',
+      j1p: 'May 2021 – Present', j1r: 'Programmer / Developer · SIMRS Unit', j1d: 'Designing UI for hospital information system modules, building application front-ends, developing the backend with PHP (Yii2), and creating print layouts for forms and reports, assisted by AI (Claude, ChatGPT, Claude Code).',
+      j2p: 'Feb 2022 – Oct 2024', j2r: 'WordPress Developer (Full-time · Remote)', j2d2: 'Faria Education Group product sites (ManageBac, SchoolsBuddy, OpenApply, and more) were built with WordPress + Divi Builder, then migrated to Svelte + Tailwind CSS. I worked on the design slicing and animation logic.',
+      j3p: 'Oct 2019 – May 2021', j3d: 'Designed and built 9 websites and web apps for clients in retail, interior design, gaming, industry, education, energy, and healthcare.',
+      j4p: 'Jun 2019 – Oct 2019', j4d: 'Setia Budi Complex, Medan. Website front-end, mobile UI/UX design, and WordPress with Divi Builder.',
+      edu: 'Education', eduDeg: 'Bachelor of Computer Science (S.Kom)', eduPer: 'Oct 2012 – Nov 2016',
+      c1: 'Got a project', c2: 'or an opening?',
+      cText: 'I do UI design, front-end, and WordPress. Tell me what you need by email or WhatsApp.',
+      mailSubject: "Hi Agung, I'd like to talk", waText: 'Hi Agung, I came across your portfolio and would like to talk about ',
+      fLab: 'Back to the lab', fMain: 'Main site'
+    },
+    id: {
+      skip: 'Lompat ke profil', labAria: 'AFW Tabloid, kembali ke daftar lab', navAria: 'Bagian', barAria: 'Halaman',
+      navProfile: 'Profil', navWork: 'Proyek', navXp: 'Pengalaman', navContact: 'Hubungi saya',
+      lang: 'EN', langAria: 'Switch to English', page: 'Hal.', edition: 'Edisi November 2026',
+      pages: ['Sampul', 'Profil', 'Proyek', 'Proyek', 'Proyek lain', 'Pengalaman', 'Kontak'],
+      hint: 'Terus gulir untuk membalik halaman', tocH: 'Daftar isi', tocOpen: ', buka daftar isi',
+      toc: ['Sampul', 'Profil', 'Faria Education', 'STARS & Kimy Kuky', 'Proyek lain', 'Pengalaman', 'Kontak'],
+      next: 'Halaman berikutnya: ', prev: 'Halaman sebelumnya: ', first: 'Ini halaman pertama', last: 'Ini halaman terakhir', toCover: 'Kembali ke sampul',
+      tick: ['Front-end developer & UI/UX designer sejak 2019', 'Kini: programmer unit SIMRS, RSUP H. Adam Malik Medan', '2022 sampai 2024: situs Faria Education Group pindah dari WordPress ke Svelte', '11 proyek di arsip', 'Terima freelance'],
+      tickLabel: 'Teks berjalan: ', tickPause: 'Jeda', tickPlay: 'Putar', tickPauseA: 'Jeda teks berjalan', tickPlayA: 'Putar teks berjalan',
+      spot: 'Sorotan / November 2026',
+      intro: 'Saya mendesain antarmuka di Figma lalu menulis kodenya sendiri: modul sistem informasi rumah sakit di RSUP H. Adam Malik Medan, situs produk Faria Education Group, dan website klien di bidang ritel, interior, gaming, dan edukasi.',
+      frame: '/Front-end ✱ UI/UX ✱ sejak 2019 *** ',
+      pfKick: 'Profil', pfH: 'Dari Figma, sampai kode yang rapi',
+      bio1: 'Sejak Mei 2021 saya programmer di unit SIMRS RSUP H. Adam Malik Medan: mendesain UI modul, membangun front-end, menulis backend Yii2, dan menyusun layout print formulir serta laporan.',
+      bio2: 'Tahun 2022 sampai 2024 saya bekerja remote untuk Faria Education Group, mengerjakan slicing desain dan logic animasi saat situs produk mereka pindah dari WordPress + Divi ke Svelte + Tailwind CSS.',
+      bio3: 'Sebelumnya, sebagai freelancer, saya merancang dan membangun 9 website dan web app untuk klien ritel, interior, gaming, industri, edukasi, energi, dan kesehatan.',
+      bio4: 'Butuh satu orang yang menggambar layarnya sekaligus menulis kodenya?',
+      sideAria: 'Keahlian', skAdv: 'Mahir', skMid: 'Menengah', skAi: 'AI-assisted development', skAgent: 'Claude Code (agen AI)',
+      f1Kick: 'Proyek 01 · Website produk', lClient: 'Klien', lTools: 'Alat', lPeriod: 'Periode',
+      p1role: 'Situs sebelumnya dibangun dengan WordPress + Divi Builder, lalu bermigrasi ke Svelte + Tailwind CSS. Slicing desain dan logic animasi untuk ManageBac, SchoolsBuddy, OpenApply, dan lainnya.',
+      j2d: 'Saya bekerja penuh waktu secara remote sebagai WordPress developer, lalu membawa halaman yang sama ke stack baru Svelte + Tailwind CSS.',
+      f2Sr: 'Proyek 02 dan 03', f2aKick: 'Proyek 02 · Sistem informasi', f2bKick: 'Proyek 03 · Website e-commerce',
+      p2role: 'Layout print, tampilan informasi tempat tidur pasien, dan backend dengan Yii2.',
+      p3role: 'Mendesain UI website dan membangunnya dengan WordPress + Divi Builder.',
+      alt2: 'Layar STARS Mandiri', alt3: 'Halaman depan Kimy Kuky Cookies',
+      ixKick: 'Proyek 04 sampai 11', ixH: 'Proyek lain dari arsip', ixAll: 'Tangkapan layar semua proyek ada di situs utama',
+      xpKick: 'Karier', xpH: 'Pengalaman',
+      j1p: 'Mei 2021 – Sekarang', j1r: 'Programmer / Developer · Unit SIMRS', j1d: 'Mendesain UI modul SIMRS, membangun front-end aplikasi, mengembangkan backend dengan PHP (Yii2), dan membuat layout print formulir dan laporan, dibantu AI (Claude, ChatGPT, Claude Code).',
+      j2p: 'Feb 2022 – Okt 2024', j2r: 'WordPress Developer (Remote)', j2d2: 'Situs produk Faria Education Group (ManageBac, SchoolsBuddy, OpenApply, dan lainnya) sebelumnya dibangun dengan WordPress + Divi Builder, lalu bermigrasi ke Svelte + Tailwind CSS. Saya mengerjakan slicing desain dan logic animasinya.',
+      j3p: 'Okt 2019 – Mei 2021', j3d: 'Merancang dan membangun 9 website dan web app untuk klien ritel, interior, gaming, industri, edukasi, energi, dan kesehatan.',
+      j4p: 'Jun 2019 – Okt 2019', j4d: 'Komp. Setia Budi, Medan. Front-end website, desain UI/UX mobile, dan WordPress dengan Divi Builder.',
+      edu: 'Pendidikan', eduDeg: 'Sarjana Komputer (S.Kom)', eduPer: 'Okt 2012 – Nov 2016',
+      c1: 'Ada proyek', c2: 'atau lowongan?',
+      cText: 'Saya mengerjakan desain UI, front-end, dan WordPress. Ceritakan kebutuhannya lewat email atau WhatsApp.',
+      mailSubject: 'Halo Agung, saya tertarik berdiskusi', waText: 'Halo Agung, saya lihat portofolio kamu dan ingin ngobrol soal ',
+      fLab: 'Kembali ke lab', fMain: 'Situs utama'
+    }
+  }
+  // proyek 04-11, dari js/data.js situs utama
+  var IX = [
+    { n: 'Barik.id', c: { en: 'Company profile', id: 'Company profile' }, cl: 'Barik Home & Interior', r: { en: 'Designed the website UI and built it with WordPress + Divi Builder.', id: 'Mendesain UI website dan membangunnya dengan WordPress + Divi Builder.' }, t: 'UI Design · WordPress · Divi' },
+    { n: 'Clarias', c: { en: 'Game top-up website', id: 'Website top up' }, cl: 'Clarias Gaming Shop', r: { en: 'Designed the website UI in Figma and sliced it into HTML.', id: 'Mendesain UI website dengan Figma dan slicing ke HTML.' }, t: 'Figma · HTML/CSS' },
+    { n: 'KIKT', c: { en: 'Company profile', id: 'Company profile' }, cl: 'Kuala Tanjung Industrial Estate', r: { en: 'Built the website with WordPress.', id: 'Membangun website dengan WordPress.' }, t: 'WordPress' },
+    { n: 'Amoz', c: { en: 'Company profile', id: 'Company profile' }, cl: 'PT. Tirta Alpin Makmur', r: { en: 'Designed the website UI in Adobe XD.', id: 'Mendesain UI website dengan Adobe XD.' }, t: 'Adobe XD · UI Design' },
+    { n: 'Skill Factory', c: { en: 'Website', id: 'Website' }, cl: 'Skill Factory', r: { en: 'Designed the website UI in Figma and built it with WordPress + Divi Builder.', id: 'Mendesain UI website dengan Figma dan membangunnya dengan WordPress + Divi Builder.' }, t: 'Figma · WordPress · Divi' },
+    { n: 'Yuk Belajar', c: { en: 'Education website', id: 'Website edukasi' }, cl: 'Indonesiabelajar.org', r: { en: 'Designed the website UI in Adobe XD and sliced it into HTML.', id: 'Mendesain UI website dengan Adobe XD dan slicing ke HTML.' }, t: 'Adobe XD · HTML/CSS' },
+    { n: 'Project TV', c: { en: 'Web app', id: 'Web app' }, cl: { en: 'A hospital in China', id: 'Salah satu rumah sakit di China' }, r: { en: 'Sliced the design into Vue.js.', id: 'Slicing desain ke Vue.js.' }, t: 'Vue.js · Front-End' },
+    { n: 'PROBIS', c: { en: 'Web app', id: 'Web app' }, cl: 'PLN UPHK Medan', r: { en: 'Designed the website UI in Adobe XD and sliced it with Vue.js.', id: 'Mendesain UI website dengan Adobe XD dan slicing dengan Vue.js.' }, t: 'Adobe XD · Vue.js' }
+  ]
+
+  var root = document.documentElement, $ = function (id) { return document.getElementById(id) }
+  var $$ = function (s, el) { return [].slice.call((el || document).querySelectorAll(s)) }
+  var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] }) }
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches
+  var pages = $$('section.leaf'), N = pages.length, stage = $('stage')
+  var book = !reduce
+  if (book) {
+    root.classList.add('book')
+    // halaman yang belum terlihat ikut dikloning saat dibalik, jadi gambarnya dimuat sejak awal
+    $$('img[loading="lazy"]').forEach(function (im) { im.loading = 'eager' })
+  }
+
+  // tombol pojok: kanan bawah = berikutnya, kiri bawah = sebelumnya; halaman terakhir: pojok kanan kembali ke sampul
+  pages.forEach(function (lf, i) {
+    if (i > 0) lf.insertAdjacentHTML('beforeend', '<button type="button" class="curl pv" data-to="' + (i - 1) + '"><span class="lb"></span></button>')
+    lf.insertAdjacentHTML('beforeend', '<button type="button" class="curl nx' + (i === N - 1 ? ' home' : '') + '" data-to="' + (i < N - 1 ? i + 1 : 0) + '"><span class="lb"></span></button>')
+  })
+
+  // bahasa: sama seperti situs utama dan lab lain. English default; ?lang=id atau pilihan tersimpan ('afw-lang')
+  var lang = ''
+  try { lang = new URLSearchParams(location.search).get('lang') || localStorage.getItem('afw-lang') || '' } catch (e) {}
+  if (lang !== 'id' && lang !== 'en') lang = 'en'
+  var tx = function (v) { return typeof v === 'string' ? v : v[lang] }
+
+  // ---------- langkah (step) ----------
+  // desktop: buku terbuka, tiap langkah = [halaman kiri, halaman kanan]; sampul sendirian di kanan (buku masih tertutup)
+  // HP / layar sempit: tiap langkah = satu halaman
+  var spread = false, ST = []
+  function buildSteps() {
+    ST = []
+    if (spread) { ST.push([-1, 0]); for (var p = 1; p < N; p += 2) ST.push([p, p + 1 < N ? p + 1 : -1]) }
+    else for (var q = 0; q < N; q++) ST.push([-1, q])
+  }
+  function stepOf(p) { return spread ? Math.floor((p + 1) / 2) : p }
+  function pagesOf(s) { return ST[s].filter(function (p) { return p >= 0 }) }
+  buildSteps()
+
+  function render() {
+    var t = T[lang], q = lang === 'id' ? '?lang=id' : ''
+    root.lang = lang
+    $$('[data-t]').forEach(function (el) { el.textContent = t[el.dataset.t] })
+    $$('[data-t-aria]').forEach(function (el) { el.setAttribute('aria-label', t[el.dataset.tAria]) })
+    $$('[data-t-alt]').forEach(function (el) { el.alt = t[el.dataset.tAlt] })
+    $$('[data-lab]').forEach(function (a) { a.href = '../' + q })
+    $$('[data-main]').forEach(function (a) { a.href = '../../' + q + (a.closest('.ix-h') ? '#proyek' : '') })
+    $$('[data-mail]').forEach(function (a) { a.href = 'mailto:agungf.wibowo@gmail.com?subject=' + encodeURIComponent(t.mailSubject) })
+    $$('[data-wa]').forEach(function (a) { a.href = 'https://wa.me/6281370419424?text=' + encodeURIComponent(t.waText) })
+    $('lang-btn').textContent = t.lang
+    $('lang-btn').setAttribute('aria-label', t.langAria)
+    $$('[data-frame]').forEach(function (el) { el.textContent = (t.frame).repeat(4) })
+    $$('[data-folio]').forEach(function (el) {
+      var i = pages.indexOf(el.closest('.leaf'))
+      el.innerHTML = '<span><b>AFW</b>✱TABLOID</span><span>' + esc(t.edition) + '</span><span>' + esc(t.page) + ' ' + (i + 1) + ' · ' + esc(t.pages[i]) + '</span>'
+    })
+    var tk = t.tick.map(esc).join(' &nbsp;✱✱&nbsp; ') + ' &nbsp;✱✱&nbsp; '
+    $('tick-tr').innerHTML = tk + tk
+    $('tick-sr').textContent = t.tickLabel + t.tick.join('. ')
+    $('ix').innerHTML = IX.map(function (p, i) {
+      return '<li' + (i >= 2 ? ' data-drop="' + i + '"' : '') + '><span class="m">' + esc(tx(p.c)) + '</span><h3>' + esc(p.n) + '</h3><p data-drop="9">' + esc(tx(p.r)) + '</p><span class="m">' + esc(tx(p.cl)) + '<br>' + esc(p.t) + '</span></li>'
+    }).join('')
+    $$('.curl').forEach(function (b) {
+      var k = +b.dataset.to, home = b.classList.contains('home')
+      b.setAttribute('aria-label', home ? t.toCover : (b.classList.contains('nx') ? t.next : t.prev) + t.pages[k])
+      b.querySelector('.lb').textContent = home ? t.toCover : t.page + ' ' + (k + 1) + ' · ' + t.pages[k]
+    })
+    $('hint-t').textContent = t.hint
+    syncTick()
+    if (book) layout(); else fit()
+    syncBar()
+  }
+
+  // judul raksasa diskalakan supaya pas selebar kolomnya; nama di sampul dipecah 1, 2, atau 3 baris sesuai lebar halaman
+  function fit() {
+    $$('[data-fit]').forEach(function (el) {
+      var W = el.clientWidth
+      if (el.dataset.fit === 'name') el.dataset.lines = W < 520 ? 3 : W < 980 ? 2 : 1
+      el.style.fontSize = '100px'
+      var r = el.querySelector('.t').getBoundingClientRect()
+      el.style.fontSize = (100 * W / r.width * 0.99).toFixed(2) + 'px'
+    })
+  }
+
+  // teks berjalan: berhenti saat disorot, bisa dijeda (berjalan lebih dari 5 detik, jadi wajib ada kontrol jeda)
+  var tickPaused = false
+  function syncTick() {
+    var t = T[lang], b = $('tick-btn')
+    $('tick').classList.toggle('paused', tickPaused)
+    b.textContent = tickPaused ? '▶' : 'II'
+    b.setAttribute('aria-label', tickPaused ? t.tickPlayA : t.tickPauseA)
+    b.setAttribute('aria-pressed', tickPaused ? 'true' : 'false')
+  }
+  $('tick-btn').addEventListener('click', function () { tickPaused = !tickPaused; syncTick() })
+  if (reduce) $('tick-btn').hidden = true
+
+  // ---------- tata letak buku ----------
+  // posisi scroll dibagi per langkah: [baca isi (kalau lebih tinggi dari layar)] lalu [balik lembar].
+  // REST: jarak gulir "diam" setelah isi selesai dibaca, sebelum lembar mulai berputar; supaya gulir kecil tidak langsung membalik halaman
+  var L = [], V = 0, GAP = 0, TURN = 0, REST = 0, PW = 0, SX = 0, step = 0, off = 0, jump = null
+  var ease = function (t) { return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2 }
+  function layout() {
+    var W = innerWidth
+    V = innerHeight
+    GAP = parseFloat(getComputedStyle(root).getPropertyValue('--gap')) || 0
+    TURN = Math.round(V * 0.9)
+    REST = Math.round(V * 0.35)
+    spread = W >= 1024 && V >= 560
+    root.classList.toggle('spread', spread)
+    PW = spread ? Math.floor(Math.min(W - GAP * 2, 1680) / 2) : W - GAP * 2
+    SX = spread ? Math.round(W / 2) : GAP
+    buildSteps()
+    pages.forEach(function (p) {
+      p.classList.remove('on-left', 'on-right')
+      p.style.width = PW + 'px'
+      p.querySelector('.paper').style.minHeight = ''
+    })
+    ST.forEach(function (st) {
+      if (st[0] >= 0) pages[st[0]].classList.add('on-left')
+      if (st[1] >= 0) pages[st[1]].classList.add('on-right')
+    })
+    fit()
+    // semua halaman setinggi layar (seperti lembar PDF): tidak ada gulir di dalam halaman, lembar yang dibalik menutup pas halaman di bawahnya
+    var h = V - GAP * 2
+    fitPages(h)
+    var y = 0
+    ST.forEach(function (st, i) {
+      var read = Math.max(0, h + GAP * 2 - V)
+      L[i] = { start: y, read: read, h: h }
+      y += read + (i < ST.length - 1 ? REST + TURN : 0)
+    })
+    $('spacer').style.height = (y + V) + 'px'
+    clearTurn()
+    glReset()
+    draw()
+  }
+
+  // Tiap halaman setinggi h, tanpa sisa kosong dan tanpa isi terpotong:
+  // 1. elemen elastis (data-grow) dikecilkan dulu ke ukuran minimum
+  // 2. kalau masih kelebihan, bagian dengan data-drop terbesar disembunyikan lebih dulu (isi lengkap ada di situs utama)
+  // 3. elemen elastis dibesarkan sampai sisa ruang terisi: h = tinggi (gambar, bingkai foto), hn = tinggi tapi tidak di bawah ukuran aslinya
+  //    (kotak/daftar yang meregang), fs = ukuran huruf (kutipan, judul)
+  // Di mode gerak dikurangi (tanpa buku) fungsi ini tidak dipakai, jadi semua isi tampil.
+  var MINH = 140
+  function fitPages(h) {
+    pages.forEach(function (pg) {
+      var paper = pg.querySelector('.paper'), items = $$('[data-drop]', pg), grows = $$('[data-grow]', pg)
+      items.forEach(function (el) { el.classList.remove('cut') })
+      grows.forEach(function (el) { el.style.height = ''; el.style.aspectRatio = ''; if (!el.hasAttribute('data-fit')) el.style.fontSize = '' })
+      paper.classList.remove('even')
+      paper.style.height = ''
+      paper.style.minHeight = '0px'
+      var fits = function () { return pg.offsetHeight <= h && paper.scrollWidth <= paper.clientWidth + 1 }
+      var base = grows.map(function (el) {
+        var b = { el: el, k: el.dataset.grow, nat: el.offsetHeight, fs: parseFloat(getComputedStyle(el).fontSize) }
+        b.min = +el.dataset.min || MINH
+        if (b.k === 'h') { el.style.aspectRatio = 'auto'; el.style.height = b.min + 'px' }
+        if (b.k === 'fs') el.style.fontSize = (b.fs * 0.75) + 'px'
+        return b
+      })
+      var levels = items.map(function (el) { return +el.dataset.drop }).filter(function (v, k, a) { return a.indexOf(v) === k }).sort(function (a, b) { return b - a })
+      for (var k = 0; k < levels.length && !fits(); k++) {
+        items.forEach(function (el) { if (+el.dataset.drop === levels[k]) el.classList.add('cut') })
+      }
+      base.forEach(function (b) {
+        var el = b.el
+        if (el.closest('.cut')) return
+        var lo, hi, set
+        if (b.k === 'hn') { el.style.height = ''; b.nat = el.offsetHeight }
+        if (b.k === 'fs') {
+          lo = b.fs * 0.75; hi = b.fs * 3
+          set = function (v) { el.style.fontSize = v.toFixed(1) + 'px' }
+        } else {
+          lo = b.k === 'hn' ? b.nat : b.min; hi = h
+          set = function (v) { el.style.height = Math.round(v) + 'px' }
+        }
+        set(lo)
+        if (!fits()) return
+        // cari ukuran terbesar yang masih muat (fs juga tidak boleh melebar keluar kolomnya)
+        for (var i = 0; i < 14; i++) {
+          var mid = (lo + hi) / 2
+          set(mid)
+          if (fits() && el.scrollWidth <= el.clientWidth + 1) lo = mid; else hi = mid
+        }
+        set(lo)
+      })
+      if (pg.offsetHeight < h - 4) paper.classList.add('even')
+      paper.style.minHeight = ''
+      paper.style.height = h + 'px'
+    })
+  }
+
+  // ---------- menggambar ----------
+  var SHIFT = 0, vis = {}
+  function put(p, x, y, sh, shr) {
+    if (p < 0) return
+    vis[p] = 1
+    var el = pages[p]
+    el.style.visibility = ''
+    el.style.transform = 'translate3d(' + (x + SHIFT).toFixed(1) + 'px,' + (GAP + y).toFixed(1) + 'px,0)'
+    el.style.setProperty('--sh', (sh || 0).toFixed(3))
+    el.style.setProperty('--shr', (shr || 0).toFixed(3))
+  }
+  function finish(open) {
+    pages.forEach(function (el, k) { if (!vis[k]) el.style.visibility = 'hidden' })
+    vis = {}
+    var g = $('gutter')
+    g.style.left = (SX + SHIFT) + 'px'
+    g.style.opacity = spread ? open.toFixed(3) : 0
+  }
+  // satu momen balik lembar: halaman kiri & kanan di bawah, lembar yang berputar (depan/belakang), tt = 0 (rata kanan) .. 1 (rata kiri).
+  // ly = posisi vertikal seluruh buku: halaman di bawah dan lembar yang berputar bergeser bersama, jadi tepi atasnya selalu rata
+  function turnScene(underL, underR, front, back, tt, ly, open) {
+    SHIFT = spread ? -PW / 2 * (1 - open) : 0
+    put(underL, SX - PW, ly, 0, tt > 0.5 ? Math.min(1, (1 - tt) * 1.8) : 0)
+    put(underR, SX, ly, 1 - ease(tt), 0)
+    leaf(front, back, tt, ly)
+    finish(open)
+  }
+
+  function draw() {
+    if (jump || !L.length) return
+    var y = window.scrollY, i = 0
+    for (var k = 0; k < ST.length; k++) if (L[k].start <= y + 0.5) i = k
+    var local = y - L[i].start, cur = L[i]
+    var t = i < ST.length - 1 && local > cur.read + REST ? Math.min(1, (local - cur.read - REST) / TURN) : 0
+    off = Math.min(local, cur.read)
+    var open = spread && i === 0 ? ease(t) : 1
+    // progres zona jeda: 0 saat isi baru habis dibaca, 1 saat lembar mulai berputar
+    var rp = i < ST.length - 1 && local > cur.read ? Math.min(1, (local - cur.read) / REST) : 0
+    $('hint').classList.toggle('on', rp > 0.02 && t === 0)
+    $('hint-p').style.transform = 'scaleX(' + rp.toFixed(3) + ')'
+    if (t === 0) {
+      clearTurn()
+      SHIFT = spread ? -PW / 2 * (1 - open) : 0
+      put(ST[i][0], SX - PW, -off)
+      put(ST[i][1], SX, -off)
+      finish(open)
+    } else {
+      turnScene(ST[i][0], ST[i + 1][1], ST[i][1], ST[i + 1][0], t, -off * (1 - ease(t)), open)
+    }
+    var p = t > 0.5 ? i + 1 : i
+    if (p !== step) { step = p; syncBar(); setHash() }
+  }
+
+  // ---------- lembar yang dibalik ----------
+  var NS = 5, turn = null
+  function clearCss() { if (turn) { turn.el.remove(); turn = null } }
+  function clearTurn() { clearCss(); glHide() }
+  function face(p, x, sw, back) {
+    var d = document.createElement('div')
+    d.className = 'face ' + (back ? 'b' : 'f')
+    if (p < 0) d.classList.add('blank')
+    else {
+      var c = pages[p].cloneNode(true)
+      c.removeAttribute('id')
+      c.removeAttribute('tabindex')
+      $$('[id]', c).forEach(function (x) { x.removeAttribute('id') })
+      c.style.cssText = 'width:' + PW + 'px;left:' + (-(back ? PW - x - sw : x)).toFixed(1) + 'px'
+      d.appendChild(c)
+    }
+    var s = document.createElement('i')
+    s.className = 'shd'
+    d.appendChild(s)
+    return d
+  }
+  function buildTurn(front, back) {
+    clearCss()
+    var el = document.createElement('div'), sw = PW / NS, parent = el, segs = []
+    el.className = 'turn'
+    el.setAttribute('aria-hidden', 'true')
+    el.inert = true
+    el.style.width = PW + 'px'
+    el.style.height = Math.max(pages[front].offsetHeight, back >= 0 ? pages[back].offsetHeight : 0) + 'px'
+    for (var j = 0; j < NS; j++) {
+      var s = document.createElement('div')
+      s.className = 'seg'
+      s.style.width = sw + 'px'
+      s.style.left = (j ? sw : 0) + 'px'
+      s.appendChild(face(front, j * sw, sw, false))
+      s.appendChild(face(back, j * sw, sw, true))
+      parent.appendChild(s)
+      parent = s
+      segs.push(s)
+    }
+    stage.appendChild(el)
+    turn = { el: el, segs: segs, key: front + '|' + back }
+  }
+  function leaf(front, back, tt, ly) {
+    if (glReady(front, back)) { clearCss(); glLeaf(front, back, tt, ly); return }
+    glHide()
+    if (!turn || turn.key !== front + '|' + back) buildTurn(front, back)
+    turn.el.style.transform = 'translate3d(' + (SX + SHIFT).toFixed(1) + 'px,' + (GAP + ly).toFixed(1) + 'px,0)'
+    var e = ease(tt), bend = -Math.sin(Math.PI * e) * (spread ? 38 : 30) / (NS - 1), cum = 0
+    // pangkal berputar dari 0 ke -180 derajat; tiap potongan berikutnya menekuk sedikit lebih jauh, tepi luar mendahului (kertas melengkung)
+    turn.segs.forEach(function (s, j) {
+      var a = j === 0 ? -180 * e : bend
+      s.style.transform = 'rotateY(' + a.toFixed(2) + 'deg)'
+      cum += a
+      var c = Math.cos(cum * Math.PI / 180)
+      s.children[0].lastChild.style.opacity = ((1 - c) * 0.32).toFixed(3)
+      s.children[1].lastChild.style.opacity = ((1 + c) * 0.32).toFixed(3)
+    })
+  }
+
+
+  // ---------- lembar WebGL (three.js) ----------
+  // Tiap halaman difoto jadi tekstur (html-to-image, dari salinan di luar layar). Saat membalik, lembar digambar di WebGL
+  // sebagai bidang yang benar-benar melengkung (silinder) dengan cahaya mengikuti lengkungannya. Saat diam yang tampil tetap HTML asli.
+  // Kalau WebGL/three gagal dimuat atau foto halaman belum siap, lembar CSS di atas yang dipakai.
+  var GL = { ok: false, tex: {}, fail: {}, gen: 0, busy: false, font: null }
+  var THREE_URL = 'https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.min.js'
+  var VERT = [
+    'uniform float uT0; uniform float uK;',
+    'varying vec2 vUv; varying vec3 vN;',
+    'void main(){',
+    '  vUv = uv;',
+    '  float u = position.x;',
+    '  float th = uT0 + uK * u;',
+    // posisi titik di sepanjang busur: sudut berubah linear dari punggung (uT0) ke tepi luar (uT0 + uK*lebar)
+    '  vec3 p = abs(uK) < 1e-6 ? vec3(u * cos(uT0), position.y, u * sin(uT0))',
+    '                          : vec3((sin(th) - sin(uT0)) / uK, position.y, (cos(uT0) - cos(th)) / uK);',
+    '  vN = vec3(-sin(th), 0.0, cos(th));',
+    '  gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);',
+    '}'].join('\n')
+  var FRAG = [
+    'uniform sampler2D uFront; uniform sampler2D uBack; uniform float uHasBack; uniform vec3 uBlank;',
+    'varying vec2 vUv; varying vec3 vN;',
+    'void main(){',
+    '  vec3 n = normalize(vN); vec4 c;',
+    '  if (gl_FrontFacing) c = texture2D(uFront, vUv);',
+    '  else { n = -n; c = uHasBack > 0.5 ? texture2D(uBack, vec2(1.0 - vUv.x, vUv.y)) : vec4(uBlank, 1.0); }',
+    '  if (c.a < 0.5) discard;',
+    '  vec3 L = normalize(vec3(-0.35, 0.25, 1.0));',
+    '  float lit = 0.6 + 0.4 * clamp(dot(n, L), 0.0, 1.0);',
+    '  float spec = pow(clamp(dot(n, normalize(L + vec3(0.0, 0.0, 1.0))), 0.0, 1.0), 48.0) * 0.1;',
+    '  gl_FragColor = vec4(c.rgb * lit + spec, 1.0);',
+    '}'].join('\n')
+
+  function glInit() {
+    if (!book || !window.htmlToImage) return
+    var cv = document.createElement('canvas')
+    if (!(cv.getContext('webgl2') || cv.getContext('webgl'))) return
+    import(THREE_URL).then(function (THREE) {
+      GL.T = THREE
+      GL.canvas = document.createElement('canvas')
+      GL.canvas.className = 'gl'
+      GL.canvas.setAttribute('aria-hidden', 'true')
+      stage.appendChild(GL.canvas)
+      GL.r = new THREE.WebGLRenderer({ canvas: GL.canvas, antialias: true, alpha: true })
+      GL.r.setClearColor(0x000000, 0)
+      GL.scene = new THREE.Scene()
+      GL.cam = new THREE.PerspectiveCamera()
+      GL.mat = new THREE.ShaderMaterial({
+        vertexShader: VERT, fragmentShader: FRAG, side: THREE.DoubleSide,
+        uniforms: { uT0: { value: 0 }, uK: { value: 0 }, uFront: { value: null }, uBack: { value: null }, uHasBack: { value: 0 }, uBlank: { value: new THREE.Color(0xE3A6C2) } }
+      })
+      GL.mesh = new THREE.Mesh(new THREE.BufferGeometry(), GL.mat)
+      GL.scene.add(GL.mesh)
+      GL.ok = true
+      glSize()
+      glQueue()
+    }).catch(function () {})
+  }
+  function glSize() {
+    if (!GL.ok) return
+    var W = innerWidth
+    GL.r.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2))
+    GL.r.setSize(W, V, false)
+    // kamera meniru perspective CSS panggung: jarak pandang dan titik hilang (perspective-origin) yang sama
+    var D = parseFloat(stage.style.perspective) || 2400
+    var ox = W * (parseFloat(stage.style.perspectiveOrigin) || 50) / 100, oy = V / 2
+    var cx = ox - W / 2, cy = V / 2 - oy, n = 1, f = D * 4
+    GL.cam.position.set(cx, cy, D)
+    GL.cam.updateMatrixWorld()
+    GL.cam.projectionMatrix.makePerspective((-W / 2 - cx) * n / D, (W / 2 - cx) * n / D, (V / 2 - cy) * n / D, (-V / 2 - cy) * n / D, n, f)
+    GL.cam.projectionMatrixInverse.copy(GL.cam.projectionMatrix).invert()
+  }
+  // ukuran berubah (resize, bahasa): semua foto halaman diulang
+  function glReset() {
+    GL.gen++
+    Object.keys(GL.tex).forEach(function (k) { GL.tex[k].t.dispose() })
+    GL.tex = {}; GL.fail = {}
+    glSize()
+    clearTimeout(GL.wait)
+    GL.wait = setTimeout(glQueue, 500)
+  }
+  var shotHold = null
+  function shoot(p) {
+    // salinan di luar layar: halaman asli bisa sedang tersembunyi (visibility) atau bergeser
+    if (!shotHold) {
+      shotHold = document.createElement('div')
+      shotHold.setAttribute('aria-hidden', 'true')
+      shotHold.inert = true
+      shotHold.style.cssText = 'position:fixed;left:-30000px;top:0;pointer-events:none'
+      document.body.appendChild(shotHold)
+    }
+    var c = pages[p].cloneNode(true)
+    c.removeAttribute('id')
+    c.removeAttribute('tabindex')
+    $$('[id]', c).forEach(function (x) { x.removeAttribute('id') })
+    c.style.cssText = 'position:relative;width:' + PW + 'px'
+    shotHold.appendChild(c)
+    var H = c.offsetHeight
+    var pr = Math.min(window.devicePixelRatio || 1, 2, 4096 / H, 4096 / PW)
+    var drop = function () { shotHold.removeChild(c) }
+    var font = GL.font !== null ? Promise.resolve() : htmlToImage.getFontEmbedCSS(c).then(function (css) { GL.font = css })
+    return font.then(function () {
+      return htmlToImage.toCanvas(c, { pixelRatio: pr, width: PW, height: H, fontEmbedCSS: GL.font })
+    }).then(function (cv) { drop(); return { cv: cv, h: H } }, function (e) { drop(); throw e })
+  }
+  // urutan foto: halaman yang tampil dan tetangganya dulu
+  function glQueue() {
+    if (!GL.ok || GL.busy) return
+    var order = []
+    ;[step, step + 1, step - 1].forEach(function (s) { if (s >= 0 && s < ST.length) order = order.concat(pagesOf(s)) })
+    for (var k = 0; k < N; k++) order.push(k)
+    var p = order.filter(function (k) { return !GL.tex[k] && !GL.fail[k] })[0]
+    if (p == null) return
+    GL.busy = true
+    var g = GL.gen
+    shoot(p).then(function (r) {
+      if (g !== GL.gen) return
+      var t = new GL.T.CanvasTexture(r.cv)
+      t.generateMipmaps = false
+      t.minFilter = GL.T.LinearFilter
+      GL.tex[p] = { t: t, h: r.h }
+    }).catch(function () { if (g === GL.gen) GL.fail[p] = 1 }).then(function () {
+      GL.busy = false
+      setTimeout(glQueue, 40)
+    })
+  }
+  function glReady(front, back) { return GL.ok && GL.tex[front] && (back < 0 || GL.tex[back]) }
+  function glLeaf(front, back, tt, ly) {
+    var F = GL.tex[front], key = PW + 'x' + F.h
+    if (GL.geo !== key) {
+      GL.mesh.geometry.dispose()
+      GL.mesh.geometry = new GL.T.PlaneGeometry(PW, F.h, 128, 1).translate(PW / 2, -F.h / 2, 0)
+      GL.geo = key
+    }
+    var u = GL.mat.uniforms, e = ease(tt)
+    // pangkal berputar 0..180 derajat di punggung; tepi luar mendahului (lengkung terbesar di tengah putaran), tidak pernah lewat 180
+    var bend = Math.min(1.15 * Math.sin(Math.PI * e), Math.PI * (1 - e))
+    u.uT0.value = Math.PI * e
+    u.uK.value = bend / PW
+    u.uFront.value = F.t
+    u.uHasBack.value = back >= 0 ? 1 : 0
+    u.uBack.value = back >= 0 ? GL.tex[back].t : F.t
+    GL.mesh.position.set(SX + SHIFT - innerWidth / 2, V / 2 - (GAP + ly), 0)
+    GL.canvas.style.display = 'block'
+    GL.r.render(GL.scene, GL.cam)
+  }
+  function glHide() { if (GL.ok) GL.canvas.style.display = 'none' }
+
+  // ---------- navigasi: selalu satu kali balik lembar, sejauh apa pun tujuannya ----------
+  var lenis = null, progFocus = false
+  function scrollNow(y) {
+    if (lenis) lenis.scrollTo(y, { immediate: true, force: true })
+    else window.scrollTo(0, y)
+  }
+  function goTo(p, instant) { goStep(stepOf(Math.max(0, Math.min(N - 1, p))), instant, p) }
+  function goStep(s, instant, focusPage) {
+    s = Math.max(0, Math.min(ST.length - 1, s))
+    var fp = focusPage != null ? focusPage : pagesOf(s)[0]
+    progFocus = true
+    pages[fp].focus({ preventScroll: true })
+    progFocus = false
+    if (!book) {
+      var y = pages[fp].getBoundingClientRect().top + window.scrollY
+      window.scrollTo({ top: y, behavior: 'auto' })
+      step = s; syncBar(); setHash()
+      return
+    }
+    var from = jump ? jump.to : step, fromOff = jump ? 0 : off
+    if (jump) { cancelAnimationFrame(jump.raf); jump = null }
+    if (instant || s === from) { scrollNow(L[s].start); draw(); return }
+    jump = { from: from, to: s, off: fromOff, t0: performance.now(), dur: 1150 }
+    scrollNow(L[s].start)
+    step = s; syncBar(); setHash()
+    jump.raf = requestAnimationFrame(tickJump)
+  }
+  function tickJump(now) {
+    $('hint').classList.remove('on')
+    var j = jump
+    if (!j) return
+    var t = Math.min(1, (now - j.t0) / j.dur), a = j.from, b = j.to
+    var oa = spread && a === 0 ? 0 : 1, ob = spread && b === 0 ? 0 : 1
+    var open = oa + (ob - oa) * ease(t)
+    if (b > a) turnScene(ST[a][0], ST[b][1], ST[a][1], ST[b][0], t, -j.off * (1 - ease(t)), open)
+    else turnScene(ST[b][0], ST[a][1], ST[b][1], ST[a][0], 1 - t, -j.off * (1 - ease(t)), open)
+    if (t < 1) j.raf = requestAnimationFrame(tickJump)
+    else { jump = null; clearTurn(); draw() }
+  }
+  function base() { return jump ? jump.to : step }
+
+  function syncBar() {
+    var t = T[lang], ps = pagesOf(step), names = []
+    ps.forEach(function (p) { if (names.indexOf(t.pages[p]) < 0) names.push(t.pages[p]) })
+    $('fo-n').textContent = t.page + ' ' + ps.map(function (p) { return p + 1 }).join('–') + ' / ' + N
+    $('fo-name').textContent = '· ' + names.join(' / ')
+    var last = ST.length - 1
+    $('pv').disabled = step === 0
+    $('nx').disabled = step === last
+    $('pv').setAttribute('aria-label', step === 0 ? t.first : t.prev + t.pages[pagesOf(step - 1)[0]])
+    $('nx').setAttribute('aria-label', step === last ? t.last : t.next + t.pages[pagesOf(step + 1)[0]])
+
+    $('toc-btn').setAttribute('aria-label', t.page + ' ' + ps.map(function (p) { return p + 1 }).join('–') + ' / ' + N + t.tocOpen)
+    $('toc-list').innerHTML = t.toc.map(function (name, k) {
+      return '<li><button type="button" data-page="' + k + '"' + (ps.indexOf(k) >= 0 ? ' aria-current="page"' : '') + '><small>' + (k < 9 ? '0' : '') + (k + 1) + '</small>' + esc(name) + '</button></li>'
+    }).join('')
+  }
+
+  // daftar isi: tombol tengah bilah membuka/menutup; Escape, klik di luar, atau memilih halaman menutupnya
+  function toc(open, focusBtn) {
+    $('toc').hidden = !open
+    $('toc-btn').setAttribute('aria-expanded', open ? 'true' : 'false')
+    if (open) { var cur = $('toc').querySelector('[aria-current]'); if (cur) cur.focus() }
+    else if (focusBtn) $('toc-btn').focus()
+  }
+  $('toc-btn').addEventListener('click', function () { toc($('toc').hidden) })
+  $('toc').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-page]')
+    if (!b) return
+    toc(false, true)
+    goTo(+b.dataset.page)
+  })
+  document.addEventListener('click', function (e) {
+    if (!$('toc').hidden && !e.target.closest('.bar')) toc(false)
+  })
+  addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && !$('toc').hidden) toc(false, true)
+  })
+  function setHash() {
+    var p = pagesOf(step)[0]
+    history.replaceState(null, '', location.pathname + location.search + (p === 0 ? '' : '#' + pages[p].id))
+  }
+
+  // ---------- kontrol ----------
+  $('pv').addEventListener('click', function () { goStep(base() - 1) })
+  $('nx').addEventListener('click', function () { goStep(base() + 1) })
+  document.addEventListener('click', function (e) {
+    var c = e.target.closest('.curl')
+    if (c && !c.closest('.turn')) { goTo(+c.dataset.to); return }
+    var a = e.target.closest('a[data-go]')
+    if (a) { e.preventDefault(); goTo(+a.dataset.go) }
+  })
+  addEventListener('keydown', function (e) {
+    if (e.altKey || e.ctrlKey || e.metaKey) return
+    if (e.key === 'ArrowRight') { e.preventDefault(); goStep(base() + 1) }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); goStep(base() - 1) }
+  })
+  // geser kiri/kanan di layar sentuh; geser vertikal tetap scroll biasa
+  var sx = 0, sy = 0
+  addEventListener('touchstart', function (e) { sx = e.touches[0].clientX; sy = e.touches[0].clientY }, { passive: true })
+  addEventListener('touchend', function (e) {
+    var dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) goStep(base() + (dx < 0 ? 1 : -1))
+  }, { passive: true })
+  // Tab ke elemen di halaman yang tidak tampil: bawa langkah itu ke layar (tanpa animasi, supaya fokus tidak tertinggal)
+  document.addEventListener('focusin', function (e) {
+    if (!book || progFocus) return
+    var lf = e.target.closest && e.target.closest('section.leaf')
+    if (!lf || e.target === lf) return
+    var k = pages.indexOf(lf), s = stepOf(k), y = 0, el = e.target
+    while (el && el !== lf) { y += el.offsetTop; el = el.offsetParent }
+    if (!jump && s === step && y - off > 40 && y - off + e.target.offsetHeight < V - 120) return
+    if (jump) { cancelAnimationFrame(jump.raf); jump = null }
+    scrollNow(L[s].start + Math.max(0, Math.min(L[s].read, y - V * 0.3)))
+    draw()
+  })
+
+  $('lang-btn').addEventListener('click', function () {
+    lang = lang === 'id' ? 'en' : 'id'
+    try { localStorage.setItem('afw-lang', lang) } catch (e) {}
+    var u = new URL(location.href)
+    if (lang === 'id') u.searchParams.set('lang', 'id'); else u.searchParams.delete('lang')
+    history.replaceState(null, '', u)
+    var p = pagesOf(step)[0]
+    render()
+    if (book) goTo(p, true)
+  })
+
+  render()
+
+  // smooth scroll. Dimatikan bila pengguna memilih gerak dikurangi
+  if (book && window.Lenis) lenis = new Lenis({ autoRaf: true, lerp: 0.09, stopInertiaOnNavigate: true })
+  var raf = 0
+  addEventListener('scroll', function () {
+    if (book) { if (!raf) raf = requestAnimationFrame(function () { raf = 0; draw() }) }
+    else {
+      var y = window.scrollY + innerHeight * 0.4, p = 0
+      pages.forEach(function (lf, k) { if (lf.offsetTop <= y) p = k })
+      if (p !== step) { step = p; syncBar(); setHash() }
+    }
+  }, { passive: true })
+  ;(function () {
+    var t
+    addEventListener('scroll', function () {
+      root.classList.add('is-scrolling')
+      clearTimeout(t)
+      t = setTimeout(function () { root.classList.remove('is-scrolling') }, 200)
+    }, { passive: true })
+  })()
+  var rz
+  addEventListener('resize', function () {
+    cancelAnimationFrame(rz)
+    rz = requestAnimationFrame(function () {
+      if (!book) { fit(); return }
+      var p = pagesOf(step)[0]
+      layout()
+      goTo(p, true)
+    })
+  })
+
+  // halaman awal dari #hash; di HP sampul dibuka dari lipatan sekali, di desktop sampul tampil sebagai buku tertutup
+  var opened = false
+  function ready() {
+    if (opened) return
+    opened = true
+    if (book) layout(); else fit()
+    glInit()
+    var k = pages.findIndex(function (lf) { return '#' + lf.id === location.hash })
+    if (k > 0) goTo(k, true)
+    else if (book && !spread && window.scrollY < 4) unfold()
+  }
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(ready)
+  setTimeout(ready, 2500)
+
+  // sampul terlipat dua (separuh bawah terlipat ke belakang), lalu dibuka ke arah pembaca
+  function unfold() {
+    var lf = pages[0], paper = lf.querySelector('.paper')
+    var fold = Math.round(V / 2 - GAP), H = paper.offsetHeight
+    var flap = paper.cloneNode(true)
+    $$('[id]', flap).forEach(function (x) { x.removeAttribute('id') })
+    flap.setAttribute('aria-hidden', 'true')
+    flap.inert = true
+    flap.style.cssText = 'position:absolute;inset:0 0 auto 0;height:' + H + 'px;z-index:7;clip-path:inset(' + fold + 'px 0 0 0);transform-origin:50% ' + fold + 'px;backface-visibility:hidden;pointer-events:none'
+    paper.style.clipPath = 'inset(0 0 ' + (H - fold) + 'px 0)'
+    lf.appendChild(flap)
+    var a = flap.animate([
+      { transform: 'perspective(1800px) rotateX(180deg)', filter: 'brightness(.55)' },
+      { transform: 'perspective(1800px) rotateX(0deg)', filter: 'brightness(1)' }
+    ], { duration: 1100, delay: 350, easing: 'cubic-bezier(.45,.05,.2,1)', fill: 'both' })
+    a.onfinish = function () { flap.remove(); paper.style.clipPath = '' }
+  }
+})()
+</script>
+</body>
+</html>
