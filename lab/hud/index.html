@@ -52,6 +52,11 @@ html[data-theme=dark] body{background:#101627}
 html[data-theme=dark] body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:url(../../assets/kertas-gelap.webp) center/cover no-repeat}
 html[data-theme=dark] .nav{background:url(../../assets/kertas-gelap.webp) center/cover no-repeat fixed,#101627}
 @media (hover:none){html[data-theme=dark] .nav{background:#101627}}
+/* layar tegak (HP): foto kertas landscape diputar 90 derajat supaya sisi panjangnya mengikuti sisi panjang layar,
+   bukan diperbesar lalu dipotong. Lapisan dibuat selebar tinggi layar (lvh: tetap saat bilah alamat muncul/hilang) lalu diputar di tengah. */
+@media (orientation:portrait){
+  body::before{inset:auto!important;top:50%!important;left:50%!important;width:100lvh;height:100vw;transform:translate(-50%,-50%) rotate(90deg)}
+}
 /* cahaya lampu meja: tepi layar sedikit lebih kusam (mode terang saja) */
 html:not([data-theme=dark]) body::after{content:"";position:fixed;inset:0;z-index:45;pointer-events:none;mix-blend-mode:multiply;
   background:radial-gradient(125% 95% at 50% 38%,transparent 52%,rgba(22,33,63,.06) 100%)}
@@ -153,7 +158,7 @@ main::before{left:var(--gx)}main::after{right:var(--gx)}
 
 /* ===== header ===== */
 /* header: transparan di puncak halaman; setelah scroll = kaca (satu-satunya elemen kaca di halaman) agar nav tetap terbaca di atas konten */
-.top{position:sticky;top:0;z-index:40;border-bottom:1px solid transparent;background:transparent;transition:background-color .3s ease,border-color .3s ease,-webkit-backdrop-filter .3s ease,backdrop-filter .3s ease}
+.top{position:sticky;top:0;z-index:40;border-bottom:1px solid var(--line);background:transparent;transition:background-color .3s ease,-webkit-backdrop-filter .3s ease,backdrop-filter .3s ease}
 .top.scrolled,.top[data-menu]{--glass:rgba(236,235,233,.78);background:var(--glass);border-bottom-color:var(--line);-webkit-backdrop-filter:blur(14px) saturate(1.2);backdrop-filter:blur(14px) saturate(1.2)}
 html[data-theme=dark] .top.scrolled,html[data-theme=dark] .top[data-menu]{--glass:rgba(16,22,39,.78)}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.top.scrolled,.top[data-menu]{--glass:#ECEBE9}html[data-theme=dark] .top.scrolled,html[data-theme=dark] .top[data-menu]{--glass:#101627}}
@@ -201,9 +206,13 @@ html[data-theme=dark] .top.scrolled,html[data-theme=dark] .top[data-menu]{--glas
 .acts{display:flex;flex-wrap:wrap;gap:14px;margin-top:34px}
 .facts{display:grid;grid-template-columns:repeat(3,auto);justify-content:start;gap:16px clamp(28px,4vw,56px);margin-top:44px}
 .facts dd{margin-top:6px;font:600 18px/1.2 var(--f-d)}
+/* penghitung: lebar tetap selebar angka final (angka tabular) supaya teks di sebelahnya tidak bergeser saat menghitung */
+.cnt>[aria-hidden]{display:inline-block;min-width:var(--w);font-variant-numeric:tabular-nums;text-align:right}
 
 .vis{position:relative;width:100%;min-height:clamp(280px,32vw,460px)}
-.topo{position:absolute;z-index:-1;left:50%;top:50%;width:min(1000px,130vw);transform:translate(-50%,calc(-50% + var(--tpy,0px)));color:var(--line);pointer-events:none}
+/* tinggi = hero + ruang geser paralaks (--tpy sampai ~200px), supaya tepi atas/bawah kontur tidak pernah tampak sebagai potongan lurus;
+   medan kontur digambar lebih tinggi dari komposisi aslinya (viewBox 0 -150 900 900) dan "slice" menutup sisanya */
+.topo{position:absolute;z-index:-1;left:50%;top:50%;width:min(1000px,130vw);height:calc(100% + 420px);transform:translate(-50%,calc(-50% + var(--tpy,0px)));color:var(--line);pointer-events:none}
 .topo path{fill:none;stroke:currentColor;stroke-width:1;vector-effect:non-scaling-stroke}
 .topo .ix{stroke:var(--line-2)}
 .topo .ring{stroke:var(--line-2);stroke-dasharray:3 5}
@@ -218,7 +227,8 @@ html[data-theme=dark] .photo{--plate:#05070D}
 .photo img{width:100%;aspect-ratio:3/4;object-fit:cover;object-position:50% 20%;background:var(--plate);filter:brightness(.8) contrast(1.2)}
 .photo .lbl{position:absolute;z-index:1;right:20px;bottom:16px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.6)}
 .photo::after{content:"";position:absolute;inset:auto 0 0 0;height:30%;background:linear-gradient(transparent,rgba(0,0,0,.72));pointer-events:none}
-.vname{writing-mode:vertical-rl;transform:rotate(180deg);font:700 clamp(32px,3.2vw,48px)/.86 var(--f-d);text-transform:uppercase;letter-spacing:-.01em}
+/* --vy dari JS (paralaks): nama bergeser lebih cepat dari foto sehingga tampak mengambang di depannya */
+.vname{writing-mode:vertical-rl;transform:translateY(var(--vy,0px)) rotate(180deg);font:700 clamp(32px,3.2vw,48px)/.86 var(--f-d);text-transform:uppercase;letter-spacing:-.01em}
 .vname span{display:block}
 /* foto di ruang kosong kiri-bawah bab pengalaman (sisa tangga langkah) */
 .who{position:relative;display:flex;align-items:flex-end;gap:14px;margin-top:clamp(40px,6vw,72px)}
@@ -401,6 +411,9 @@ dialog::backdrop{background:rgba(15,16,18,.6)}
 .js .rv.in .no::before{transform:none}
 .js .card.rv,.js .step.rv{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .7s cubic-bezier(.2,.7,.2,1)}
 .js .card.rv.in,.js .step.rv.in{opacity:1;transform:none}
+/* deskripsi langkah masuk dari kanan, sedikit setelah judulnya, supaya mata membaca judul dulu baru keterangan */
+.js .step.rv .d{opacity:0;transform:translateX(64px);transition:opacity .7s ease .25s,transform .9s cubic-bezier(.2,.7,.2,1) .25s}
+.js .step.rv.in .d{opacity:1;transform:none}
 /* transisi dari video referensi, diterjemahkan ke scroll (sekali, saat bagian masuk layar):
    judul naik dari balik masker per baris, accent line ditarik dari kiri, isi muncul bertahap */
 .js .mk{display:block;overflow:clip;padding-bottom:.08em;margin-bottom:-.08em}
@@ -427,7 +440,7 @@ dialog::backdrop{background:rgba(15,16,18,.6)}
   .dark{clip-path:none}
   html{scroll-behavior:auto}
   *,*::before,*::after{transition:none!important}
-  .js .card.rv,.js .step.rv{opacity:1;transform:none}
+  .js .card.rv,.js .step.rv,.js .step.rv .d{opacity:1;transform:none}
   .js .rv .no::before{transform:none}
 }
 
@@ -467,6 +480,8 @@ dialog::backdrop{background:rgba(15,16,18,.6)}
   .top .cbtn{display:none}
   .hero-g{grid-template-columns:1fr}
   .vis{min-height:200px}
+  /* satu kolom: kotak visual ada di bawah teks, jadi kontur ditambatkan ke dasarnya dan memanjang ke atas menutup seluruh hero */
+  .topo{top:auto;bottom:-160px;height:1400px;transform:translate(-50%,var(--tpy,0px))}
   .photo{width:min(60vw,250px)}
   .facts{grid-template-columns:1fr 1fr}
   .sha{grid-template-columns:1fr auto;gap:12px}
@@ -528,7 +543,7 @@ dialog::backdrop{background:rgba(15,16,18,.6)}
           <h1 class="h1" id="h1"><span>Front-End Developer</span><span>&amp; UI/UX Designer</span></h1>
         </div>
         <div class="vis">
-          <svg class="topo" id="topo" viewBox="0 0 900 600" aria-hidden="true" focusable="false"></svg>
+          <svg class="topo" id="topo" viewBox="0 -150 900 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false"></svg>
           <span class="gh" aria-hidden="true"></span><span class="xh" aria-hidden="true"></span>
           <span class="dots" aria-hidden="true"></span>
         </div>
@@ -577,7 +592,7 @@ const T = {
     hi: 'Halo, saya', contactMe: 'Hubungi saya', see: 'Lihat proyek',
     loc: 'Lokasi', exp: 'Pengalaman', edu: 'Pendidikan', projectsN: 'proyek',
     detail: 'Lihat detail', all: 'Tampilkan semua proyek', less: 'Tampilkan lebih sedikit', shots: 'Tampilan', strip: 'Screenshot Faria Education Group', sl: { role: 'slider', slide: 'Slide', of: 'dari', pick: 'Pilih slide', prev: 'Slide sebelumnya', next: 'Slide berikutnya' },
-    loading: 'Memuat gambar', broken: 'Gambar gagal dimuat', main: 'Situs utama', footNav: 'Tautan footer', ext: 'buka di tab baru', address: 'Alamat',
+    loading: 'Memuat gambar', broken: 'Gambar gagal dimuat', main: 'Situs utama', lab: 'Semua lab', footNav: 'Tautan footer', ext: 'buka di tab baru', address: 'Alamat',
     err: ['Konten gagal dimuat', 'File js/data.js tidak terbaca, jadi halaman ini kosong. Coba muat ulang; kalau masih gagal, situs utama tetap bisa dibuka.', 'Muat ulang']
   },
   en: {
@@ -586,7 +601,7 @@ const T = {
     hi: "Hi, I'm", contactMe: 'Contact me', see: 'See the projects',
     loc: 'Location', exp: 'Experience', edu: 'Education', projectsN: 'projects',
     detail: 'View details', all: 'Show all projects', less: 'Show fewer', shots: 'Views', strip: 'Faria Education Group screenshots', sl: { role: 'carousel', slide: 'Slide', of: 'of', pick: 'Choose a slide', prev: 'Previous slide', next: 'Next slide' },
-    loading: 'Loading image', broken: 'Image failed to load', main: 'Main site', footNav: 'Footer links', ext: 'opens in a new tab', address: 'Address',
+    loading: 'Loading image', broken: 'Image failed to load', main: 'Main site', lab: 'All labs', footNav: 'Footer links', ext: 'opens in a new tab', address: 'Address',
     err: ['Content failed to load', 'js/data.js could not be read, so this page is empty. Try reloading; if it still fails, the main site is still available.', 'Reload']
   }
 }
@@ -624,8 +639,17 @@ const lines = (s, mk = true, base = 0) => s.map((x, i) => mk ? `<span class="mk"
 // dashline: tumpukan garis merah yang makin tebal ke bawah
 const dashline = () => '<svg class="dl" width="30" height="134" viewBox="0 0 30 134" aria-hidden="true">' +
   Array.from({ length: 12 }, (_, i) => `<rect x="0" y="${i * 11.6}" width="30" height="${(1 + i * .28).toFixed(2)}" fill="var(--acc)" style="--i:${i}"/>`).join('') + '</svg>'
+// angka pertama di teks jadi penghitung: angka final ada di teks tersembunyi (dibaca pembaca layar & tampil tanpa animasi),
+// yang terlihat dihitung naik dari 0 oleh initCounters()
+const num = s => {
+  s = String(s)
+  const m = s.match(/\d+/)
+  if (!m) return esc(s)
+  const n = m[0]
+  return esc(s.slice(0, m.index)) + `<span class="cnt" data-to="${n}" style="--w:${n.length}ch"><span class="vh">${n}</span><span aria-hidden="true">${n}</span></span>` + esc(s.slice(m.index + n.length))
+}
 const shA = (n, id, title, meta) =>
-  `<div class="sha rv"><span class="no">${pad(n)}</span><h2 id="${id}">${lines(title)}</h2>${meta ? `<span class="meta lbl m">${esc(meta)}</span>` : '<span></span>'}</div><div class="aline rv"></div>`
+  `<div class="sha rv"><span class="no">${pad(n)}</span><h2 id="${id}">${lines(title)}</h2>${meta ? `<span class="meta lbl m">${num(meta)}</span>` : '<span></span>'}</div><div class="aline rv"></div>`
 const shB = (n, id, title, meta) =>
   `<div class="shb rv"><span class="big mk" aria-hidden="true"><span>${pad(n)}</span></span><h2 id="${id}">${lines([title], true, .12)}</h2>${meta ? `<span class="meta lbl m">${esc(meta)}</span>` : ''}</div><div class="aline rv"></div>`
 function shot(file, alt, lazy, natural, cut) {
@@ -669,7 +693,7 @@ function render() {
     `<p class="lead rv-f" style="--d:.4s">${esc(P.tagline)}</p>` +
     `<ul class="roles lbl rv-f" style="--d:.5s">${P.roles.map(r => `<li>${esc(r)}</li>`).join('')}</ul>` +
     `<div class="acts rv-f" style="--d:.6s"><a class="bbtn" href="#projects">${esc(t.see)}</a><a class="cbtn fill" href="#contact">${esc(t.contactMe)}</a></div>` +
-    `<dl class="facts rv-f" style="--d:.7s">${[[t.loc, P.location], [t.exp, P.years], [t.edu, E.degree]].map(([k, v]) => `<div><dt class="lbl m">${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>`
+    `<dl class="facts rv-f" style="--d:.7s">${[[t.loc, P.location], [t.exp, P.years], [t.edu, E.degree]].map(([k, v]) => `<div><dt class="lbl m">${esc(k)}</dt><dd>${v === P.years ? num(v) : esc(v)}</dd></div>`).join('')}</dl>`
   const nm = P.name.split(' ')
 
   // ---- proyek
@@ -732,10 +756,12 @@ function render() {
     `<div><p class="lbl m">LinkedIn</p><a href="${esc(C.linkedin)}" target="_blank" rel="noopener">${esc(C.linkedin.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, ''))}${ext}</a></div>` +
     `<div><p class="lbl m">${esc(t.address)}</p><p class="v">${esc(C.address)}</p></div></div></div></div>`
 
-  // panah hanya pada dua tautan footer: arah (ke atas) dan pindah halaman (situs utama)
+  // panah hanya pada tautan footer: arah (ke atas) dan pindah halaman (daftar lab, situs utama)
+  const lq = lang === 'id' ? '?lang=id' : ''
   $('foot').innerHTML = guides() + `<div class="wrap foot-in"><p class="foot-id lbl m"><b aria-hidden="true">//</b>${esc(D.footer)}</p>` +
     `<nav aria-label="${esc(t.footNav)}"><a class="tbtn" href="#profile">${esc(U.top)}<span aria-hidden="true">↑</span></a>` +
-    `<a class="tbtn" href="${BASE}${lang === 'id' ? '?lang=id' : ''}">${esc(t.main)}<span aria-hidden="true">↗</span></a></nav></div>`
+    `<a class="tbtn" href="${BASE}lab/${lq}">${esc(t.lab)}<span aria-hidden="true">↗</span></a>` +
+    `<a class="tbtn" href="${BASE}${lq}">${esc(t.main)}<span aria-hidden="true">↗</span></a></nav></div>`
 
   $('more-btn').addEventListener('click', () => {
     showAll = !showAll
@@ -907,6 +933,7 @@ function observe() {
     if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target) }
   }), { rootMargin: '0px 0px -10% 0px' })
   document.querySelectorAll('.rv').forEach(el => reduce ? el.classList.add('in') : io.observe(el))
+  if (!reduce) initCounters()
   const links = [...document.querySelectorAll('#nav-list a')]
   navIo = new IntersectionObserver(es => es.forEach(e => {
     if (!e.isIntersecting || (e.target.id === 'contact' && root.classList.contains('curtain'))) return
@@ -915,19 +942,44 @@ function observe() {
   document.querySelectorAll('main > section, #contact').forEach(s => navIo.observe(s))
 }
 
+// ---- penghitung angka (7+ tahun, 11 proyek): mulai dari 0, naik ke angka final saat terlihat, sekali saja.
+// Jeda menunggu fade-in induknya (--d dari .rv-f) supaya hitungan tidak sudah selesai sebelum angkanya tampak.
+let cntIo
+function initCounters() {
+  if (cntIo) cntIo.disconnect()
+  const els = document.querySelectorAll('.cnt')
+  els.forEach(el => { el.lastElementChild.textContent = '0' })
+  cntIo = new IntersectionObserver(es => es.forEach(e => {
+    if (!e.isIntersecting) return
+    cntIo.unobserve(e.target)
+    const el = e.target, to = +el.dataset.to, out = el.lastElementChild
+    const fade = el.closest('.rv-f'), delay = fade ? parseFloat(fade.style.getPropertyValue('--d')) * 1000 || 0 : 250
+    const t0 = performance.now() + delay, dur = 1400
+    const tick = now => {
+      const k = Math.max(0, Math.min(1, (now - t0) / dur))
+      out.textContent = Math.round(to * (1 - Math.pow(1 - k, 3)))
+      if (k < 1 && el.isConnected) requestAnimationFrame(tick)
+    }
+    requestAnimationFrame(tick)
+  }), { rootMargin: '0px 0px -10% 0px' })
+  els.forEach(el => cntIo.observe(el))
+}
+
 // ---- garis kontur: medan acak ber-seed + marching squares, digambar sekali
 function topo() {
   let s = 20191104
   const rnd = () => { s |= 0; s = s + 0x6D2B79F5 | 0; let x = Math.imul(s ^ s >>> 15, 1 | s); x = x + Math.imul(x ^ x >>> 7, 61 | x) ^ x; return ((x ^ x >>> 14) >>> 0) / 4294967296 }
-  const W = 90, H = 60, K = 10
+  // medan 90x90 sel mulai dari y = -15: komposisi asli (0..60) tetap di tengah, ditambah 15 sel di atas & bawah
+  const W = 90, H = 90, K = 10, Y0 = -15
   const bumps = Array.from({ length: 6 }, (_, i) => ({ x: i ? 10 + rnd() * 70 : 46, y: i ? 6 + rnd() * 48 : 30, s: 7 + rnd() * 13, a: i ? (rnd() - .35) * 1.4 : 1.6 }))
   const F = []
   let lo = Infinity, hi = -Infinity
   for (let y = 0; y <= H; y++) {
     const row = []
     for (let x = 0; x <= W; x++) {
-      let v = .18 * Math.sin(x * .09 + y * .05) + .12 * Math.cos(y * .11 - x * .03)
-      bumps.forEach(b => { v += b.a * Math.exp(-((x - b.x) ** 2 + (y - b.y) ** 2) / (2 * b.s * b.s)) })
+      const yy = y + Y0
+      let v = .18 * Math.sin(x * .09 + yy * .05) + .12 * Math.cos(yy * .11 - x * .03)
+      bumps.forEach(b => { v += b.a * Math.exp(-((x - b.x) ** 2 + (yy - b.y) ** 2) / (2 * b.s * b.s)) })
       row.push(v); lo = Math.min(lo, v); hi = Math.max(hi, v)
     }
     F.push(row)
@@ -945,7 +997,7 @@ function topo() {
       const pt = k => k === 0 ? [x + (lv - a) / (b - a), y] : k === 1 ? [x + 1, y + (lv - b) / (c - b)] : k === 2 ? [x + (lv - e) / (c - e), y + 1] : [x, y + (lv - a) / (e - a)]
       SEG[idx].forEach(([p, q]) => {
         const A = pt(p), B = pt(q)
-        d += `M${(A[0] * K).toFixed(1)} ${(A[1] * K).toFixed(1)}L${(B[0] * K).toFixed(1)} ${(B[1] * K).toFixed(1)}`
+        d += `M${(A[0] * K).toFixed(1)} ${((A[1] + Y0) * K).toFixed(1)}L${(B[0] * K).toFixed(1)} ${((B[1] + Y0) * K).toFixed(1)}`
       })
     }
     // setiap kontur ke-4 lebih tegas, seperti garis indeks di peta topografi
@@ -1044,9 +1096,17 @@ addEventListener('scroll', () => {
 // ---- paralaks kartu proyek: hanya desktop dengan mouse dan tanpa preferensi gerak dikurangi
 const paraMq = matchMedia('(min-width:1024px) and (hover:hover) and (prefers-reduced-motion:no-preference)')
 function para() {
-  const cards = document.querySelectorAll('#proj-grid .card')
-  if (!paraMq.matches) { cards.forEach(c => { c.style.removeProperty('--py'); c.style.removeProperty('--ps'); c.style.removeProperty('--ty') }); return }
+  const cards = document.querySelectorAll('#proj-grid .card'), vn = document.querySelector('.who .vname')
+  if (!paraMq.matches) { cards.forEach(c => { c.style.removeProperty('--py'); c.style.removeProperty('--ps'); c.style.removeProperty('--ty') }); if (vn) vn.style.removeProperty('--vy'); return }
   const vh = innerHeight
+  // nama vertikal di samping foto: posisi dihitung dari blok foto (bukan dari nama sendiri) supaya tidak ikut terpengaruh geserannya
+  if (vn) {
+    const r = vn.parentElement.getBoundingClientRect()
+    if (r.bottom > -150 && r.top < vh + 150) {
+      const p = Math.max(-1, Math.min(1, (r.top + r.height / 2 - vh / 2) / (vh / 2 + r.height / 2)))
+      vn.style.setProperty('--vy', (p * 90).toFixed(1) + 'px')
+    }
+  }
   cards.forEach(c => {
     if (c.hidden) return
     const r = c.getBoundingClientRect()
