@@ -83,8 +83,15 @@ html.spread .leaf.on-right .curl.pv,html.spread .leaf.on-left .curl.nx{display:n
 /* mode buku (JS + gerak tidak dikurangi): panggung tetap, halaman diposisikan JS, posisi scroll dipetakan ke baca/balik lembar */
 /* perspektif diatur JS: buku terbuka di desktop, satu halaman di HP */
 html.book .stage{position:fixed;inset:0;overflow:hidden;touch-action:pan-y}
+/* HP: buku tidak digulir (bilah URL tidak naik-turun), pindah halaman lewat geser; tarik ke bawah tidak memuat ulang halaman */
+html.still,html.still body{overscroll-behavior:none}
+html.still .stage{touch-action:none}
 html.book .leaf{position:absolute;top:0;left:0;margin:0;will-change:transform}
 html.book .curl{display:block}
+/* pojok sampul baru muncul setelah sampul selesai dibuka dari lipatannya */
+.leaf.folding .curl{opacity:0;pointer-events:none}
+.leaf.unfolded .curl{animation:curl-in .4s ease-out}
+@keyframes curl-in{from{opacity:0}}
 /* lembar yang sedang dibalik: 5 potongan bersambung yang masing-masing menekuk sedikit, jadi kertas tampak melengkung */
 .turn{position:absolute;top:0;left:0;z-index:20;transform-style:preserve-3d;pointer-events:none}
 .seg{position:absolute;top:0;height:100%;transform-style:preserve-3d;transform-origin:0 50%}
@@ -279,7 +286,7 @@ html.book .spacer{display:block}
   .pf,.f1,.ct{grid-template-columns:minmax(0,1fr)}
   .cols{column-count:1}
   .side{border-left:0;padding-left:0;border-top:2px solid var(--ink);padding-top:8px}
-  .f2{grid-template-columns:minmax(0,1fr)}
+  .f2{grid-template-columns:minmax(0,1fr);row-gap:0}
   .f2 article{padding:0 !important;border-right:0 !important}
   .f2 article+article{margin-top:24px;padding-top:24px !important;border-top:2px solid var(--ink)}
   .ix{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -690,6 +697,9 @@ html.lenis{scroll-behavior:auto}
   // posisi scroll dibagi per langkah: [baca isi (kalau lebih tinggi dari layar)] lalu [balik lembar].
   // REST: jarak gulir "diam" setelah isi selesai dibaca, sebelum lembar mulai berputar; supaya gulir kecil tidak langsung membalik halaman
   var L = [], V = 0, GAP = 0, TURN = 0, REST = 0, PW = 0, SX = 0, step = 0, off = 0, jump = null
+  // still: layar sentuh dengan satu halaman. Menggulir di HP memunculkan/menyembunyikan bilah URL dan mengubah tinggi layar,
+  // jadi di sini dokumen tidak bisa digulir; halaman diganti lewat geser (kiri/kanan atau atas/bawah), pojok, panah, dan daftar isi
+  var still = false, touchOnly = matchMedia('(hover: none) and (pointer: coarse)')
   var ease = function (t) { return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2 }
   var easeInv = function (e) { return e < 0.5 ? Math.sqrt(e / 2) : 1 - Math.sqrt((1 - e) / 2) }
   function layout() {
@@ -700,6 +710,8 @@ html.lenis{scroll-behavior:auto}
     REST = Math.round(V * 0.35)
     spread = W >= 1024 && V >= 560
     root.classList.toggle('spread', spread)
+    still = !spread && touchOnly.matches
+    root.classList.toggle('still', still)
     PW = spread ? Math.floor(Math.min(W - GAP * 2, 1680) / 2) : W - GAP * 2
     SX = spread ? Math.round(W / 2) : GAP
     // HP: halaman 2 dst menempel ke tepi kiri layar (seperti dijilid di punggung) dan tanpa pojok tertekuk; hanya sampul yang mengambang dengan pojoknya
@@ -724,7 +736,7 @@ html.lenis{scroll-behavior:auto}
       L[i] = { start: y, read: read, h: h }
       y += read + (i < ST.length - 1 ? REST + TURN : 0)
     })
-    $('spacer').style.height = (y + V) + 'px'
+    $('spacer').style.height = still ? '0px' : (y + V) + 'px'
     clearTurn()
     glReset()
     draw()
@@ -756,6 +768,20 @@ html.lenis{scroll-behavior:auto}
       var levels = items.map(function (el) { return +el.dataset.drop }).filter(function (v, k, a) { return a.indexOf(v) === k }).sort(function (a, b) { return b - a })
       for (var k = 0; k < levels.length && !fits(); k++) {
         items.forEach(function (el) { if (+el.dataset.drop === levels[k]) el.classList.add('cut') })
+      }
+      // judul yatim: blok yang seluruh isi buangannya terpotong (tinggal judul) ikut dibuang, lalu ruangnya dipakai
+      // untuk mengembalikan isi yang tadi terpotong, mulai dari yang terakhir dibuang
+      var orphan = items.filter(function (el) {
+        var kids = $$('[data-drop]', el)
+        return !el.classList.contains('cut') && kids.length && kids.every(function (c) { return c.classList.contains('cut') })
+      })
+      if (orphan.length) {
+        orphan.forEach(function (el) { el.classList.add('cut') })
+        for (var r = k - 1; r >= 0; r--) {
+          var back = items.filter(function (el) { return +el.dataset.drop === levels[r] && orphan.indexOf(el) < 0 && !el.parentNode.closest('.cut') })
+          back.forEach(function (el) { el.classList.remove('cut') })
+          if (!fits()) { back.forEach(function (el) { el.classList.add('cut') }); break }
+        }
       }
       base.forEach(function (b) {
         var el = b.el
@@ -819,14 +845,16 @@ html.lenis{scroll-behavior:auto}
   function draw() {
     if (jump || !L.length) return
     var y = window.scrollY, i = 0
-    for (var k = 0; k < ST.length; k++) if (L[k].start <= y + 0.5) i = k
+    if (still) { i = step; y = L[i].start }
+    else for (var k = 0; k < ST.length; k++) if (L[k].start <= y + 0.5) i = k
     var local = y - L[i].start, cur = L[i]
     var t = i < ST.length - 1 && local > cur.read + REST ? Math.min(1, (local - cur.read - REST) / TURN) : 0
     off = Math.min(local, cur.read)
     var open = spread && i === 0 ? ease(t) : 1
     // progres zona jeda: 0 saat isi baru habis dibaca, 1 saat lembar mulai berputar
     var rp = i < ST.length - 1 && local > cur.read ? Math.min(1, (local - cur.read) / REST) : 0
-    $('hint').classList.toggle('on', rp > 0.02 && t === 0)
+    // petunjuk baru hilang setelah lembar terlihat terangkat, bukan tepat saat putaran dimulai
+    $('hint').classList.toggle('on', rp > 0.02 && t < 0.06)
     $('hint-p').style.transform = 'scaleX(' + rp.toFixed(3) + ')'
     if (t === 0) {
       clearTurn()
@@ -835,7 +863,9 @@ html.lenis{scroll-behavior:auto}
       put(ST[i][1], SX, -off)
       finish(open)
     } else {
-      turnScene(ST[i][0], ST[i + 1][1], ST[i][1], ST[i + 1][0], t, -off * (1 - ease(t)), open)
+      // saat digulir, sudut lembar sebanding dengan jarak gulir (easeInv membatalkan ease di dalam lembar);
+      // kalau tidak, awal putaran nyaris diam dan terasa seperti gulir tidak berefek
+      turnScene(ST[i][0], ST[i + 1][1], ST[i][1], ST[i + 1][0], easeInv(t), -off * (1 - t), open)
     }
     var p = t > 0.5 ? i + 1 : i
     if (p !== step) { step = p; syncBar(); setHash() }
@@ -1063,6 +1093,7 @@ html.lenis{scroll-behavior:auto}
   // ---------- navigasi: selalu satu kali balik lembar, sejauh apa pun tujuannya ----------
   var lenis = null, progFocus = false
   function scrollNow(y) {
+    if (still) return
     if (lenis) lenis.scrollTo(y, { immediate: true, force: true })
     else window.scrollTo(0, y)
   }
@@ -1080,8 +1111,12 @@ html.lenis{scroll-behavior:auto}
       return
     }
     var from = jump ? jump.to : step, fromOff = jump ? 0 : off
+    settling = false; clearTimeout(settleT)
     if (jump) { cancelAnimationFrame(jump.raf); jump = null }
-    if (instant || s === from) { scrollNow(L[s].start); draw(); return }
+    if (instant || s === from) {
+      if (still && s !== step) { step = s; syncBar(); setHash() }
+      scrollNow(L[s].start); draw(); return
+    }
     TILT = 1
     jump = { from: from, to: s, off: fromOff, t0: performance.now(), dur: 1150 }
     scrollNow(L[s].start)
@@ -1169,11 +1204,12 @@ html.lenis{scroll-behavior:auto}
     else if (e.key === 'ArrowLeft') { e.preventDefault(); goStep(base() - 1) }
   })
   // geser kiri/kanan di layar sentuh: lembar mengikuti jari selama digeser, lalu menyelesaikan putaran (atau kembali) saat dilepas.
-  // Gestur tegak tetap gulir biasa (touch-action: pan-y di panggung). Tanpa buku (gerak dikurangi): pindah halaman saat dilepas.
-  var sx = 0, sy = 0, lx = 0, lt = 0, vx = 0, drag = null, axis = null
+  // Gestur tegak: gulir biasa, kecuali di mode still (geser atas = halaman berikut, bawah = sebelumnya). Tanpa buku (gerak dikurangi): pindah halaman saat dilepas.
+  var sx = 0, sy = 0, lx = 0, lt = 0, vx = 0, drag = null, axis = null, onBar = false
   addEventListener('touchstart', function (e) {
     if (e.touches.length > 1) return
     sx = lx = e.touches[0].clientX; sy = e.touches[0].clientY; lt = performance.now(); vx = 0; axis = null
+    onBar = !!e.target.closest('.bar, .toc')
   }, { passive: true })
   addEventListener('touchmove', function (e) {
     if (!book || e.touches.length > 1 || e.target.closest('.bar')) return
@@ -1213,7 +1249,13 @@ html.lenis{scroll-behavior:auto}
       if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) goStep(base() + (dx < 0 ? 1 : -1))
       return
     }
-    if (!drag) return
+    if (!drag) {
+      if (still && axis === 'y' && !onBar && e.type === 'touchend') {
+        var vy = e.changedTouches[0].clientY - sy
+        if (Math.abs(vy) > 50) goStep(base() + (vy < 0 ? 1 : -1))
+      }
+      return
+    }
     var d = drag, fling = -vx * d.dir
     drag = null
     // jadi dibalik kalau sudah lewat sepertiga, atau dijentik cukup cepat ke arah yang sama
@@ -1254,7 +1296,27 @@ html.lenis{scroll-behavior:auto}
   // smooth scroll. Dimatikan bila pengguna memilih gerak dikurangi
   if (book && window.Lenis) lenis = new Lenis({ autoRaf: true, lerp: 0.09, stopInertiaOnNavigate: true })
   var raf = 0
+  // gulir berhenti di tengah putaran: lembar menyelesaikan sendiri (maju = terbuka ke halaman berikut, mundur = kembali rebah),
+  // supaya lembar tidak menggantung setengah terangkat setelah petunjuk "terus gulir" hilang
+  var lastY = 0, sDir = 1, settleT = 0, settling = false
+  function settle() {
+    if (!book || still || jump || settling || !L.length) return
+    var y = window.scrollY, i = 0
+    for (var k = 0; k < ST.length; k++) if (L[k].start <= y + 0.5) i = k
+    var cur = L[i]
+    if (i >= ST.length - 1) return
+    var t = (y - cur.start - cur.read - REST) / TURN
+    if (t <= 0 || t >= 1) return
+    var to = (sDir >= 0 || t > 0.96) ? L[i + 1].start : cur.start + cur.read
+    var dur = 0.35 + 0.65 * Math.abs(to - y) / TURN
+    settling = true
+    if (lenis) lenis.scrollTo(to, { duration: dur, easing: function (x) { return 1 - Math.pow(1 - x, 3) }, lock: true, force: true, onComplete: function () { settling = false } })
+    else { window.scrollTo({ top: to, behavior: 'smooth' }); setTimeout(function () { settling = false }, dur * 1000 + 100) }
+  }
   addEventListener('scroll', function () {
+    var y = window.scrollY
+    if (y !== lastY) { sDir = y > lastY ? 1 : -1; lastY = y }
+    if (book && !settling) { clearTimeout(settleT); settleT = setTimeout(settle, 160) }
     if (book) { if (!raf) raf = requestAnimationFrame(function () { raf = 0; draw() }) }
     else {
       var y = window.scrollY + innerHeight * 0.4, p = 0
@@ -1306,11 +1368,12 @@ html.lenis{scroll-behavior:auto}
     flap.style.cssText = 'position:absolute;inset:0 0 auto 0;height:' + H + 'px;z-index:7;clip-path:inset(' + fold + 'px 0 0 0);transform-origin:50% ' + fold + 'px;backface-visibility:hidden;pointer-events:none'
     paper.style.clipPath = 'inset(0 0 ' + (H - fold) + 'px 0)'
     lf.appendChild(flap)
+    lf.classList.add('folding')
     var a = flap.animate([
       { transform: 'perspective(1800px) rotateX(180deg)', filter: 'brightness(.55)' },
       { transform: 'perspective(1800px) rotateX(0deg)', filter: 'brightness(1)' }
     ], { duration: 1100, delay: 350, easing: 'cubic-bezier(.45,.05,.2,1)', fill: 'both' })
-    a.onfinish = function () { flap.remove(); paper.style.clipPath = '' }
+    a.onfinish = function () { flap.remove(); paper.style.clipPath = ''; lf.classList.replace('folding', 'unfolded') }
   }
 })()
 </script>
