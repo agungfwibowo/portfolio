@@ -107,8 +107,12 @@ html.book.spread .gutter{display:block}
 .gl{position:absolute;inset:0;z-index:20;width:100%;height:100%;display:none;pointer-events:none}
 /* isi yang dipangkas supaya halaman muat satu layar (diatur JS, lihat fitPages) */
 [data-drop].cut{display:none !important}
-html.book:not(.spread) .leaf.bare{--cr:0px;--cl:0px}
-html.book:not(.spread) .leaf.bare .curl{display:none !important}
+/* pojok tertekuk hanya tampak di sampul; di halaman lain pojoknya rata dan baru terlipat perlahan saat disorot (aturan :hover di atas lebih spesifik) */
+html.book .leaf.bare{--cr:0px;--cl:0px}
+/* HP sentuh: tidak ada sorot, pindah halaman lewat geser */
+html.still .leaf.bare .curl{display:none !important}
+/* selama sampul dibuka dari lipatannya, halaman di bawahnya belum tampak */
+html.book .leaf.folding ~ .leaf{visibility:hidden !important}
 .spacer{display:none}
 html.book .spacer{display:block}
 
@@ -134,7 +138,6 @@ html.book .spacer{display:block}
 .toc button small{flex:none;width:22px;font:500 12px var(--mono)}
 .toc button:hover{background:var(--hl)}
 .toc button[aria-current="page"]{background:var(--ink);color:var(--paper)}
-.bar .lang{font-size:13px;border-left:1px solid rgba(243,195,217,.3)}
 @media (max-width:420px){.bar .fo .nm-pg{display:none}}
 
 /* ---------- unsur tabloid bersama ---------- */
@@ -171,6 +174,9 @@ html.book .spacer{display:block}
 .mast nav{display:flex;flex-wrap:wrap;gap:4px 26px}
 .mast nav a{display:inline-flex;align-items:center;min-height:44px;font:400 14px var(--mono);text-transform:uppercase;text-decoration:none;border-bottom:2px solid transparent;transition:border-color .3s}
 .mast nav a:hover{border-color:var(--ink)}
+/* tombol bahasa hanya ada di kepala sampul, setara tautan menu */
+.mast .lang{min-width:44px;min-height:44px;padding:0 4px;border:0;border-bottom:2px solid transparent;background:none;color:inherit;font:600 14px var(--mono);text-transform:uppercase;cursor:pointer;transition:border-color .3s}
+.mast .lang:hover{border-color:var(--ink)}
 .tick{display:flex;align-items:center;border-top:2px solid var(--ink);border-bottom:2px solid var(--ink)}
 .tick .vp{flex:1;overflow:hidden;white-space:nowrap;padding:12px 0;font:400 14px var(--mono);text-transform:uppercase}
 .tick .tr{display:inline-block;animation:tick 60s linear infinite}
@@ -311,7 +317,7 @@ html.book .spacer{display:block}
 }
 @media (prefers-reduced-motion:reduce){
   .tick .tr{animation:none}
-  .leaf,.curl .lb,.btn,.bar button,.lnk,.tick button,.mast nav a{transition:none}
+  .leaf,.curl .lb,.btn,.bar button,.lnk,.tick button,.mast nav a,.mast .lang{transition:none}
 }
 /* Lenis (smooth scroll), dari dist/lenis.css 1.3.27, sama seperti lab lain */
 html.lenis,html.lenis body{height:auto}
@@ -338,6 +344,7 @@ html.lenis{scroll-behavior:auto}
           <a href="#pengalaman" data-go="5" data-t="navXp"></a>
         </nav>
         <a class="btn y" href="#kontak" data-go="6" data-t="navContact"></a>
+        <button type="button" class="lang" id="lang-btn"></button>
       </header>
       <div class="tick" id="tick" data-drop="3">
         <div class="vp" aria-hidden="true"><span class="tr" id="tick-tr"></span></div>
@@ -502,7 +509,6 @@ html.lenis{scroll-behavior:auto}
     <ol id="toc-list"></ol>
   </div>
   <button type="button" id="nx" aria-label="Next page">›</button>
-  <button type="button" class="lang" id="lang-btn"></button>
 </nav>
 
 <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js" integrity="sha384-UbfRVKN3/elS1r7JcK2FhmPP+KlJ4CvYwbyYD7tH+uTkbT9bNJr9eJeQ0FoFbAgz" crossorigin="anonymous"></script>
@@ -714,8 +720,8 @@ html.lenis{scroll-behavior:auto}
     root.classList.toggle('still', still)
     PW = spread ? Math.floor(Math.min(W - GAP * 2, 1680) / 2) : W - GAP * 2
     SX = spread ? Math.round(W / 2) : GAP
-    // HP: halaman 2 dst menempel ke tepi kiri layar (seperti dijilid di punggung) dan tanpa pojok tertekuk; hanya sampul yang mengambang dengan pojoknya
-    pages.forEach(function (p, k) { p.classList.toggle('bare', !spread && k > 0) })
+    // hanya sampul yang punya pojok tertekuk (HP dan desktop); di HP halaman 2 dst juga menempel ke tepi kiri layar seperti dijilid di punggung
+    pages.forEach(function (p, k) { p.classList.toggle('bare', k > 0) })
     buildSteps()
     pages.forEach(function (p) {
       p.classList.remove('on-left', 'on-right')
@@ -815,12 +821,13 @@ html.lenis{scroll-behavior:auto}
   var SHIFT = 0, vis = {}
   function pwOf(p) { return spread ? PW : p === 0 ? innerWidth - GAP * 2 : innerWidth - GAP }
   function sxOf(p) { return spread ? SX : p === 0 ? GAP : 0 }
-  function put(p, x, y, sh, shr) {
+  function put(p, x, y, sh, shr, under) {
     if (p < 0) return
     if (!spread) x = sxOf(p)
     vis[p] = 1
     var el = pages[p]
     el.style.visibility = ''
+    el.style.zIndex = under ? '-1' : ''
     el.style.transform = 'translate3d(' + (x + SHIFT).toFixed(1) + 'px,' + (GAP + y).toFixed(1) + 'px,0)'
     el.style.setProperty('--sh', (sh || 0).toFixed(3))
     el.style.setProperty('--shr', (shr || 0).toFixed(3))
@@ -861,6 +868,9 @@ html.lenis{scroll-behavior:auto}
       SHIFT = spread ? -PW / 2 * (1 - open) : 0
       put(ST[i][0], SX - PW, -off)
       put(ST[i][1], SX, -off)
+      // halaman berikutnya (dan di desktop, halaman kiri sebelumnya) tergeletak di bawah, jadi yang tampak di balik pojok terlipat adalah kertas, bukan latar
+      if (i < ST.length - 1) put(ST[i + 1][1], SX, -off, 0, 0, true)
+      if (spread && i > 0) put(ST[i - 1][0], SX - PW, -off, 0, 0, true)
       finish(open)
     } else {
       // saat digulir, sudut lembar sebanding dengan jarak gulir (easeInv membatalkan ease di dalam lembar);
