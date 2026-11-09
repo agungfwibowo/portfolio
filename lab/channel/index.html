@@ -677,10 +677,10 @@ p{margin:0}
     // partikel melayang, sebagian oranye seperti di foto; naik pelan dan ikut bergeser saat kamera turun
     '  for (int l = 0; l < 3; l++) {',
     '    float fl = float(l), sc = 9.0 + fl * 8.0;',
-    '    vec2 g = vec2(x, v) * sc + vec2(t * .04 * (fl + 1.0), -t * (.05 + fl * .02) + uDepth * sc * 2.4) + fl * 17.0;',
+    '    vec2 g = vec2(x, v) * sc + vec2(t * .04 * (fl + 1.0), -t * (.05 + fl * .02) + uDepth * sc * .6) + fl * 17.0;',
     '    vec2 id = floor(g), f = fract(g) - .5;',
     '    float h = hash(id + fl * 3.1);',
-    '    if (h > .85) {',
+    '    if (h > .88) {',
     '      vec2 o = (vec2(hash(id + 1.7), hash(id + 9.2)) - .5) * .6;',
     '      float sz = mix(.16, .05, fl / 2.0);',
     '      float a = smoothstep(sz, sz * .15, length(f - o));',
@@ -763,7 +763,7 @@ p{margin:0}
 
   // ---------- gelembung depan ----------
   // sedikit saja (4 sampai 7) dan transparan supaya teks di belakangnya tetap terbaca;
-  // naik lebih cepat dari gelembung di air dan ikut bergeser lebih jauh saat digulir, jadi terasa dekat ke kamera
+  // naik lebih cepat dari gelembung di air, jadi terasa dekat ke kamera; saat digulir hanya ikut bergeser pelan
   var fore = $('#fore'), fctx = fore.getContext('2d'), fdpr = 1, bubs = [], foreDirty = true
   function bubble(b, anywhere) {
     var W = innerWidth, H = innerHeight
@@ -791,7 +791,7 @@ p{margin:0}
     fctx.clearRect(0, 0, W, H)
     bubs.forEach(function (b) {
       if (!paused) { b.y -= b.v * dt; b.ph += b.w * dt }
-      b.y -= Math.max(-40, Math.min(40, dy)) * 0.6 // dibatasi: lompatan pindah channel tidak melempar semua gelembung
+      b.y -= Math.max(-20, Math.min(20, dy)) * 0.2 // dibatasi: lompatan pindah channel tidak melempar semua gelembung
       if (b.y < -b.r * 3) bubble(b)
       else if (b.y > H + b.r * 3) { bubble(b); b.y = -b.r * 2 }
       var x = b.x + Math.sin(b.ph) * b.a, c = b.warm ? '255,170,110' : '215,250,242'

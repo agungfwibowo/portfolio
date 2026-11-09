@@ -32,6 +32,7 @@ jobs:
           cp -r lab/hud _site/lab/
           cp -r lab/poster _site/lab/
           cp -r lab/tabloid _site/lab/
+          cp -r lab/channel _site/lab/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
