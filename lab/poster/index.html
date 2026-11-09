@@ -79,10 +79,12 @@ a,button{cursor:pointer;color:inherit;font:inherit}
 .l3{position:relative;z-index:4;margin-top:-.06em;font-size:44vw}
 .l3 .echo{position:absolute;inset:0;pointer-events:none}
 .l3 .echo .t{position:absolute;left:0;top:0;color:transparent;-webkit-text-stroke:1px rgba(237,237,237,var(--a));transform:translateY(calc(var(--i)*-.011em))}
-/* foto Agung di dalam huruf, hitam putih dan kontras tinggi; posisinya digeser JS (parallax) */
-.photo{position:relative;background-image:var(--noise),linear-gradient(180deg,rgba(18,18,18,.3),rgba(18,18,18,.65)),url(../../assets/foto-agung.webp);background-size:220px,100% 100%,cover;background-position:0 0,0 0,50% calc(2% + var(--py,0) * 1px);background-blend-mode:overlay,normal,normal;-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:1.5px rgba(237,237,237,.9);filter:grayscale(1) contrast(.9) brightness(.85)}
+/* foto Agung di dalam huruf, hitam putih dan diredam supaya menyatu dengan latar; posisinya digeser JS (parallax) */
+.photo{position:relative;background-image:var(--noise),linear-gradient(180deg,rgba(18,18,18,.72),rgba(18,18,18,.88)),url(../../assets/foto-agung.webp);background-size:220px,100% 100%,cover;background-position:0 0,0 0,50% calc(2% + var(--py,0) * 1px);background-blend-mode:overlay,normal,normal;-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:1.5px rgba(237,237,237,.9);filter:grayscale(1) contrast(.9) brightness(.85)}
 .tag{position:absolute;z-index:5;left:var(--pad);bottom:clamp(40px,7vw,120px);padding:.5em .9em .55em;background:var(--ink);font:900 clamp(18px,3.4vw,52px)/1 var(--wide);letter-spacing:-.02em;transform:skewX(-8deg)}
 .intro{position:absolute;z-index:5;left:var(--pad);bottom:16%;display:grid;grid-template-columns:72px minmax(0,46ch);gap:20px;align-items:center;margin:0}
+/* lebar menengah: hero pendek sehingga intro yang diukur dari bawah naik menabrak kepala halaman; di rentang ini intro diukur dari bawah kepala */
+@media (min-width:881px) and (max-width:1199px){.intro{bottom:auto;top:calc(clamp(16px,2.6vw,40px) + 44px + 28px)}}
 .intro p{margin:0;font-size:clamp(15px,1.2vw,17px);line-height:1.55;color:var(--paper);text-shadow:0 0 14px rgba(0,0,0,.9),0 0 3px rgba(0,0,0,.9)}
 .globe{width:72px;height:72px;stroke:var(--paper);fill:none;stroke-width:1.2}
 html.js .hero .fit,html.js .hero .tag,html.js .intro{opacity:0;translate:0 6vh}
@@ -203,9 +205,13 @@ html.js .shot.in{clip-path:inset(0 0 0 0);transition:clip-path 1.2s cubic-bezier
 .is-scrolling a,.is-scrolling button{pointer-events:none}
 
 /* ---------- HP ---------- */
-@media (max-width:760px){
+@media (max-width:880px){
   .top{position:relative;padding:16px}
-  .top .sp{display:none}
+  /* HP: logo dan tombol bahasa sebaris (bahasa di kanan atas), pil nama turun ke baris kedua; .sp jadi pemutus baris, margin negatif membatalkan jarak baris gandanya */
+  .pill{order:-2}
+  .lang{order:-1;margin-left:auto}
+  .top .sp{order:0;flex-basis:100%;height:0;margin-top:-12px}
+  .who{order:1}
   .pill-e{width:84px;margin-left:-36px}
   .who{height:40px;padding-left:16px;font-size:13px}
   .chip{margin-left:10px;padding:0 14px 0 24px;font-size:12px}
@@ -534,7 +540,7 @@ main:focus,section:focus{outline:none}
 
   // ukuran huruf raksasa: diukur di 100px lalu diskalakan supaya satu baris pas selebar (atau setinggi) wadahnya
   function fit() {
-    var mob = innerWidth <= 760
+    var mob = innerWidth <= 880
     $$('[data-fit],[data-fitv]').forEach(function (el) {
       var vert = el.hasAttribute('data-fitv') && !mob
       var t = el.querySelector('.t.photo, .t.main') || el.querySelector('.t')
@@ -604,7 +610,7 @@ main:focus,section:focus{outline:none}
     var frame = function () {
       raf = 0
       var vh = innerHeight
-      var mob = innerWidth <= 760
+      var mob = innerWidth <= 880
       par.forEach(function (el) {
         // di HP baris hero tidak digeser supaya paragraf pembuka tidak menutupi FRONT-END
         if (mob && el.closest('.hero')) { el.style.transform = ''; return }
