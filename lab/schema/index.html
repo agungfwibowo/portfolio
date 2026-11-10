@@ -70,6 +70,10 @@ button{font:inherit;color:inherit}
 .glide.vp{transition:background-position .38s var(--ease),background-size .38s var(--ease)}
 .wires{position:absolute;left:0;top:0;width:1px;height:1px;overflow:visible;pointer-events:none}
 .m-list .wires{display:none}
+/* lebar dunia kanvas tidak boleh terbawa ke daftar (bikin halaman HP melebar dan ter-zoom out) */
+.m-list .world{width:auto!important;height:auto!important}
+/* zoom kecil: titik terlalu rapat, latar dibuat polos */
+.m-canvas .vp.nodots{background-image:none}
 
 /* garis relasi: aksen pink; garis putus-putus (disebut di deskripsi kerja) baru muncul saat disorot */
 .e{fill:none;stroke:var(--wire);stroke-width:1.6;stroke-linecap:round;opacity:.55;transition:opacity .3s,stroke-width .3s}
@@ -638,6 +642,7 @@ button.chip:hover{background:var(--tint);border-color:var(--wire)}
     vp.style.backgroundSize = g + 'px ' + g + 'px'
     vp.style.backgroundPosition = view.x + 'px ' + view.y + 'px'
     $('#zoomv').textContent = Math.round(view.s * 100) + '%'
+    vp.classList.toggle('nodots', view.s < 0.6)
   }
   var glideT
   function glide() {
@@ -773,7 +778,7 @@ button.chip:hover{background:var(--tint);border-color:var(--wire)}
     $('#v-canvas').setAttribute('aria-pressed', m === 'canvas')
     $('#v-list').setAttribute('aria-pressed', m === 'list')
     if (m === 'canvas') { layout(); initialView(); userMoved = false }
-    else { world.style.transform = ''; vp.style.backgroundSize = ''; vp.style.backgroundPosition = ''; world.classList.remove('lit') }
+    else { world.style.transform = ''; world.style.width = ''; world.style.height = ''; vp.classList.remove('nodots'); vp.style.backgroundSize = ''; vp.style.backgroundPosition = ''; world.classList.remove('lit') }
     if (save) try { localStorage.setItem('afw-schema-view', m) } catch (e) {}
   }
   $('#v-canvas').addEventListener('click', function () { setMode('canvas', true) })
