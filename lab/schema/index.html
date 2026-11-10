@@ -9,6 +9,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23151515'/%3E%3Ctext x='16' y='21.5' font-family='Arial' font-weight='700' font-size='12' fill='%23e3f45c' text-anchor='middle'%3EAFW%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<script>document.documentElement.classList.add('js', 'booting')</script>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 /* Arah visual: kanvas editor node dari referensi pemilik (mockup "Sundays"), diisi ERD sungguhan.
@@ -72,8 +73,7 @@ button{font:inherit;color:inherit}
 .m-list .wires{display:none}
 /* lebar dunia kanvas tidak boleh terbawa ke daftar (bikin halaman HP melebar dan ter-zoom out) */
 .m-list .world{width:auto!important;height:auto!important}
-/* zoom kecil: titik terlalu rapat, latar dibuat polos */
-.m-canvas .vp.nodots{background-image:none}
+
 
 /* garis relasi: aksen pink; garis putus-putus (disebut di deskripsi kerja) baru muncul saat disorot */
 .e{fill:none;stroke:var(--wire);stroke-width:1.6;stroke-linecap:round;opacity:.55;transition:opacity .3s,stroke-width .3s}
@@ -90,8 +90,11 @@ button{font:inherit;color:inherit}
   box-shadow:0 1px 2px rgba(21,21,21,.04),0 12px 28px -20px rgba(21,21,21,.28)}
 .m-canvas .card{position:absolute;width:var(--w)}
 .card-head{display:flex;align-items:center;gap:12px;padding:14px 16px 10px}
+/* mouse: seluruh kartu bisa diseret; layar sentuh: hanya kepala kartu, supaya badan kartu tetap bisa menggeser kanvas */
+@media (hover:hover) and (pointer:fine){.m-canvas .card{cursor:grab}}
 .m-canvas .card-head{cursor:grab}
-.m-canvas .grabbing .card-head{cursor:grabbing}
+.m-canvas .grabbing .card,.m-canvas .grabbing .card-head,.m-canvas .grabbing .rb{cursor:grabbing}
+.m-canvas .card.dragging{box-shadow:0 1px 2px rgba(21,21,21,.05),0 22px 40px -22px rgba(21,21,21,.4)}
 .tile{width:40px;height:40px;border-radius:11px;display:grid;place-items:center;flex:none}
 .tile svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .t-job{background:var(--lime);color:var(--ink)}
@@ -210,6 +213,41 @@ button.chip:hover{background:var(--tint);border-color:var(--wire)}
 .empty{color:var(--ink-2)}
 @media (max-width:880px){.panel{top:calc(var(--top) + 8px);left:8px;right:8px;bottom:8px;width:auto}}
 
+/* ---------- loader: dua tabel kecil lalu satu relasi yang tergambar, sampai font dimuat dan kanvas selesai ditata ---------- */
+#boot{position:fixed;inset:0;z-index:60;display:grid;place-content:center;justify-items:center;gap:14px;
+  background-color:var(--paper);background-image:radial-gradient(var(--dot) 1.1px,transparent 1.4px);background-size:24px 24px;
+  transition:opacity .35s var(--ease)}
+html:not(.js) #boot{display:none}
+#boot.done{opacity:0;pointer-events:none}
+#boot svg{width:240px;max-width:calc(100vw - 48px);height:auto;fill:none;stroke-linecap:round;stroke-linejoin:round;overflow:visible}
+#boot .bk{fill:#fff;stroke:var(--line-2);stroke-width:1.5;animation:bIn .4s var(--ease) both}
+#boot .b2{animation-delay:.15s}
+#boot .b3{animation-delay:.3s}
+#boot .rw{stroke:var(--line-2);stroke-width:3;animation:bIn .4s .2s var(--ease) both}
+/* baris yang tersambung jadi pink saat relasinya terhubung, seperti sorotan baris di kanvas */
+#boot .rc{animation:bIn .4s .2s var(--ease) both,bRow .3s 1.15s var(--ease) forwards}
+#boot .rc.c2{animation-delay:.2s,2s}
+@keyframes bRow{to{stroke:var(--wire)}}
+#boot .ln{stroke:var(--wire);stroke-width:2;stroke-dasharray:1;stroke-dashoffset:1;animation:bDraw .7s .5s var(--ease) forwards}
+#boot .ln.l2{animation-delay:1.35s}
+#boot .mk{stroke:var(--wire);stroke-width:2;opacity:0;animation:bIn .25s 1.15s forwards}
+#boot .pt{fill:#fff;stroke:var(--wire);stroke-width:2;opacity:0;animation:bIn .25s 1.15s forwards}
+#boot .m2{animation-delay:2s}
+#boot p{margin:0;font:400 12.5px/1.4 var(--mono);color:var(--ink-2);text-align:center;padding:0 24px}
+#boot .boot-h{margin-top:10px;font:700 26px/1.1 var(--wide);font-stretch:118%;letter-spacing:-.015em;color:var(--ink);animation:bIn .4s .2s var(--ease) both}
+@keyframes bIn{from{opacity:0}to{opacity:1}}
+@keyframes bDraw{to{stroke-dashoffset:0}}
+.booting body{overflow:hidden}
+/* selesai memuat: navbar turun dari atas, toolbar masuk dari luar (kiri di kanvas, bawah di daftar).
+   transisi hanya hidup selama .intro supaya ganti tampilan kanvas/daftar tidak ikut beranimasi */
+.booting .top{transform:translateY(-100%)}
+.booting.m-canvas .tools{transform:translateX(calc(-100% - 24px))}
+.booting.m-list .tools{transform:translate(-50%,calc(100% + 24px))}
+.booting .hint{opacity:0}
+.intro .top{transition:transform .6s .25s var(--ease)}
+.intro .tools{transition:transform .6s .4s var(--ease)}
+.intro .hint{transition:opacity .4s .75s}
+
 /* ---------- galat ---------- */
 .err{position:fixed;inset:var(--top) 0 0 0;display:grid;place-items:center;padding:24px;z-index:40;background:var(--paper)}
 .err[hidden]{display:none}
@@ -220,10 +258,30 @@ button.chip:hover{background:var(--tint);border-color:var(--wire)}
 @media (prefers-reduced-motion:reduce){
   .glide .world,.glide.vp{transition:none}
   .row.flash .rb{animation:none;background:var(--tint-2)}
+  #boot *{animation:none!important;opacity:1!important;stroke-dashoffset:0!important}
+  .intro .top,.intro .tools,.intro .hint{transition:none}
 }
 </style>
 </head>
 <body>
+<div id="boot" aria-hidden="true">
+  <svg viewBox="0 0 240 200">
+    <rect class="bk" x="2" y="52" width="64" height="56" rx="10"/>
+    <rect class="bk b2" x="150" y="2" width="64" height="56" rx="10"/>
+    <rect class="bk b3" x="174" y="142" width="64" height="56" rx="10"/>
+    <path class="rw" d="M14 80h26M162 18h32M162 42h24M186 158h30M186 182h22"/>
+    <path class="rw rc" d="M14 68h36M162 30h40"/>
+    <path class="rw rc c2" d="M14 92h32M186 170h40"/>
+    <path class="ln" pathLength="1" d="M66 68H78C110 68 112 30 138 30H150"/>
+    <path class="mk" d="M77 62v12M134 30l12-6M134 30h12M134 30l12 6"/>
+    <circle class="pt" cx="66" cy="68" r="3.5"/><circle class="pt" cx="150" cy="30" r="3.5"/>
+    <path class="ln l2" pathLength="1" d="M66 92H78C124 92 138 170 162 170H174"/>
+    <path class="mk m2" d="M77 86v12M158 170l12-6M158 170h12M158 170l12 6"/>
+    <circle class="pt m2" cx="66" cy="92" r="3.5"/><circle class="pt m2" cx="174" cy="170" r="3.5"/>
+  </svg>
+  <p class="boot-h" data-t="title">Portfolio schema</p>
+  <p id="boot-t"></p>
+</div>
 <a class="skip" href="#cards" data-t="skip">Skip to the diagram</a>
 
 <header class="top">
@@ -239,7 +297,7 @@ button.chip:hover{background:var(--tint);border-color:var(--wire)}
   </div>
 </header>
 
-<main id="main">
+<main id="main" aria-busy="true">
   <div class="vp" id="vp" tabindex="0" role="region" data-t-aria="vpAria">
     <div class="world" id="world">
       <svg class="wires" id="wires" aria-hidden="true"></svg>
@@ -292,10 +350,11 @@ button.chip:hover{background:var(--tint);border-color:var(--wire)}
       main: 'Main site', mainAria: 'Go to the main site', crumbAria: 'Page location', title: 'Portfolio schema',
       vpAria: 'Portfolio relationship diagram. Arrow keys pan, plus and minus zoom, 0 shows everything.',
       toolsAria: 'Canvas tools', fit: 'Show everything', zin: 'Zoom in', zout: 'Zoom out', vCanvas: 'Canvas view', vList: 'List view',
-      hint: 'Drag the canvas to pan · Ctrl + scroll to zoom · drag a card header to move it',
+      hint: 'Drag the canvas to pan · Ctrl + scroll to zoom · drag a card to move it',
       hintTouch: 'Drag with one finger to pan · pinch to zoom',
       lgT: 'How to read it', lgOne: 'one', lgMany: 'many', lgImp: 'named in a job description, shown on hover',
       sub: function (t, n) { return t + ' table · ' + n + (n === 1 ? ' row' : ' rows') },
+      boot: function (j, p, k) { return 'Linking ' + j + ' jobs, ' + p + ' projects, and ' + k + ' skills' },
       tbl: { profile: 'profile', jobs: 'jobs', pros: 'projects', skl: 'skills', edu: 'education', contact: 'contact' },
       tProfile: 'Profile', tJobs: 'Work', tPros: 'Projects', tEdu: 'Education', tContact: 'Contact',
       sc: {
@@ -322,10 +381,11 @@ button.chip:hover{background:var(--tint);border-color:var(--wire)}
       main: 'Situs utama', mainAria: 'Ke situs utama', crumbAria: 'Lokasi halaman', title: 'Skema portofolio',
       vpAria: 'Diagram relasi portofolio. Tombol panah untuk menggeser, plus dan minus untuk zoom, 0 untuk menampilkan semua.',
       toolsAria: 'Alat kanvas', fit: 'Tampilkan semua', zin: 'Perbesar', zout: 'Perkecil', vCanvas: 'Tampilan kanvas', vList: 'Tampilan daftar',
-      hint: 'Seret kanvas untuk menggeser · Ctrl + gulir untuk zoom · seret kepala kartu untuk memindahkannya',
+      hint: 'Seret kanvas untuk menggeser · Ctrl + gulir untuk zoom · seret kartu untuk memindahkannya',
       hintTouch: 'Geser dengan satu jari · cubit untuk zoom',
       lgT: 'Cara membaca', lgOne: 'satu', lgMany: 'banyak', lgImp: 'disebut di deskripsi kerja, muncul saat disorot',
       sub: function (t, n) { return 'tabel ' + t + ' · ' + n + ' baris' },
+      boot: function (j, p, k) { return 'Menghubungkan ' + j + ' pekerjaan, ' + p + ' proyek, dan ' + k + ' keahlian' },
       tbl: { profile: 'profil', jobs: 'pekerjaan', pros: 'proyek', skl: 'keahlian', edu: 'pendidikan', contact: 'kontak' },
       tProfile: 'Profil', tJobs: 'Pekerjaan', tPros: 'Proyek', tEdu: 'Pendidikan', tContact: 'Kontak',
       sc: {
@@ -376,9 +436,20 @@ button.chip:hover{background:var(--tint);border-color:var(--wire)}
     $('#hint').textContent = coarse ? t.hintTouch : t.hint
   }
 
+  // loader hilang setelah garisnya selesai tergambar (sekitar 2,7 detik sejak halaman dibuka), tidak lebih lama dari itu
+  function unboot(now) {
+    var b = $('#boot'); if (!b || b.classList.contains('done')) return
+    setTimeout(function () {
+      b.classList.add('done'); root.classList.add('intro'); root.classList.remove('booting'); $('#main').removeAttribute('aria-busy')
+      setTimeout(function () { root.classList.remove('intro') }, 1300)
+      setTimeout(function () { b.remove() }, 400)
+    }, now || reduce ? 0 : Math.max(0, 2700 - performance.now()))
+  }
+
   var S = window.SITE
   if (!S || !S.id || !S.id.projects) {
     chrome()
+    unboot(true)
     $('#err').hidden = false
     $('#err-reload').addEventListener('click', function () { location.reload() })
     $('#lang-btn').addEventListener('click', function () { lang = lang === 'id' ? 'en' : 'id'; t = T[lang]; chrome() })
@@ -638,11 +709,21 @@ button.chip:hover{background:var(--tint);border-color:var(--wire)}
   function used() { userMoved = true; root.classList.add('used') }
   function apply() {
     world.style.transform = 'translate(' + view.x + 'px,' + view.y + 'px) scale(' + view.s + ')'
-    var g = 24 * view.s
+    // zoom kecil: hanya tiap titik ke-2/ke-4 yang tampil, supaya jarak di layar tetap >= 18px dan tidak terlihat rapat
+    var step = 24
+    while (step * view.s < 18) step *= 2
+    var g = step * view.s
     vp.style.backgroundSize = g + 'px ' + g + 'px'
-    vp.style.backgroundPosition = view.x + 'px ' + view.y + 'px'
+    // titik digambar di tengah petak; geser setengah petak supaya titik selalu di kelipatan 24px kanvas,
+    // jadi saat jarak dikali dua titik yang tersisa tetap titik yang sama (tidak melompat)
+    vp.style.backgroundPosition = (view.x - g / 2) + 'px ' + (view.y - g / 2) + 'px'
+    // loader menutup seluruh layar (termasuk navbar): pakai kisi yang sama supaya titik tidak melompat saat loader memudar
+    var bt = document.getElementById('boot')
+    if (bt) {
+      bt.style.backgroundSize = vp.style.backgroundSize
+      bt.style.backgroundPosition = (view.x - g / 2) + 'px ' + (view.y - g / 2 + vp.getBoundingClientRect().top) + 'px'
+    }
     $('#zoomv').textContent = Math.round(view.s * 100) + '%'
-    vp.classList.toggle('nodots', view.s < 0.6)
   }
   var glideT
   function glide() {
@@ -715,7 +796,8 @@ button.chip:hover{background:var(--tint);border-color:var(--wire)}
       drag = null; moved = true
       return
     }
-    var h = e.target.closest('.card-head'), card = h && h.closest('.card')
+    var card = e.pointerType === 'mouse' ? e.target.closest('.card') : (e.target.closest('.card-head') || {}).parentNode
+    if (card && !card.classList.contains('card')) card = null
     drag = { id: e.pointerId, x0: e.clientX, y0: e.clientY, vx: view.x, vy: view.y, on: false,
       card: card ? card.dataset.card : null, p: card ? pos[card.dataset.card].slice() : null }
   })
@@ -736,7 +818,7 @@ button.chip:hover{background:var(--tint);border-color:var(--wire)}
       drag.on = true; moved = true; used()
       try { vp.setPointerCapture(e.pointerId) } catch (er) {}
       vp.classList.add('grabbing')
-      if (drag.card) { manual[drag.card] = 1; cardEl[drag.card].style.zIndex = ++zTop }
+      if (drag.card) { manual[drag.card] = 1; cardEl[drag.card].style.zIndex = ++zTop; cardEl[drag.card].classList.add('dragging') }
     }
     if (drag.card) {
       pos[drag.card] = [drag.p[0] + dx / view.s, drag.p[1] + dy / view.s]
@@ -746,9 +828,11 @@ button.chip:hover{background:var(--tint);border-color:var(--wire)}
   function endPtr(e) {
     delete ptrs[e.pointerId]
     if (pinch && Object.keys(ptrs).length < 2) pinch = null
-    if (drag && drag.id === e.pointerId) { drag = null; vp.classList.remove('grabbing') }
+    if (drag && drag.id === e.pointerId) { if (drag.card) cardEl[drag.card].classList.remove('dragging'); drag = null; vp.classList.remove('grabbing') }
   }
   vp.addEventListener('pointerup', endPtr)
+  // seret bawaan browser pada tautan/gambar memotong seretan kartu
+  vp.addEventListener('dragstart', function (e) { if (isCanvas()) e.preventDefault() })
   vp.addEventListener('pointercancel', endPtr)
   // seretan bukan klik
   vp.addEventListener('click', function (e) { if (moved) { e.stopPropagation(); e.preventDefault(); moved = false } }, true)
@@ -778,7 +862,7 @@ button.chip:hover{background:var(--tint);border-color:var(--wire)}
     $('#v-canvas').setAttribute('aria-pressed', m === 'canvas')
     $('#v-list').setAttribute('aria-pressed', m === 'list')
     if (m === 'canvas') { layout(); initialView(); userMoved = false }
-    else { world.style.transform = ''; world.style.width = ''; world.style.height = ''; vp.classList.remove('nodots'); vp.style.backgroundSize = ''; vp.style.backgroundPosition = ''; world.classList.remove('lit') }
+    else { world.style.transform = ''; world.style.width = ''; world.style.height = ''; vp.style.backgroundSize = ''; vp.style.backgroundPosition = ''; world.classList.remove('lit') }
     if (save) try { localStorage.setItem('afw-schema-view', m) } catch (e) {}
   }
   $('#v-canvas').addEventListener('click', function () { setMode('canvas', true) })
@@ -882,10 +966,11 @@ button.chip:hover{background:var(--tint);border-color:var(--wire)}
   chrome(); renderCards()
   setMode(saved === 'canvas' || saved === 'list' ? saved : (innerWidth > 880 ? 'canvas' : 'list'))
   // tinggi kartu berubah setelah font dimuat: hitung ulang garis, dan pas-kan lagi kalau pengunjung belum menggeser
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () {
-    if (!isCanvas()) return
-    layout(); if (!userMoved) initialView()
-  })
+  $('#boot-t').textContent = t.boot(JOBS.length, PROS.length, skills.length)
+  function settle() { if (isCanvas()) { layout(); if (!userMoved) initialView() } unboot() }
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(settle)
+  // font lambat atau gagal: jangan tahan pengunjung lebih dari 4 detik
+  setTimeout(unboot, 4000)
   var rz
   addEventListener('resize', function () { clearTimeout(rz); rz = setTimeout(function () { if (isCanvas() && !userMoved) initialView() }, 150) })
 })()
